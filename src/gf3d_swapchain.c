@@ -230,12 +230,14 @@ int gf3d_swapchain_get_presentation_mode()
 {
     int i;
     int chosen = -1;
-    for (i = 0; i < gf3d_swapchain.formatCount; i++)
+    for (i = 0; i < gf3d_swapchain.presentModeCount; i++)
     {
         if (gf3d_swapchain.presentModes[i] == VK_PRESENT_MODE_MAILBOX_KHR)
             return i;
         chosen = i;
+		
     }
+
     return chosen;
 }
 

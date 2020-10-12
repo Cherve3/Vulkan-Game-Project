@@ -229,7 +229,7 @@ void gf3d_vgraphics_setup(
     gf3d_vgraphics.vk_app_info.apiVersion = VK_API_VERSION_1_2;
     
     gf3d_vgraphics.vk_instance_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-    gf3d_vgraphics.vk_instance_info.pNext = NULL;
+	gf3d_vgraphics.vk_instance_info.pNext = NULL;
     gf3d_vgraphics.vk_instance_info.pApplicationInfo = &gf3d_vgraphics.vk_app_info;
     
     if (enableValidation)
@@ -389,6 +389,7 @@ VkDeviceCreateInfo gf3d_vgraphics_get_device_info(Bool enableValidationLayers)
     {
         createInfo.enabledLayerCount = gf3d_validation_get_validation_layer_count();
         createInfo.ppEnabledLayerNames = gf3d_validation_get_validation_layer_names();
+		
     }
     else
     {

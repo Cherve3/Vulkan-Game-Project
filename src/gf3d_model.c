@@ -109,6 +109,7 @@ void gf3d_model_delete(Model *model)
 
     gf3d_mesh_free(model->mesh);
     gf3d_texture_free(model->texture);
+	memset(model,0 , sizeof(Model));
 }
 
 void gf3d_model_draw(Model *model,Uint32 bufferFrame, VkCommandBuffer commandBuffer,Matrix4 modelMat)
