@@ -27,4 +27,10 @@ Uint32 gf3d_validation_get_validation_layer_count();
  */
 const char* const* gf3d_validation_get_validation_layer_names();
 
+/**
+* @brief 
+* @return 
+*/
+VkValidationFlagsEXT gf3d_validation_flag_properties();
+
 #endif

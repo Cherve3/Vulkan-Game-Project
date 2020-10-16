@@ -71,6 +71,29 @@ Entity *gf3d_entity_new()
 	return NULL;
 }
 
+void gf3d_entity_update(Entity *self){
+	if (!self) return;
+	if (!self->update) return;
+	//vector3D_add(self->position, self->position, self->velocity);
+}
+
+void gf3d_entity_think(Entity *self)
+{
+	if (!self)return;
+	if (!self->think)return; // No think function
+	self->think(self);
+}
+
+void gf3d_entity_think_all()
+{
+	int i;
+	for (i = 0; i < gf3d_entity.entity_count; i++)
+	{
+		if (!gf3d_entity.entity_list[i]._inuse) continue;
+		gf3d_entity_think(&gf3d_entity.entity_list[i]);
+	}
+}
+
 void gf3d_entity_draw(Entity *self, Uint32 bufferFrame, VkCommandBuffer commandBuffer)
 {
 	if (!self) return;

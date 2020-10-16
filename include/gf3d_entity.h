@@ -13,9 +13,17 @@
 typedef struct Entity_S
 {
 	Uint8		_inuse;		/**<flag to make sure entities are not re-assigned while active*/
+	Vector3D	position;
+	Vector3D	velocity;
+	Vector3D	rotation;
+	Vector3D	scale;
 	Model		*model;
 	Matrix4		modelMatrix;
+	void		(*update)(struct Entity_S *self);
 	void		(*think)(struct Entity_S *self);
+	void		(*touch)(struct Entity_S *self);
+	void		(*damage)(struct Entity_S *self);
+	void		(*die)(struct Entity_S *self);
 }Entity;
 
 /**
@@ -44,6 +52,11 @@ void gf3d_entity_draw(Entity *self, Uint32 bufferFrame, VkCommandBuffer commandB
  *	@param commandBuffer the command to populate with this draw command
  */
 void gf3d_entity_draw_all(Uint32 bufferFrame, VkCommandBuffer commandBuffer);
+
+/**
+ *	@brief call think function for all active entities
+ */
+void gf3d_entity_think_all();
 
 /**
  *	@brief free an entity so it can be reused by the system

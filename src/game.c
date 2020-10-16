@@ -12,6 +12,8 @@
 #include "gf3d_texture.h"
 #include "gf3d_entity.h"
 
+#include "rpg_player.h"
+
 int main(int argc,char *argv[])
 {
     int done = 0;
@@ -21,6 +23,8 @@ int main(int argc,char *argv[])
     Uint32 bufferFrame = 0;
     VkCommandBuffer commandBuffer;
 	Entity *ent1 = NULL;
+	Entity *player = NULL;
+	Entity *goblin = NULL;
     
     for (a = 1; a < argc;a++)
     {
@@ -47,10 +51,20 @@ int main(int argc,char *argv[])
     // main game loop
     slog("gf3d main loop begin");
 	
-	ent1 = gf3d_entity_new();
-	if (ent1)
+	player = rpg_player_new();
+	goblin = gf3d_entity_new();
+	if (goblin)
 	{
-		ent1->model = gf3d_model_load("dino");
+		goblin->model = gf3d_model_load("goblin");
+		gfc_matrix_make_translation(goblin->modelMatrix, vector3d(gfc_crandom() * 5, gfc_crandom() * 5, gfc_crandom() * 5));
+		gfc_matrix_rotate(goblin->modelMatrix, goblin->modelMatrix,0.002, vector3d(0, 0, 1));
+	}
+
+	if (player)
+	{
+		player->model = gf3d_model_load("dino");
+		player->think = rpg_player_think;
+		player->position = vector3d(0, 0, 0);
 	}
 
     while(!done)
@@ -59,14 +73,14 @@ int main(int argc,char *argv[])
         keys = SDL_GetKeyboardState(NULL); // get the keyboard state for this frame
         //update game things here
         
-        gf3d_vgraphics_rotate_camera(0.001);
-        gfc_matrix_rotate(
-            ent1->modelMatrix,
-            ent1->modelMatrix,
-            0.002,
-            vector3d(1,0,0));
+		//SDL_CaptureMouse(0);
+		SDL_ShowCursor(0);
+        //gf3d_vgraphics_rotate_camera(0.001);
 
-        // configure render command for graphics command pool
+		gf3d_entity_think_all();
+		gfc_matrix_rotate(goblin->modelMatrix, goblin->modelMatrix, 0.002, vector3d(0, 0, 1));
+		
+		// configure render command for graphics command pool
         // for each mesh, get a command and configure it from the pool
         bufferFrame = gf3d_vgraphics_render_begin();
 			gf3d_pipeline_reset_frame(gf3d_vgraphics_get_graphics_pipeline(),bufferFrame);
