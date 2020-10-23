@@ -1,6 +1,6 @@
-#include "gfc_matrix.h"
-
 #include <string.h>
+
+#include "gf3d_camera.h"
 
 Matrix4 gf3d_camera = {0};
 

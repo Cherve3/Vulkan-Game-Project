@@ -6,6 +6,8 @@
 
 #include "gf3d_model.h"
 
+#include "rpg_collision.h"
+
 /**
  *	@purpose this is the file to access the entity management system
  */
@@ -13,12 +15,15 @@
 typedef struct Entity_S
 {
 	Uint8		_inuse;		/**<flag to make sure entities are not re-assigned while active*/
+	char *		name;
 	Vector3D	position;
 	Vector3D	velocity;
 	Vector3D	rotation;
 	Vector3D	scale;
 	Model		*model;
 	Matrix4		modelMatrix;
+	BoxCollider boxCollider;
+
 	void		(*update)(struct Entity_S *self);
 	void		(*think)(struct Entity_S *self);
 	void		(*touch)(struct Entity_S *self);
@@ -64,5 +69,11 @@ void gf3d_entity_think_all();
  *	@note the pointer should be set to zero and no longer used.
  */
 void gf3d_entity_free(Entity *self);
+
+/**
+ *	@brief check if the entity collided with another entity
+ *	@param self the entity colliding
+ */
+int gf3d_entity_collision_test(Entity *self);
 
 #endif

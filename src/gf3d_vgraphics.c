@@ -23,6 +23,7 @@
 #include "gf3d_pipeline.h"
 #include "gf3d_commands.h"
 #include "gf3d_texture.h"
+#include "gf3d_camera.h"
 
 
 typedef struct
@@ -107,19 +108,23 @@ void gf3d_vgraphics_init(
     gfc_matrix_identity(gf3d_vgraphics.ubo.proj);
     gfc_matrix_view(
         gf3d_vgraphics.ubo.view,
-        vector3d(2,40,2),
+        vector3d(1,40,5),
         vector3d(0,0,0),
         vector3d(0,0,1)
     );
     gfc_matrix_perspective(
         gf3d_vgraphics.ubo.proj,
-        45 * GFC_DEGTORAD,
+        80 * GFC_DEGTORAD,
         renderWidth/(float)renderHeight,
-        0.1f,
-        100
+        1.0f,
+        1000
     );
     
     gf3d_vgraphics.ubo.proj[1][1] *= -1;
+	
+	gf3d_camera_set_view(gf3d_vgraphics.ubo.view);
+	//gf3d_camera_set_view(gf3d_vgraphics.ubo.view);
+	//gf3d_camera_set_view(gf3d_vgraphics.ubo.view);
 
     gf3d_vgraphics_setup(
         windowName,
@@ -658,13 +663,23 @@ uint32_t gf3d_vgraphics_find_memory_type(uint32_t typeFilter, VkMemoryPropertyFl
     return 0;
 }
 
-void gf3d_vgraphics_rotate_camera(float degrees)
+void gf3d_vgraphics_rotate_z(float degrees)
 {
     gfc_matrix_rotate(
         gf3d_vgraphics.ubo.view,
         gf3d_vgraphics.ubo.view,
         degrees,
         vector3d(0,0,1));
+
+}
+
+void gf3d_vgraphics_rotate_x(float degrees)
+{
+	gfc_matrix_rotate(
+		gf3d_vgraphics.ubo.view,
+		gf3d_vgraphics.ubo.view,
+		degrees,
+		vector3d(1, 0, 0));
 
 }
 

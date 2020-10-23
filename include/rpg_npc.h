@@ -1,16 +1,16 @@
-#ifndef __RPG_PLAYER_H__
-#define __RPG_PLAYER_H__
+#ifndef __RPG_NPC_H__
+#define __RPG_NPC_H__
 
 #include "gf3d_entity.h"
 
 /**
-*	@purpose this is the definition file for a player character.
-*/
+ *	@purpose this is the definition file for an NPC character.
+ */
 
 
 typedef struct{
 	char* name;
-	
+
 	Uint8 level;
 	Uint32 exp;
 
@@ -23,7 +23,7 @@ typedef struct{
 	Uint8 stamina;
 	Uint8 stamina_max;			//100
 	Uint8 stamina_regen;		//10
-	
+
 	float carry_weight;
 
 	Uint8 strength;
@@ -43,29 +43,29 @@ typedef struct{
 	Uint8 luck;
 	Uint8 luck_max;
 
-}pStats;
+}npcStats;
 
 typedef struct{
 	//Spellbook
 	//Bag slots
 	Uint8 spell;
-}pInventory;
+}npcInventory;
 
 /**
- *	@brief initialize a player character
- */
-void rpg_player_init();
-
-/**
- *	@brief runs gf3d_entity_new function to add player to entity system
- *	@return NULL on error or a pointer to an entity otherwise
- */
-Entity *rpg_player_new();
-
-/**
-*	@brief called once per frame to update player state
-*	@param self the player that is being updated
+*	@brief initialize an NPC character
 */
-void rpg_player_think(Entity *self);
+void rpg_npc_init();
+
+/**
+*	@brief runs gf3d_entity_new function to add an NPC to entity system
+*	@return NULL on error or a pointer to an entity otherwise
+*/
+Entity *rpg_npc_new();
+
+/**
+ *	@brief called once per frame to update NPC state
+ *	@param self the NPC that is being updated
+ */
+void rpg_npc_think(Entity *self);
 
 #endif
