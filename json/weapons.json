@@ -1,0 +1,9 @@
+{
+    "weapons":[
+        {"ItemType":2, "damage":5, "weight": 5, "name":"dagger", "description":"A Small pointy blade."},
+        {"ItemType":2, "damage":10, "weight": 20, "name":"hammer", "description":"A midsize blunt weapon."},
+        {"ItemType":2, "damage":10, "weight": 15, "name":"sword", "description":"A midsize pointy blade."},
+        {"ItemType":2, "damage":5, "weight": 5, "name":"bow", "description":"A curved wood with a string attached.."}
+        
+    ]
+}

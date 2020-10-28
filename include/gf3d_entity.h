@@ -24,11 +24,11 @@ typedef struct Entity_S
 	Matrix4		modelMatrix;
 	BoxCollider boxCollider;
 
-	void		(*update)(struct Entity_S *self);
-	void		(*think)(struct Entity_S *self);
-	void		(*touch)(struct Entity_S *self);
-	void		(*damage)(struct Entity_S *self);
-	void		(*die)(struct Entity_S *self);
+	void		(*update)	(struct Entity_S *self);
+	void		(*think)	(struct Entity_S *self);
+	void		(*touch)	(struct Entity_S *self);
+	void		(*damage)	(struct Entity_S *self);
+	void		(*die)		(struct Entity_S *self);
 }Entity;
 
 /**

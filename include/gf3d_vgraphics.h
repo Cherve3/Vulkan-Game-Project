@@ -49,6 +49,8 @@ VkBuffer gf3d_vgraphics_get_uniform_buffer_by_index(Uint32 index);
 
 UniformBufferObject gf3d_vgraphics_get_uniform_buffer_object();
 
+Matrix4 *gf3d_vgraphics_get_ubo_view();
+
 Pipeline *gf3d_vgraphics_get_graphics_pipeline();
 
 Command *gf3d_vgraphics_get_graphics_command_pool();

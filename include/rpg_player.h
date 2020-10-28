@@ -2,13 +2,17 @@
 #define __RPG_PLAYER_H__
 
 #include "gf3d_entity.h"
+#include "rpg_items.h"
+#include "rpg_spellbook.h"
 
 /**
 *	@purpose this is the definition file for a player character.
 */
 
 
-typedef struct{
+
+typedef struct PStats_S
+{
 	char* name;
 	
 	Uint8 level;
@@ -45,12 +49,17 @@ typedef struct{
 
 }pStats;
 
-typedef struct{
-	//Spellbook
-	//Bag slots
-	Uint8 spell;
+typedef struct PInventory_S{
+	Spell *spellbook;
+	Item *bag;
 }pInventory;
 
+typedef struct Player_S
+{
+	Entity *ent;
+	pStats stats;
+	pInventory inventory;
+}Player;
 /**
  *	@brief initialize a player character
  */
@@ -67,5 +76,19 @@ Entity *rpg_player_new();
 *	@param self the player that is being updated
 */
 void rpg_player_think(Entity *self);
+
+void rpg_player_free(Player *player);
+
+void rpg_player_inventory_free(pInventory *inventory);
+
+void rpg_player_bag_free(Item *bag);
+
+Entity *get_player_entity();
+
+Player *get_player();
+
+pStats get_player_stats();
+
+pInventory get_player_inventory();
 
 #endif

@@ -109,12 +109,13 @@ void gf3d_vgraphics_init(
     gfc_matrix_view(
         gf3d_vgraphics.ubo.view,
         vector3d(1,40,5),
-        vector3d(0,0,0),
+        vector3d(1,1,0),
         vector3d(0,0,1)
     );
+
     gfc_matrix_perspective(
         gf3d_vgraphics.ubo.proj,
-        80 * GFC_DEGTORAD,
+        70 * GFC_DEGTORAD,
         renderWidth/(float)renderHeight,
         1.0f,
         1000
@@ -122,9 +123,6 @@ void gf3d_vgraphics_init(
     
     gf3d_vgraphics.ubo.proj[1][1] *= -1;
 	
-	gf3d_camera_set_view(gf3d_vgraphics.ubo.view);
-	//gf3d_camera_set_view(gf3d_vgraphics.ubo.view);
-	//gf3d_camera_set_view(gf3d_vgraphics.ubo.view);
 
     gf3d_vgraphics_setup(
         windowName,
@@ -142,7 +140,7 @@ void gf3d_vgraphics_init(
     gf3d_mesh_init(1024);//TODO: pull this from a parameter
     gf3d_texture_init(1024);
     gf3d_pipeline_init(4);// how many different rendering pipelines we need
-    gf3d_vgraphics.pipe = gf3d_pipeline_basic_model_create(device,"shaders/vert.spv","shaders/frag.spv",gf3d_vgraphics_get_view_extent(),1024);
+    gf3d_vgraphics.pipe = gf3d_pipeline_basic_model_create(device,"shaders/vert.spv","shaders/frag.spv",gf3d_vgraphics_get_view_extent(),2048);
     gf3d_model_manager_init(1024,gf3d_swapchain_get_swap_image_count(),device);
 	gf3d_command_system_init(8 * gf3d_swapchain_get_swap_image_count(), device);
 
@@ -696,6 +694,11 @@ Command *gf3d_vgraphics_get_graphics_command_pool()
 UniformBufferObject gf3d_vgraphics_get_uniform_buffer_object()
 {
     return gf3d_vgraphics.ubo;
+}
+
+Matrix4 *gf3d_vgraphics_get_ubo_view()
+{
+	return gf3d_vgraphics.ubo.view;
 }
 
 VkImageView gf3d_vgraphics_create_image_view(VkImage image, VkFormat format)

@@ -39,26 +39,6 @@ void gf3d_validation_query_layer_properties()
     }
 }
 
-VkValidationFlagsEXT gf3d_validation_flag_properties(){
-	int i;
-	const char* const layer = { "VK_LAYER_LUNARG_screenshot" };
-	slog("Layer List: %s", layer);
-
-	gf3d_validation_flags.sType = VK_STRUCTURE_TYPE_VALIDATION_FLAGS_EXT;
-	gf3d_validation_flags.pNext = NULL;
-	gf3d_validation_flags.disabledValidationCheckCount = 1;
-	gf3d_validation_flags.pDisabledValidationChecks = gfc_allocate_array(sizeof(const char *), gf3d_validation_flags.disabledValidationCheckCount);
-	slog("Validation disable count: %i", gf3d_validation_flags.disabledValidationCheckCount);
-
-	for (i = 0; i < gf3d_validation.layerCount; i++){
-		if (strcmp(gf3d_validation.availableLayers[i].layerName, "VK_LAYER_LUNARG_screenshot") == 0){
-			gf3d_validation_flags.pDisabledValidationChecks = layer;
-		}
-	}
-	slog("Disabled Validation Checks: %s", layer);// gf3d_validation_flags.pDisabledValidationChecks);
-
-	return gf3d_validation_flags;
-}
 
 void gf3d_validation_close()
 {

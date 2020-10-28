@@ -3,6 +3,9 @@
 
 #include "gf3d_entity.h"
 
+#include "rpg_items.h"
+#include "rpg_spellbook.h"
+
 /**
  *	@purpose this is the definition file for an NPC character.
  */
@@ -46,9 +49,8 @@ typedef struct{
 }npcStats;
 
 typedef struct{
-	//Spellbook
-	//Bag slots
-	Uint8 spell;
+	Spell *spellbook;
+	Item *bag;
 }npcInventory;
 
 /**
