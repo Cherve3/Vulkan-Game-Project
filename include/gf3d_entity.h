@@ -16,10 +16,12 @@ typedef struct Entity_S
 {
 	Uint8		_inuse;		/**<flag to make sure entities are not re-assigned while active*/
 	char *		name;
+
 	Vector3D	position;
-	Vector3D	velocity;
 	Vector3D	rotation;
-	Vector3D	scale;
+	Vector3D	direction;
+	Vector3D	velocity;
+
 	Model		*model;
 	Matrix4		modelMatrix;
 	BoxCollider boxCollider;
@@ -57,6 +59,11 @@ void gf3d_entity_draw(Entity *self, Uint32 bufferFrame, VkCommandBuffer commandB
  *	@param commandBuffer the command to populate with this draw command
  */
 void gf3d_entity_draw_all(Uint32 bufferFrame, VkCommandBuffer commandBuffer);
+
+/**
+*	@brief call update function for all active entities
+*/
+void gf3d_entity_update_all();
 
 /**
  *	@brief call think function for all active entities

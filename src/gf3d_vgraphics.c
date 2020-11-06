@@ -106,19 +106,13 @@ void gf3d_vgraphics_init(
     gfc_matrix_identity(gf3d_vgraphics.ubo.model);
     gfc_matrix_identity(gf3d_vgraphics.ubo.view);
     gfc_matrix_identity(gf3d_vgraphics.ubo.proj);
-    gfc_matrix_view(
-        gf3d_vgraphics.ubo.view,
-        vector3d(1,40,5),
-        vector3d(1,1,0),
-        vector3d(0,0,1)
-    );
 
     gfc_matrix_perspective(
         gf3d_vgraphics.ubo.proj,
         70 * GFC_DEGTORAD,
         renderWidth/(float)renderHeight,
         1.0f,
-        1000
+        1500
     );
     
     gf3d_vgraphics.ubo.proj[1][1] *= -1;
@@ -468,7 +462,7 @@ void gf3d_vgraphics_render_end(Uint32 imageIndex)
 }
 
 /**
- * VULKAN DEVEICE SUPPORT
+ * VULKAN DEVICE SUPPORT
  */
 
 Bool gf3d_vgraphics_device_validate(VkPhysicalDevice device)

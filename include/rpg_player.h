@@ -21,8 +21,8 @@ typedef struct PStats_S
 	Uint8 life;
 	Uint8 life_max;				//100
 	Uint8 life_regen;			//10
-	Uint8 magic;
-	Uint8 magic_max;			//100
+	Uint8 mana;
+	Uint8 mana_max;			//100
 	Uint8 magic_regen;			//10
 	Uint8 stamina;
 	Uint8 stamina_max;			//100

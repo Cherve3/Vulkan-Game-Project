@@ -1,47 +1,83 @@
 #include <string.h>
 
+#include "simple_logger.h"
+#include "gfc_matrix.h"
+
+#include "gf3d_vgraphics.h"
 #include "gf3d_camera.h"
 
-Matrix4 gf3d_camera = {0};
 
-void gf3d_camera_get_view(Matrix4 *view)
+static Camera camera;
+
+void gf3d_camera_init()
 {
-    if (!view)return;
-    memcpy(view,gf3d_camera,sizeof(Matrix4));
+	camera.view = gf3d_vgraphics_get_ubo_view();
+	camera.position = vector3d(0, -10, -20);
+	camera.forward = vector3d(0, 1, 0);
+	camera.up = vector3d(0, 0, 1);
+	camera.rotation = vector3d(0, 0, 0);
+
+	vector3d_normalize(&camera.forward);
+	vector3d_normalize(&camera.up);
+
+	//Translate Camera Z
+	//gfc_matrix_rotate(camera.view, camera.view, 90, vector_forward());
+	gfc_matrix_new_translation(camera.view, camera.position);
+	float angle = 180 * GFC_DEGTORAD;
+	gfc_matrix_rotate(camera.view,camera.view,angle, vector_up());
+	
 }
 
-void gf3d_camera_set_view(Matrix4 *view)
+void camera_update()
 {
-    if (!view)return;
-    memcpy(gf3d_camera,view,sizeof(Matrix4));
+	SDL_Event event;
+	while (SDL_PollEvent(&event))
+	{
+		if (event.type == SDL_MOUSEWHEEL)
+		{
+			if (event.wheel.y > 0) // scroll up
+			{
+				gf3d_camera_move(vector3d(0, 0, event.wheel.y));
+			}
+			else if (event.wheel.y < 0) // scroll down
+			{
+				gf3d_camera_move(vector3d(0, 0, event.wheel.y));
+			}
+		}
+	}
 }
 
-void gf3d_camera_look_at(
-    Vector3D position,
-    Vector3D target,
-    Vector3D up
-)
+Matrix4 *gf3d_get_camera()
 {
-    gfc_matrix_view(
-        gf3d_camera,
-        position,
-        target,
-        up
-    );
+	return camera.view;
+}
+
+void gf3d_camera_look_at(Vector3D position, Vector3D target, Vector3D up)
+{
+	gfc_matrix_view(
+		camera.view,
+		position,
+		target,
+		up
+		);
+}
+
+Vector3D gf3d_camera_get_position()
+{
+	return camera.position;
 }
 
 void gf3d_camera_set_position(Vector3D position)
 {
-    gf3d_camera[0][3] = position.x;
-    gf3d_camera[1][3] = position.y;
-    gf3d_camera[2][3] = position.z;
+	camera.position.x = position.x;
+	camera.position.y = position.y;
+	camera.position.z = position.z;
 }
 
 void gf3d_camera_move(Vector3D move)
 {
-    gf3d_camera[0][3] += move.x;
-    gf3d_camera[1][3] += move.y;
-    gf3d_camera[2][3] += move.z;
+	vector3d_add(camera.position, camera.position, move);
+	gfc_matrix_translate(camera.view, move);
 }
 
 /*eol@eof*/

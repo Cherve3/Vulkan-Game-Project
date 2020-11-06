@@ -49,7 +49,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>C:\Users\rckal\OneDrive\Desktop\School Stuff\libs\SDL2-2.0.12\include;C:\Users\rckal\OneDrive\Desktop\School Stuff\libs\SDL2_ttf-2.0.15\include;C:\Users\rckal\OneDrive\Desktop\School Stuff\libs\SDL2_mixer-2.0.4\include;C:\Users\rckal\OneDrive\Desktop\School Stuff\libs\SDL2_image-2.0.5\include;C:\Users\rckal\OneDrive\Desktop\School Stuff\Vulkan-Game-Project\include;C:\Users\rckal\OneDrive\Desktop\School Stuff\Vulkan-Game-Project\gfc\include;C:\Users\rckal\OneDrive\Desktop\School Stuff\Vulkan-Game-Project\gfc\simple_json\include;C:\Users\rckal\OneDrive\Desktop\School Stuff\Vulkan-Game-Project\gfc\simple_logger\include;C:\VulkanSDK\1.2.154.1\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\rckal\OneDrive\Desktop\School Stuff\libs\SDL2-2.0.12\lib\x86;C:\Users\rckal\OneDrive\Desktop\School Stuff\libs\SDL2_ttf-2.0.15\lib\x86;C:\Users\rckal\OneDrive\Desktop\School Stuff\libs\SDL2_mixer-2.0.4\lib\x86;C:\Users\rckal\OneDrive\Desktop\School Stuff\libs\SDL2_image-2.0.5\lib\x86;C:\VulkanSDK\1.2.154.1\Lib32;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\Git\libs\SDL2-2.0.12\lib\x86;C:\Git\libs\SDL2_ttf-2.0.15\lib\x86;C:\Git\libs\SDL2_mixer-2.0.4\lib\x86;C:\Git\libs\SDL2_image-2.0.5\lib\x86;C:\VulkanSDK\1.2.154.1\Lib32;$(LibraryPath)</LibraryPath>
     <OutDir>..</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -76,6 +76,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Git\Vulkan-Game-Project\include;C:\Git\Vulkan-Game-Project\gfc\include;C:\Git\Vulkan-Game-Project\gfc\simple_json\include;C:\Git\Vulkan-Game-Project\gfc\simple_logger\include;C:\VulkanSDK\1.2.154.1\Include;C:\Git\libs\SDL2-2.0.12\include;C:\Git\libs\SDL2_image-2.0.5\include;C:\Git\libs\SDL2_mixer-2.0.4\include;C:\Git\libs\SDL2_ttf-2.0.15\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -115,7 +116,14 @@
     <ClInclude Include="..\include\gf3d_validation.h" />
     <ClInclude Include="..\include\gf3d_vgraphics.h" />
     <ClInclude Include="..\include\gf3d_vqueues.h" />
+    <ClInclude Include="..\include\rpg_chests.h" />
+    <ClInclude Include="..\include\rpg_collision.h" />
+    <ClInclude Include="..\include\rpg_items.h" />
+    <ClInclude Include="..\include\rpg_npc.h" />
     <ClInclude Include="..\include\rpg_player.h" />
+    <ClInclude Include="..\include\rpg_spell.h" />
+    <ClInclude Include="..\include\rpg_spellbook.h" />
+    <ClInclude Include="..\include\rpg_ui.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\gfc\simple_json\src\simple_json.c" />
@@ -149,7 +157,10 @@
     <ClCompile Include="..\src\gf3d_validation.c" />
     <ClCompile Include="..\src\gf3d_vgraphics.c" />
     <ClCompile Include="..\src\gf3d_vqueues.c" />
+    <ClCompile Include="..\src\rpg_npc.c" />
     <ClCompile Include="..\src\rpg_player.c" />
+    <ClCompile Include="..\src\rpg_spellbook.c" />
+    <ClCompile Include="..\src\rpg_ui.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -15,6 +15,7 @@
 
 #include "rpg_player.h"
 #include "rpg_npc.h"
+#include "rpg_ui.h"
 
 int main(int argc,char *argv[])
 {
@@ -24,13 +25,12 @@ int main(int argc,char *argv[])
     const Uint8 * keys;
     Uint32 bufferFrame = 0;
     VkCommandBuffer commandBuffer;
-	Entity *ent1 = NULL;
-	Entity *playerEnt = NULL;
+
 	Entity *goblinGrunt = NULL;
 	Entity *goblinHeavy = NULL;
 	Entity *world = NULL;
 	Entity *chest = NULL;
-	Player *player;
+
 
     for (a = 1; a < argc;a++)
     {
@@ -52,62 +52,73 @@ int main(int argc,char *argv[])
     );
 	slog_sync();
 
+	gf3d_camera_init();
+
 	gf3d_entity_init(1024);
 
     // main game loop
     slog("gf3d main loop begin");
 	
 	rpg_player_init();
-	player = get_player();
-	playerEnt = get_player_entity();
 
 	goblinGrunt = rpg_npc_new();
 	world = gf3d_entity_new();
 	chest = gf3d_entity_new();
 	goblinHeavy = rpg_npc_new();
-
+	
 	if (goblinGrunt)
 	{
 		goblinGrunt->model = gf3d_model_load("goblingrunt");
 		goblinGrunt->think = rpg_npc_think;
 		goblinGrunt->name = "Goblin Grunt";
-		gfc_matrix_make_translation(goblinGrunt->modelMatrix, vector3d(gfc_crandom() * 3, gfc_crandom() * 3, gfc_crandom() * 3));
-		gfc_matrix_rotate(goblinGrunt->modelMatrix, goblinGrunt->modelMatrix, 0.002, vector3d(0, 0, 1));
-		
+		goblinGrunt->position = vector3d(-5, 0, -5);
+		goblinHeavy->boxCollider.depth = 2.0;
+		goblinHeavy->boxCollider.height = 2.0;
+		goblinHeavy->boxCollider.width = 2.0;
+		goblinHeavy->boxCollider.x = goblinHeavy->position.x;
+		goblinHeavy->boxCollider.y = goblinHeavy->position.y;
+		goblinHeavy->boxCollider.z = goblinHeavy->position.z;
+		gfc_matrix_new_translation(goblinGrunt->modelMatrix, goblinGrunt->position);
 	}
 	if (goblinHeavy)
 	{
 		goblinHeavy->model = gf3d_model_load("goblinheavy");
 		goblinHeavy->think = rpg_npc_think;
 		goblinHeavy->name = "Goblin Heavy";
-		gfc_matrix_make_translation(goblinHeavy->modelMatrix, vector3d(gfc_crandom() * 8, gfc_crandom() * 8, gfc_crandom() * 8));
-		gfc_matrix_rotate(goblinHeavy->modelMatrix, goblinHeavy->modelMatrix, 0.002, vector3d(0, 0, 1));
-
-	}
-	if (playerEnt)
-	{
-		playerEnt->model = gf3d_model_load("dino");
-		playerEnt->think = rpg_player_think;
-		playerEnt->name = "Player";
+		goblinHeavy->position = vector3d(5, 0, -5);
+		goblinHeavy->boxCollider.depth = 2.0;
+		goblinHeavy->boxCollider.height = 2.0;
+		goblinHeavy->boxCollider.width = 2.0;
+		goblinHeavy->boxCollider.x = goblinHeavy->position.x;
+		goblinHeavy->boxCollider.y = goblinHeavy->position.y;
+		goblinHeavy->boxCollider.z = goblinHeavy->position.z;
+		gfc_matrix_new_translation(goblinHeavy->modelMatrix, goblinHeavy->position);
 	}
 	slog_sync();
 	if (world)
 	{
 		world->model = gf3d_model_load("world");
 		world->name = "World";
-		world->position = vector3d(0, 0, -6);
-		gfc_matrix_make_translation(world->modelMatrix, world->position);
-		world->boxCollider.depth = 1.0;
-		world->boxCollider.height = 1.0;
-		world->boxCollider.width = 1.0;
-		world->boxCollider.x = 1.0;
-		world->boxCollider.y = 1.0;
-		world->boxCollider.z = 1.0;
+		world->position = vector3d(0, 0, 0);
+		gfc_matrix_new_translation(world->modelMatrix, world->position);
+		world->boxCollider.depth = 1000.0;
+		world->boxCollider.height = 1;
+		world->boxCollider.width = 1000.0;
+		world->boxCollider.x = world->position.x;
+		world->boxCollider.y = world->position.y;
+		world->boxCollider.z = world->position.z;
 		
 	}
 	if (chest){
 		chest->model = gf3d_model_load("chest");
-		gfc_matrix_make_translation(chest->modelMatrix, vector3d(0, 0, 0));
+		chest->position = vector3d(0, 0, 0);
+		gfc_matrix_new_translation(chest->modelMatrix, chest->position);
+		goblinHeavy->boxCollider.depth = 2.0;
+		goblinHeavy->boxCollider.height = 2.0;
+		goblinHeavy->boxCollider.width = 2.0;
+		goblinHeavy->boxCollider.x = goblinHeavy->position.x;
+		goblinHeavy->boxCollider.y = goblinHeavy->position.y;
+		goblinHeavy->boxCollider.z = goblinHeavy->position.z;
 		chest->name = "Chest";
 	}
 	
@@ -119,19 +130,19 @@ int main(int argc,char *argv[])
         SDL_PumpEvents();   // update SDL's internal event structures
         keys = SDL_GetKeyboardState(NULL); // get the keyboard state for this frame
         //update game things here
-
-		gf3d_entity_think_all();
-
-		//slog("\nPosition: x:%f, y:%f, z:%f", playerEnt->position.x, playerEnt->position.y, playerEnt->position.z);
-		//slog("\nVelocity: x:%f, y:%f, z:%f", playerEnt->velocity.x, playerEnt->velocity.y, playerEnt->velocity.z);
-		//slog("\nRotation: x:%f, y:%f, z:%f", player->rotation.x, player->rotation.y, player->rotation.z);
 		
+
+
+
 		// configure render command for graphics command pool
         // for each mesh, get a command and configure it from the pool
         bufferFrame = gf3d_vgraphics_render_begin();
 			gf3d_pipeline_reset_frame(gf3d_vgraphics_get_graphics_pipeline(),bufferFrame);
             commandBuffer = gf3d_command_rendering_begin(bufferFrame);
 				
+				camera_update();
+				gf3d_entity_think_all();
+				gf3d_entity_update_all();
 				gf3d_entity_draw_all(bufferFrame, commandBuffer);
                 
             gf3d_command_rendering_end(commandBuffer);

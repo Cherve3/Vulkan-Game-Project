@@ -12,7 +12,7 @@ void rpg_npc_init(){
 
 	npc->position = vector3d(0, 0, 0);
 	npc->velocity = vector3d(0, 0, 0);
-	npc->rotation = vector3d(0, 0, 0);
+	npc->rotation = vector3d(0,0,0);
 
 	npc->boxCollider.depth = 1.0;
 	npc->boxCollider.height = 1.0;
