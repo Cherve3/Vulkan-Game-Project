@@ -68,7 +68,7 @@ void rpg_npc_think(Entity *self){
 
 	rpg_npc_move(self);
 
-	//gf3d_entity_collision_test(self);
+	gf3d_entity_collision_test(self);
 }
 
 void rpg_npc_move(Entity *self){

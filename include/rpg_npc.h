@@ -53,6 +53,13 @@ typedef struct{
 	Item *bag;
 }npcInventory;
 
+
+typedef struct NPC_S
+{
+	Entity *ent;
+	npcStats stats;
+	npcInventory inventory;
+}NPC;
 /**
 *	@brief initialize an NPC character
 */

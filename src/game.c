@@ -13,6 +13,7 @@
 #include "gf3d_texture.h"
 #include "gf3d_entity.h"
 
+#include "rpg_goblin.h"
 #include "rpg_player.h"
 #include "rpg_npc.h"
 #include "rpg_ui.h"
@@ -26,11 +27,8 @@ int main(int argc,char *argv[])
     Uint32 bufferFrame = 0;
     VkCommandBuffer commandBuffer;
 
-	Entity *goblinGrunt = NULL;
-	Entity *goblinHeavy = NULL;
 	Entity *world = NULL;
 	Entity *chest = NULL;
-
 
     for (a = 1; a < argc;a++)
     {
@@ -61,39 +59,13 @@ int main(int argc,char *argv[])
 	
 	rpg_player_init();
 
-	goblinGrunt = rpg_npc_new();
 	world = gf3d_entity_new();
 	chest = gf3d_entity_new();
-	goblinHeavy = rpg_npc_new();
 	
-	if (goblinGrunt)
-	{
-		goblinGrunt->model = gf3d_model_load("goblingrunt");
-		goblinGrunt->think = rpg_npc_think;
-		goblinGrunt->name = "Goblin Grunt";
-		goblinGrunt->position = vector3d(-5, 0, -5);
-		goblinHeavy->boxCollider.depth = 2.0;
-		goblinHeavy->boxCollider.height = 2.0;
-		goblinHeavy->boxCollider.width = 2.0;
-		goblinHeavy->boxCollider.x = goblinHeavy->position.x;
-		goblinHeavy->boxCollider.y = goblinHeavy->position.y;
-		goblinHeavy->boxCollider.z = goblinHeavy->position.z;
-		gfc_matrix_new_translation(goblinGrunt->modelMatrix, goblinGrunt->position);
-	}
-	if (goblinHeavy)
-	{
-		goblinHeavy->model = gf3d_model_load("goblinheavy");
-		goblinHeavy->think = rpg_npc_think;
-		goblinHeavy->name = "Goblin Heavy";
-		goblinHeavy->position = vector3d(5, 0, -5);
-		goblinHeavy->boxCollider.depth = 2.0;
-		goblinHeavy->boxCollider.height = 2.0;
-		goblinHeavy->boxCollider.width = 2.0;
-		goblinHeavy->boxCollider.x = goblinHeavy->position.x;
-		goblinHeavy->boxCollider.y = goblinHeavy->position.y;
-		goblinHeavy->boxCollider.z = goblinHeavy->position.z;
-		gfc_matrix_new_translation(goblinHeavy->modelMatrix, goblinHeavy->position);
-	}
+	rpg_goblin_init(GoblinGrunt,vector3d(-10,0, -10));
+	rpg_goblin_init(GoblinHeavy, vector3d(10, 0, -10));
+	rpg_goblin_init(GoblinArcher, vector3d(10, 0, 10));
+
 	slog_sync();
 	if (world)
 	{
@@ -101,9 +73,9 @@ int main(int argc,char *argv[])
 		world->name = "World";
 		world->position = vector3d(0, 0, 0);
 		gfc_matrix_new_translation(world->modelMatrix, world->position);
-		world->boxCollider.depth = 1000.0;
+		world->boxCollider.depth = 10000.0;
 		world->boxCollider.height = 1;
-		world->boxCollider.width = 1000.0;
+		world->boxCollider.width = 10000.0;
 		world->boxCollider.x = world->position.x;
 		world->boxCollider.y = world->position.y;
 		world->boxCollider.z = world->position.z;
@@ -113,12 +85,12 @@ int main(int argc,char *argv[])
 		chest->model = gf3d_model_load("chest");
 		chest->position = vector3d(0, 0, 0);
 		gfc_matrix_new_translation(chest->modelMatrix, chest->position);
-		goblinHeavy->boxCollider.depth = 2.0;
-		goblinHeavy->boxCollider.height = 2.0;
-		goblinHeavy->boxCollider.width = 2.0;
-		goblinHeavy->boxCollider.x = goblinHeavy->position.x;
-		goblinHeavy->boxCollider.y = goblinHeavy->position.y;
-		goblinHeavy->boxCollider.z = goblinHeavy->position.z;
+		chest->boxCollider.depth = 2.0;
+		chest->boxCollider.height = 2.0;
+		chest->boxCollider.width = 2.0;
+		chest->boxCollider.x = chest->position.x;
+		chest->boxCollider.y = chest->position.y;
+		chest->boxCollider.z = chest->position.z;
 		chest->name = "Chest";
 	}
 	
@@ -130,9 +102,6 @@ int main(int argc,char *argv[])
         SDL_PumpEvents();   // update SDL's internal event structures
         keys = SDL_GetKeyboardState(NULL); // get the keyboard state for this frame
         //update game things here
-		
-
-
 
 		// configure render command for graphics command pool
         // for each mesh, get a command and configure it from the pool

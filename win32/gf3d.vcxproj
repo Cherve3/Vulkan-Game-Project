@@ -118,6 +118,7 @@
     <ClInclude Include="..\include\gf3d_vqueues.h" />
     <ClInclude Include="..\include\rpg_chests.h" />
     <ClInclude Include="..\include\rpg_collision.h" />
+    <ClInclude Include="..\include\rpg_goblin.h" />
     <ClInclude Include="..\include\rpg_items.h" />
     <ClInclude Include="..\include\rpg_npc.h" />
     <ClInclude Include="..\include\rpg_player.h" />
@@ -157,6 +158,7 @@
     <ClCompile Include="..\src\gf3d_validation.c" />
     <ClCompile Include="..\src\gf3d_vgraphics.c" />
     <ClCompile Include="..\src\gf3d_vqueues.c" />
+    <ClCompile Include="..\src\rpg_goblin.c" />
     <ClCompile Include="..\src\rpg_npc.c" />
     <ClCompile Include="..\src\rpg_player.c" />
     <ClCompile Include="..\src\rpg_spellbook.c" />

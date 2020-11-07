@@ -9,8 +9,6 @@
 *	@purpose this is the definition file for a player character.
 */
 
-
-
 typedef struct PStats_S
 {
 	char* name;

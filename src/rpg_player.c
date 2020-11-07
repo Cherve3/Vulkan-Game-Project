@@ -27,6 +27,8 @@ void rpg_player_init(){
 	player->ent->velocity = vector3d(0, 0, 0);
 	player->ent->rotation = vector3d(0, 0, 0);
 
+	player->ent->direction = vector3d(0, 0, 1);
+
 	
 	player->ent->boxCollider.depth = 5.0;
 	player->ent->boxCollider.height = 5.0;
@@ -133,8 +135,10 @@ void rpg_player_think(Entity *self){
 	gf3d_entity_collision_test(self);
 
 	rpg_player_move(self);
+
 	Vector3D negate;
 	vector3d_negate(negate,gf3d_camera_get_position());
+	gfc_matrix_translate(gf3d_get_camera(), negate);
 	gf3d_camera_look_at(negate,self->position,vector_up());
 	
 }
@@ -170,12 +174,20 @@ void rpg_player_move(Entity *self){
 	
 	SDL_GetMouseState(&x, &y);
 	SDL_GetRelativeMouseState(&x_rel, &y_rel);
+
+	float angle = x_rel*GFC_DEGTORAD;
+	vector3d_rotate_about_y(&self->direction, angle);
+	vector3d_normalize(&self->direction);
 	
-	vector3d_rotate_about_vector(&self->rotation, self->position,self->direction, x_rel*0.01);
-	slog("\nRotation: x:%f, y:%f, z:%f", self->rotation.x, self->rotation.y, self->rotation.z);
+	Matrix4 rotate;
+	//gfc_new_rotation_matrix(camera, vector3d(y_rel,x_rel,0));
+	//gfc_matrix_rotate(self->modelMatrix,self->modelMatrix,angle,vector_forward());
+	//slog("\nDirection: x:%f, y:%f, z:%f", self->direction.x, self->direction.y, self->direction.z);
+	
 	//Player input
 	if (keys[SDL_SCANCODE_W])
 	{
+		//gfc_matrix_translate(self->modelMatrix,self->direction);
 		self->velocity.z += 1;
 	}
 	if (keys[SDL_SCANCODE_A])
