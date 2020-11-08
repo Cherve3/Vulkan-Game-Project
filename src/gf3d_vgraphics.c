@@ -695,6 +695,11 @@ Matrix4 *gf3d_vgraphics_get_ubo_view()
 	return gf3d_vgraphics.ubo.view;
 }
 
+SDL_Window *gf3d_vgraphics_get_window()
+{
+	return gf3d_vgraphics.main_window;
+}
+
 VkImageView gf3d_vgraphics_create_image_view(VkImage image, VkFormat format)
 {
     VkImageView imageView;

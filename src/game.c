@@ -37,7 +37,7 @@ int main(int argc,char *argv[])
             validate = 0;
         }
     }
-    
+
     init_logger("gf3d.log");    
     slog("gf3d begin");
     gf3d_vgraphics_init(
@@ -97,6 +97,15 @@ int main(int argc,char *argv[])
 	SDL_ShowCursor(0);
 	SDL_SetRelativeMouseMode(SDL_TRUE);
     
+	//UI TEST
+
+	SDL_Renderer *renderer = SDL_CreateRenderer(gf3d_vgraphics_get_window(), -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
+	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0,0);
+
+	rpg_ui_init(renderer);
+
+
 	while(!done)
     {
         SDL_PumpEvents();   // update SDL's internal event structures
@@ -109,11 +118,14 @@ int main(int argc,char *argv[])
 			gf3d_pipeline_reset_frame(gf3d_vgraphics_get_graphics_pipeline(),bufferFrame);
             commandBuffer = gf3d_command_rendering_begin(bufferFrame);
 				
+				SDL_RenderPresent(renderer);
+				
 				camera_update();
 				gf3d_entity_think_all();
 				gf3d_entity_update_all();
 				gf3d_entity_draw_all(bufferFrame, commandBuffer);
-                
+
+				
             gf3d_command_rendering_end(commandBuffer);
             
         gf3d_vgraphics_render_end(bufferFrame);

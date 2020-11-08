@@ -24,6 +24,6 @@ typedef struct
 	SDL_Texture *stats;
 }Menu;
 
-void rpg_ui_init(SDL_Window *window);
+void rpg_ui_init(SDL_Renderer *renderer);
 
 #endif

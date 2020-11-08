@@ -143,17 +143,21 @@ int gf3d_entity_collision_test(Entity *self){
 				((gf3d_entity.entity_list[i].boxCollider.x + gf3d_entity.entity_list[i].boxCollider.width) >= self->boxCollider.x))
 			{
 				
-				self->position.x = gf3d_entity.entity_list[i].boxCollider.x-1;
+				self->position.x -= 1;
+				//self->position.z -= 1;
 			}
 			else if (((self->boxCollider.y + self->boxCollider.height) >= gf3d_entity.entity_list[i].boxCollider.y) ||
 				((gf3d_entity.entity_list[i].boxCollider.y + gf3d_entity.entity_list[i].boxCollider.height) >= self->boxCollider.y))
 			{
-				self->position.y = gf3d_entity.entity_list[i].boxCollider.y-1;
+
+				self->position.y -= 1;
+
 			}
 			else if (((self->boxCollider.z + self->boxCollider.depth) >= gf3d_entity.entity_list[i].boxCollider.z) ||
 				((gf3d_entity.entity_list[i].boxCollider.z + gf3d_entity.entity_list[i].boxCollider.depth) >= self->boxCollider.z))
 			{
-				self->position.z = gf3d_entity.entity_list[i].boxCollider.z-1;
+				//self->position.x -= 1;
+				self->position.z -= 1;
 			}
 			
 			slog("COLLISION detected.");
