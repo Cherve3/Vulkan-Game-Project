@@ -26,4 +26,6 @@ typedef struct
 
 void rpg_ui_init(SDL_Renderer *renderer);
 
+void toggle_stats(SDL_Renderer *renderer);
+
 #endif

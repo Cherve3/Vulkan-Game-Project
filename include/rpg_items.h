@@ -15,6 +15,7 @@ typedef struct
 	char *name;
 	char *description;
 
+	Uint8 quantity;
 	float weight;
 
 }Item;

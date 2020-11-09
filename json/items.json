@@ -5,6 +5,6 @@
         {"ItemType":0, "weight":0.5, "name":"stamina", "description":"A potion to accelerate stamina regeneration."},
         
         {"ItemType":1, "weight":2, "name":"wood", "description":"A wood log."},
-        {"ItemType":1, "weight":0.1, "name":"plant", "description":"A small plant."}
+        {"ItemType":1, "weight":0.1, "name":"plant", "description":"A small plant. Can be used in crafting."}
     ]
 }

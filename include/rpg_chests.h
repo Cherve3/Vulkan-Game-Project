@@ -3,16 +3,25 @@
 
 #include "gfc_types.h"
 
+#include "gf3d_entity.h"
+
+#include "rpg_collision.h"
 #include "rpg_items.h"
 
 typedef struct
 {
-
-	Item *loot;
+	Uint8			_inuse;
+	Item			*loot;
+	Entity			*ent;
+	CircleCollider	interactBounds;
 }Chest;
 
-void chest_init();
+void rpg_chests_free(Chest *chest);
 
-void chest_destroy();
+void rpg_chests_close();
+
+Chest *rpg_chest_new();
+
+void chest_init();
 
 #endif

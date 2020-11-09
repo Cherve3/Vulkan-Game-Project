@@ -13,6 +13,7 @@
 #include "gf3d_texture.h"
 #include "gf3d_entity.h"
 
+#include "rpg_chests.h"
 #include "rpg_goblin.h"
 #include "rpg_player.h"
 #include "rpg_npc.h"
@@ -28,7 +29,8 @@ int main(int argc,char *argv[])
     VkCommandBuffer commandBuffer;
 
 	Entity *world = NULL;
-	Entity *chest = NULL;
+	Chest *chest = NULL;
+	Entity *water = NULL;
 
     for (a = 1; a < argc;a++)
     {
@@ -50,17 +52,22 @@ int main(int argc,char *argv[])
     );
 	slog_sync();
 
+    // main game loop
+    slog("gf3d main loop begin");
+
 	gf3d_camera_init();
 
 	gf3d_entity_init(1024);
 
-    // main game loop
-    slog("gf3d main loop begin");
-	
+	rpg_chests_init(10);
+
 	rpg_player_init();
 
 	world = gf3d_entity_new();
-	chest = gf3d_entity_new();
+	chest = rpg_chest_new();
+	
+
+	//water = gf3d_entity_new();
 	
 	rpg_goblin_init(GoblinGrunt,vector3d(-10,0, -10));
 	rpg_goblin_init(GoblinHeavy, vector3d(10, 0, -10));
@@ -82,16 +89,27 @@ int main(int argc,char *argv[])
 		
 	}
 	if (chest){
-		chest->model = gf3d_model_load("chest");
-		chest->position = vector3d(0, 0, 0);
-		gfc_matrix_new_translation(chest->modelMatrix, chest->position);
-		chest->boxCollider.depth = 2.0;
-		chest->boxCollider.height = 2.0;
-		chest->boxCollider.width = 2.0;
-		chest->boxCollider.x = chest->position.x;
-		chest->boxCollider.y = chest->position.y;
-		chest->boxCollider.z = chest->position.z;
-		chest->name = "Chest";
+/*		chest->loot[0].description = "A wood log.";
+		chest->loot[0].name = "Wood";
+		chest->loot[0].type = 1;
+		chest->loot[0].weight = 2;
+		chest->loot[0].quantity = 1;*/
+		//chest->model = gf3d_model_load("chest");
+		//chest->position = vector3d(0, 0, 0);
+		//gfc_matrix_new_translation(chest->modelMatrix, chest->position);
+		//chest->boxCollider.depth = 2.0;
+		//chest->boxCollider.height = 2.0;
+		//chest->boxCollider.width = 2.0;
+		//chest->boxCollider.x = chest->position.x;
+		//chest->boxCollider.y = chest->position.y;
+		//chest->boxCollider.z = chest->position.z;
+		//chest->name = "Chest";
+	}
+	if (water)
+	{
+		water->model = gf3d_model_load("water");
+		water->position = vector3d(20, -2, 20);
+		water->name = "Water";
 	}
 	
 	SDL_ShowCursor(0);
@@ -118,14 +136,16 @@ int main(int argc,char *argv[])
 			gf3d_pipeline_reset_frame(gf3d_vgraphics_get_graphics_pipeline(),bufferFrame);
             commandBuffer = gf3d_command_rendering_begin(bufferFrame);
 				
-				SDL_RenderPresent(renderer);
+				SDL_RenderPresent(renderer);//UI TEST
 				
 				camera_update();
+
 				gf3d_entity_think_all();
 				gf3d_entity_update_all();
 				gf3d_entity_draw_all(bufferFrame, commandBuffer);
 
-				
+				toggle_stats(renderer);
+
             gf3d_command_rendering_end(commandBuffer);
             
         gf3d_vgraphics_render_end(bufferFrame);

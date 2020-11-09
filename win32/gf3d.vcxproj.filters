@@ -239,5 +239,8 @@
     <ClCompile Include="..\src\rpg_goblin.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\rpg_chests.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
