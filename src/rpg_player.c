@@ -22,6 +22,8 @@ void rpg_player_init(){
 	player->ent->think = rpg_player_think;
 	player->ent->update = rpg_player_update;
 	player->ent->name = "Player";
+
+	gfc_matrix_rotate(&player->ent->modelMatrix, &player->ent->modelMatrix, 90 * GFC_DEGTORAD, vector3d(0,0,1));
 	
 	player->ent->position = vector3d(0, 0, 0);
 	player->ent->velocity = vector3d(0, 0, 0);
@@ -124,9 +126,9 @@ void rpg_player_update(Entity *self)
 	self->boxCollider.y = self->position.y;
 	self->boxCollider.z = self->position.z;
 
-	slog("\nPosition: x:%f, y:%f, z:%f", self->position.x, self->position.y, self->position.z);
-	slog("\nVelocity: x:%f, y:%f, z:%f", self->velocity.x, self->velocity.y, self->velocity.z);
-	slog("\nRotation: x:%f, y:%f, z:%f", self->rotation.x, self->rotation.y, self->rotation.z);
+	//slog("\nPosition: x:%f, y:%f, z:%f", self->position.x, self->position.y, self->position.z);
+	//slog("\nVelocity: x:%f, y:%f, z:%f", self->velocity.x, self->velocity.y, self->velocity.z);
+	//slog("\nRotation: x:%f, y:%f, z:%f", self->rotation.x, self->rotation.y, self->rotation.z);
 
 }
 
@@ -135,6 +137,7 @@ void rpg_player_think(Entity *self){
 	gf3d_entity_collision_test(self);
 
 	rpg_player_move(self);
+	rpg_player_input(self);
 
 	Vector3D negate;
 	vector3d_negate(negate,gf3d_camera_get_position());
@@ -210,6 +213,17 @@ void rpg_player_move(Entity *self){
 	{
 		self->velocity.y -= 1;
 	}
+
+	Matrix4 temp;
+	gfc_matrix_new_translation(self->modelMatrix, self->position);
+	//gfc_matrix_new_translation(camera, self->position);
+	
+}
+
+rpg_player_input(Entity *self)
+{
+	const Uint8 *keys = SDL_GetKeyboardState(NULL);
+
 	if (keys[SDL_SCANCODE_E])
 	{
 		slog("Interact");
@@ -221,10 +235,9 @@ void rpg_player_move(Entity *self){
 	if (keys[SDL_SCANCODE_TAB])
 	{
 		slog("Stats");
-
 	}
-	Matrix4 temp;
-	gfc_matrix_new_translation(self->modelMatrix, self->position);
-	//gfc_matrix_new_translation(camera, self->position);
-	
+	if (SDL_GetMouseState(NULL, NULL)& SDL_BUTTON(SDL_BUTTON_LEFT))
+	{
+		slog("Button: %i", SDL_GetMouseState(NULL, NULL));
+	}
 }

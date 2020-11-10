@@ -7,25 +7,31 @@
 
 typedef struct
 {
-	SDL_Surface *health;
-	SDL_Surface *mana;
-	SDL_Surface *stamina;
-	SDL_Surface *base;
+	SDL_Surface *HUDsurface;
 
-	SDL_Texture *healthTexture;
-	SDL_Texture *manaTexture;
-	SDL_Texture *staminaTexture;
-	SDL_Texture *baseTexture;
+	SDL_Texture *health;
+	SDL_Texture *mana;
+	SDL_Texture *stamina;
+	SDL_Texture **base;
 }HUD;
 
 typedef struct
 {
+	SDL_Surface *menuSurface;
+
 	SDL_Texture *menu;
 	SDL_Texture *stats;
+	SDL_Texture *text;
+
+	SDL_Color white;
 }Menu;
 
-void rpg_ui_init(SDL_Renderer *renderer);
+void rpg_ui_init(SDL_Renderer *renderer, int screenWidth, int screenHeight);
 
-void toggle_stats(SDL_Renderer *renderer);
+void toggle_stats(SDL_Renderer *renderer, Bool *toggle);
+
+void stats_on(SDL_Renderer *renderer);
+
+void stats_off(SDL_Renderer *renderer);
 
 #endif

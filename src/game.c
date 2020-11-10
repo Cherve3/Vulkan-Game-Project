@@ -4,6 +4,7 @@
 #include "simple_json.h"
 #include "gfc_vector.h"
 #include "gfc_matrix.h"
+#include "gfc_types.h"
 
 #include "gf3d_vgraphics.h"
 #include "gf3d_pipeline.h"
@@ -31,6 +32,8 @@ int main(int argc,char *argv[])
 	Entity *world = NULL;
 	Chest *chest = NULL;
 	Entity *water = NULL;
+	Entity *fire = NULL;
+	Bool *toggleStats = false;
 
     for (a = 1; a < argc;a++)
     {
@@ -65,8 +68,8 @@ int main(int argc,char *argv[])
 
 	world = gf3d_entity_new();
 	chest = rpg_chest_new();
+	fire = gf3d_entity_new();
 	
-
 	//water = gf3d_entity_new();
 	
 	rpg_goblin_init(GoblinGrunt,vector3d(-10,0, -10));
@@ -111,18 +114,22 @@ int main(int argc,char *argv[])
 		water->position = vector3d(20, -2, 20);
 		water->name = "Water";
 	}
+	if (fire)
+	{
+		fire->model = gf3d_model_load("fire");
+		fire->position = vector3d(0, 10, 2);
+		fire->name = "Fire";
+		gfc_matrix_new_translation(fire->modelMatrix, fire->position);
+	}
 	
 	SDL_ShowCursor(0);
 	SDL_SetRelativeMouseMode(SDL_TRUE);
     
 	//UI TEST
-
 	SDL_Renderer *renderer = SDL_CreateRenderer(gf3d_vgraphics_get_window(), -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
 	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-	SDL_SetRenderDrawColor(renderer, 0, 0, 0,0);
-
-	rpg_ui_init(renderer);
-
+	
+	rpg_ui_init(renderer, 720, 480);
 
 	while(!done)
     {
@@ -136,7 +143,7 @@ int main(int argc,char *argv[])
 			gf3d_pipeline_reset_frame(gf3d_vgraphics_get_graphics_pipeline(),bufferFrame);
             commandBuffer = gf3d_command_rendering_begin(bufferFrame);
 				
-				SDL_RenderPresent(renderer);//UI TEST
+				//SDL_RenderPresent(renderer);//UI TEST
 				
 				camera_update();
 
@@ -144,7 +151,18 @@ int main(int argc,char *argv[])
 				gf3d_entity_update_all();
 				gf3d_entity_draw_all(bufferFrame, commandBuffer);
 
-				toggle_stats(renderer);
+				//toggle_stats(renderer, toggleStats);
+/*				if (!toggleStats){
+					toggleStats = true;
+					stats_on(renderer);
+				
+				}
+				else
+				{
+					toggleStats = false;
+					//stats_off(SDL_GetRenderer(gf3d_vgraphics_get_window()));
+				}*/
+
 
             gf3d_command_rendering_end(commandBuffer);
             
@@ -155,6 +173,7 @@ int main(int argc,char *argv[])
     
     vkDeviceWaitIdle(gf3d_vgraphics_get_default_logical_device());
     //cleanup
+	SDL_Quit();
     slog("gf3d program end");
     slog_sync();
     return 0;
