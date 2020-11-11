@@ -6,6 +6,7 @@
 #include "rpg_player.h"
 #include "rpg_spellbook.h"
 #include "rpg_items.h"
+#include "rpg_projectile.h"
 
 static Player *player = { 0 };
 
@@ -22,19 +23,24 @@ void rpg_player_init(){
 	player->ent->think = rpg_player_think;
 	player->ent->update = rpg_player_update;
 	player->ent->name = "Player";
-
-	gfc_matrix_rotate(&player->ent->modelMatrix, &player->ent->modelMatrix, 90 * GFC_DEGTORAD, vector3d(0,0,1));
 	
-	player->ent->position = vector3d(0, 0, 0);
+	
+	
+	player->ent->position = vector3d(-5, 0, 0);
 	player->ent->velocity = vector3d(0, 0, 0);
 	player->ent->rotation = vector3d(0, 0, 0);
+
+	gfc_matrix_new_translation(player->ent->modelMatrix,player->ent->position);
+	Matrix4 rotate;
+	//gfc_matrix_identity(rotate);
+	gfc_matrix_rotate(player->ent->modelMatrix, rotate, 90*GFC_DEGTORAD, vector3d(0,1,0));
 
 	player->ent->direction = vector3d(0, 0, 1);
 
 	
-	player->ent->boxCollider.depth = 5.0;
-	player->ent->boxCollider.height = 5.0;
-	player->ent->boxCollider.width = 5.0;
+	player->ent->boxCollider.depth = 1.0;
+	player->ent->boxCollider.height = 2.0;
+	player->ent->boxCollider.width = 1.0;
 	player->ent->boxCollider.x = player->ent->position.x;
 	player->ent->boxCollider.y = player->ent->position.y;
 	player->ent->boxCollider.z = player->ent->position.z;
@@ -71,6 +77,8 @@ void rpg_player_init(){
 	player->stats.intelligence_max	= 100;
 	player->stats.luck				= 1;
 	player->stats.luck_max			= 100;
+
+	player->stats.toggleStats = false;
 	
 	player->inventory.bag = (Item *)gfc_allocate_array(sizeof(Item), 30);
 	player->inventory.spellbook = (Spell *)gfc_allocate_array(sizeof(Spell),5);
@@ -139,10 +147,12 @@ void rpg_player_think(Entity *self){
 	rpg_player_move(self);
 	rpg_player_input(self);
 
+
+	/*
 	Vector3D negate;
 	vector3d_negate(negate,gf3d_camera_get_position());
 	gfc_matrix_translate(gf3d_get_camera(), negate);
-	gf3d_camera_look_at(negate,self->position,vector_up());
+	gf3d_camera_look_at(negate,self->position,vector_up());*/
 	
 }
 
@@ -191,19 +201,19 @@ void rpg_player_move(Entity *self){
 	if (keys[SDL_SCANCODE_W])
 	{
 		//gfc_matrix_translate(self->modelMatrix,self->direction);
-		self->velocity.z += 1;
+		self->velocity.z -= 1;
 	}
 	if (keys[SDL_SCANCODE_A])
 	{
-		self->velocity.x += 1;
+		self->velocity.x -= 1;
 	}
 	if (keys[SDL_SCANCODE_S])
 	{
-		self->velocity.z -= 1;
+		self->velocity.z += 1;
 	}
 	if (keys[SDL_SCANCODE_D])
 	{
-		self->velocity.x -= 1;
+		self->velocity.x += 1;
 	}
 	if (keys[SDL_SCANCODE_SPACE])
 	{
@@ -214,19 +224,26 @@ void rpg_player_move(Entity *self){
 		self->velocity.y -= 1;
 	}
 
-	Matrix4 temp;
+	Vector3D negate;
+	vector3d_negate(negate, self->position);
+	negate.z -= 8;
+	negate.y -= 7;
 	gfc_matrix_new_translation(self->modelMatrix, self->position);
-	//gfc_matrix_new_translation(camera, self->position);
+	gfc_matrix_new_translation(camera, negate);
+
+	
 	
 }
 
 rpg_player_input(Entity *self)
 {
 	const Uint8 *keys = SDL_GetKeyboardState(NULL);
-
+	int x_rel, y_rel;
+	SDL_GetRelativeMouseState(&x_rel, &y_rel);
 	if (keys[SDL_SCANCODE_E])
 	{
 		slog("Interact");
+
 	}
 	if (keys[SDL_SCANCODE_I])
 	{
@@ -235,9 +252,33 @@ rpg_player_input(Entity *self)
 	if (keys[SDL_SCANCODE_TAB])
 	{
 		slog("Stats");
+		if (player->stats.toggleStats == false)
+			player->stats.toggleStats = true;
+		else
+			player->stats.toggleStats = false;
 	}
+
 	if (SDL_GetMouseState(NULL, NULL)& SDL_BUTTON(SDL_BUTTON_LEFT))
 	{
 		slog("Button: %i", SDL_GetMouseState(NULL, NULL));
+		//rpg_fireball_spawn(self);
 	}
+
+	SDL_Event event;
+	while (SDL_PollEvent(&event))
+	{
+		if (event.type == SDL_MOUSEWHEEL)
+		{
+			if (event.wheel.y > 0) // scroll up
+			{
+				gf3d_camera_move(vector_forward());
+			}
+			else if (event.wheel.y < 0) // scroll down
+			{
+				gf3d_camera_move(vector_backward());
+			}
+		}
+	}
+
+	gfc_matrix_rotate(self->modelMatrix, self->modelMatrix, x_rel*GFC_DEGTORAD, vector_up());
 }

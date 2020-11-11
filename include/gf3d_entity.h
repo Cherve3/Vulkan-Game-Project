@@ -83,4 +83,5 @@ void gf3d_entity_free(Entity *self);
  */
 int gf3d_entity_collision_test(Entity *self);
 
+
 #endif

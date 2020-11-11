@@ -124,42 +124,83 @@ void rpg_ui_init(SDL_Renderer *renderer, int screenWidth, int screenHeight)
 	*/
 }
 
-void toggle_stats(SDL_Renderer *renderer, Bool *toggle)
+void toggle_stats(SDL_Renderer *renderer, Bool toggle)
 {
 	const Uint8 *keys;
-
 	keys = SDL_GetKeyboardState(NULL);
 
 	Player *player = get_player();
-	SDL_Rect rect, rect2;
 
-	rect.x = 50;
-	rect.y = 40;
-	rect.h = 400;
-	rect.w = 400;
+	SDL_Texture *statmenu;
 
-	rect2.x = 90;
-	rect2.y = 70;
-	rect2.h = 40;
-	rect2.w = 100;
-
-	slog("%i", toggle);
-
-	if (keys[SDL_SCANCODE_TAB] && (toggle == false))
+	if (keys[SDL_SCANCODE_TAB] && player->stats.toggleStats == true)
 	{
-		toggle = true;
+		renderer = SDL_CreateRenderer(gf3d_vgraphics_get_window(), -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
+		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+
+		statmenu = IMG_LoadTexture(renderer, "images/statmenu.png");
+		SDL_Rect rect, rect2;
+
+		TTF_Font *font = TTF_OpenFont("fonts/OfenbacherSchwabCAT.ttf", 64);
+		if (!font)
+		{
+			slog("Font is NULL");
+			slog(SDL_GetError());
+		}
+		char* textName = strcat("Name: ",player->stats.name);
+
+		slog(textName);
+		SDL_Color color;
+		color.b = 255;
+		color.r = 255;
+		color.g = 255;
+		color.a = 255;
+
+		SDL_Surface *text = TTF_RenderText_Solid(font, textName, color);
+		SDL_Texture *tex = SDL_CreateTextureFromSurface(renderer, text);
+		if (!text)
+		{
+			slog("Surface is NULL");
+			slog(SDL_GetError());
+		}
+
+		if (!tex)
+		{
+			slog("Texture is NULL");
+			slog(SDL_GetError());
+		}
+
+		rect.x = 50;
+		rect.y = 40;
+		rect.h = 500;
+		rect.w = 400;
+
+		rect2.x = 90;
+		rect2.y = 70;
+		rect2.h = 50;
+		rect2.w = 100;
+
+	
 		slog("Toggled stats ON");
-		//SDL_FreeSurface(text);
+		SDL_FreeSurface(text);
 		SDL_RenderClear(renderer);
 
-		SDL_RenderCopy(renderer, UI.menu->stats, NULL, &UI.rect_list[4]);
-		SDL_RenderCopy(renderer, UI.menu->text, NULL, &UI.rect_list[5]);
-
+		SDL_RenderCopy(renderer, statmenu, NULL, &rect);
+		SDL_RenderCopy(renderer, tex, NULL, &rect2);
+		SDL_RenderPresent(renderer);
+		toggle = true;
 	}
+	else if (keys[SDL_SCANCODE_TAB] && player->stats.toggleStats == false)
+	{
+		slog("Toggled stats OFF");
+		toggle = false;
+		//SDL_DestroyTexture(statmenu);
+		SDL_RenderClear(renderer);
+		SDL_DestroyRenderer(renderer);
+	}
+
 }
-
-
-
+/*
 void stats_on(SDL_Renderer *renderer)
 {
 	const Uint8 *keys = SDL_GetKeyboardState(NULL);
@@ -213,4 +254,4 @@ void stats_off(SDL_Renderer *renderer)
 		SDL_DestroyRenderer(renderer);
 
 	}
-}
+}*/

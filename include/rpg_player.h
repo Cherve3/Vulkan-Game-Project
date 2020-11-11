@@ -45,6 +45,8 @@ typedef struct PStats_S
 	Uint8 luck;
 	Uint8 luck_max;
 
+	Bool toggleStats;
+
 }pStats;
 
 typedef struct PInventory_S{

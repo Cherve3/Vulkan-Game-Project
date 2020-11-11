@@ -10,13 +10,17 @@
 typedef struct
 {
 	SphereCollider collider;
+	int damage;
+	float cooldown;
 	Entity *ent;
 }Fireball;
 
-void rpg_fireball_spawn(Vector3D position);
+void rpg_fireball_spawn(Entity *player);
 
 void rpg_despawn();
 
-void rpg_fireball_think();
+void rpg_fireball_think(Entity *self);
+
+void rpg_fireball_update(Entity *self);
 
 #endif

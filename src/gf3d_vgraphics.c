@@ -111,8 +111,8 @@ void gf3d_vgraphics_init(
         gf3d_vgraphics.ubo.proj,
         70 * GFC_DEGTORAD,
         renderWidth/(float)renderHeight,
-        1.0f,
-        1500
+        0.1f,
+        2000
     );
     
     gf3d_vgraphics.ubo.proj[1][1] *= -1;

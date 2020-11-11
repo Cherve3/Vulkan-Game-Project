@@ -4,6 +4,7 @@
 #include "SDL.h"
 #include "SDL_image.h"
 #include "SDL_surface.h"
+#include "rpg_player.h"
 
 typedef struct
 {
@@ -28,7 +29,7 @@ typedef struct
 
 void rpg_ui_init(SDL_Renderer *renderer, int screenWidth, int screenHeight);
 
-void toggle_stats(SDL_Renderer *renderer, Bool *toggle);
+void toggle_stats(SDL_Renderer *renderer);
 
 void stats_on(SDL_Renderer *renderer);
 

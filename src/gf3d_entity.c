@@ -173,8 +173,7 @@ int gf3d_entity_collision_test(Entity *self){
 
 Entity* gf3d_get_entity_list()
 {	
-	return &gf3d_entity.entity_list;
+	return gf3d_entity.entity_list;
 }
-
 
 /*eol@eof*/

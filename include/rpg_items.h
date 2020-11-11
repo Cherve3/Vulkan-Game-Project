@@ -1,10 +1,14 @@
 #ifndef __RPG_ITEMS_H__
 #define __RPG_ITEMS_H__
 
+#include "gfc_vector.h"
+
+#include "gfc_types.h"
+
 typedef enum
 {
-	potion,
-	materials,
+	consumable,
+	material,
 	weapon,
 	armor,
 }ItemType;
@@ -15,32 +19,16 @@ typedef struct
 	char *name;
 	char *description;
 
+	Uint8 armor;
+	Uint8 damage;
+
 	Uint8 quantity;
 	float weight;
 
 }Item;
 
-typedef struct
-{
-	ItemType type;
-	char *name;
-	char *description;
+Item rpg_item_new();
 
-	Uint8 armor;
-
-	float weight;
-}Armor;
-
-typedef struct
-{
-	ItemType type;
-	char *name;
-	char *description;
-
-	Uint8 damage;
-
-	float weight;
-}Weapon;
-
+Item *rpg_item_spawn(Vector3D position);
 
 #endif
