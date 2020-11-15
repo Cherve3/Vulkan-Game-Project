@@ -34,4 +34,6 @@ Entity *rpg_goblin_new();
 */
 void rpg_goblin_think(Entity *self);
 
+void rpg_goblin_search(Entity *player);
+
 #endif

@@ -9,11 +9,13 @@
 #include "rpg_projectile.h"
 
 static Player *player = { 0 };
+Matrix4 *camera = { 0 };
 
 void rpg_player_move(Entity *self);
 void rpg_player_update();
 
 void rpg_player_init(){
+	camera = gf3d_get_camera();
 
 	player = (Player *)gfc_allocate_array(sizeof(Player),1);
 
@@ -24,23 +26,15 @@ void rpg_player_init(){
 	player->ent->update = rpg_player_update;
 	player->ent->name = "Player";
 	
-	
-	
-	player->ent->position = vector3d(-5, 0, 0);
+	player->ent->position = vector3d(0, 3.2, 6);
 	player->ent->velocity = vector3d(0, 0, 0);
 	player->ent->rotation = vector3d(0, 0, 0);
 
-	gfc_matrix_new_translation(player->ent->modelMatrix,player->ent->position);
-	Matrix4 rotate;
-	//gfc_matrix_identity(rotate);
-	gfc_matrix_rotate(player->ent->modelMatrix, rotate, 90*GFC_DEGTORAD, vector3d(0,1,0));
-
 	player->ent->direction = vector3d(0, 0, 1);
 
-	
-	player->ent->boxCollider.depth = 1.0;
-	player->ent->boxCollider.height = 2.0;
-	player->ent->boxCollider.width = 1.0;
+	player->ent->boxCollider.width = 3.0;
+	player->ent->boxCollider.height = 3.0;
+	player->ent->boxCollider.depth = 3.0;
 	player->ent->boxCollider.x = player->ent->position.x;
 	player->ent->boxCollider.y = player->ent->position.y;
 	player->ent->boxCollider.z = player->ent->position.z;
@@ -121,9 +115,10 @@ void rpg_player_bag_free(Item *bag)
 void rpg_player_update(Entity *self)
 {
 	if (vector3d_magnitude(self->velocity) > 0.001)
-	{
+	{	
+		vector3d_scale(self->velocity, self->velocity, 0.3);
 		vector3d_add(self->position, self->position, self->velocity);
-		vector3d_scale(self->velocity, self->velocity, 0.01);
+		
 	}
 	else
 	{
@@ -141,19 +136,14 @@ void rpg_player_update(Entity *self)
 }
 
 void rpg_player_think(Entity *self){
-
-	gf3d_entity_collision_test(self);
-
-	rpg_player_move(self);
-	rpg_player_input(self);
-
-
-	/*
-	Vector3D negate;
-	vector3d_negate(negate,gf3d_camera_get_position());
-	gfc_matrix_translate(gf3d_get_camera(), negate);
-	gf3d_camera_look_at(negate,self->position,vector_up());*/
 	
+	Vector3D collision = gf3d_entity_collision_test(self);
+
+	rpg_player_move(self, collision);
+	
+
+	
+	rpg_player_input(self);
 }
 
 Entity *get_player_entity()
@@ -176,62 +166,59 @@ pInventory get_player_inventory()
 	return player->inventory;
 }
 
-void rpg_player_move(Entity *self){
+void rpg_player_move(Entity *self, Vector3D collided){
 	const Uint8 *keys;
 	const Uint32 x, y;
 	const int x_rel, y_rel;
 
-	Matrix4 *camera = gf3d_get_camera();
-	
 	keys = SDL_GetKeyboardState(NULL);
-	
+
 	SDL_GetMouseState(&x, &y);
 	SDL_GetRelativeMouseState(&x_rel, &y_rel);
 
 	float angle = x_rel*GFC_DEGTORAD;
 	vector3d_rotate_about_y(&self->direction, angle);
 	vector3d_normalize(&self->direction);
-	
-	Matrix4 rotate;
-	//gfc_new_rotation_matrix(camera, vector3d(y_rel,x_rel,0));
-	//gfc_matrix_rotate(self->modelMatrix,self->modelMatrix,angle,vector_forward());
+
 	//slog("\nDirection: x:%f, y:%f, z:%f", self->direction.x, self->direction.y, self->direction.z);
-	
+
 	//Player input
-	if (keys[SDL_SCANCODE_W])
+	if (keys[SDL_SCANCODE_W])// && collided.z != negZ)
 	{
 		//gfc_matrix_translate(self->modelMatrix,self->direction);
 		self->velocity.z -= 1;
 	}
-	if (keys[SDL_SCANCODE_A])
+	if (keys[SDL_SCANCODE_A])// && collided.x != negX)
 	{
 		self->velocity.x -= 1;
 	}
-	if (keys[SDL_SCANCODE_S])
+	if (keys[SDL_SCANCODE_S])// && collided.z != posZ)
 	{
 		self->velocity.z += 1;
 	}
-	if (keys[SDL_SCANCODE_D])
+	if (keys[SDL_SCANCODE_D])// && collided.x != posX)
 	{
 		self->velocity.x += 1;
 	}
-	if (keys[SDL_SCANCODE_SPACE])
+	if (keys[SDL_SCANCODE_SPACE] )//&& collided.y != posY)
 	{
 		self->velocity.y += 1;
 	}
-	if (keys[SDL_SCANCODE_LSHIFT])
+	if (keys[SDL_SCANCODE_LSHIFT] )//&& collided.y != negY)
 	{
 		self->velocity.y -= 1;
 	}
 
+	//Changes location of camera
 	Vector3D negate;
 	vector3d_negate(negate, self->position);
-	negate.z -= 8;
-	negate.y -= 7;
+	negate.z -= 14;
+	negate.y -= 6;
 	gfc_matrix_new_translation(self->modelMatrix, self->position);
 	gfc_matrix_new_translation(camera, negate);
-
-	
+	//Player and camera rotation?
+	gfc_matrix_rotate(self->modelMatrix, self->modelMatrix, x_rel*GFC_DEGTORAD, vector3d(0, 1, 0));
+	gfc_matrix_rotate(camera, camera, -x_rel*GFC_DEGTORAD, vector3d(0, 1, 0));
 	
 }
 
@@ -258,10 +245,11 @@ rpg_player_input(Entity *self)
 			player->stats.toggleStats = false;
 	}
 
-	if (SDL_GetMouseState(NULL, NULL)& SDL_BUTTON(SDL_BUTTON_LEFT))
+	if (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_RIGHT))
 	{
 		slog("Button: %i", SDL_GetMouseState(NULL, NULL));
-		//rpg_fireball_spawn(self);
+		if (player->stats.mana > 10)
+			rpg_fireball_spawn(self);
 	}
 
 	SDL_Event event;
@@ -279,6 +267,4 @@ rpg_player_input(Entity *self)
 			}
 		}
 	}
-
-	gfc_matrix_rotate(self->modelMatrix, self->modelMatrix, x_rel*GFC_DEGTORAD, vector_up());
 }

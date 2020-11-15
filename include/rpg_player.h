@@ -79,11 +79,15 @@ void rpg_player_think(Entity *self);
 
 void rpg_player_free(Player *player);
 
+void rpg_player_touch(Entity *self);
+
 void rpg_player_inventory_free(pInventory *inventory);
 
 void rpg_player_bag_free(Item *bag);
 
 Entity *get_player_entity();
+
+void rpg_player_move(Entity *self, Vector3D collided);
 
 Player *get_player();
 

@@ -2,36 +2,92 @@
 
 #include "rpg_projectile.h"
 
-void rpg_fireball_spawn(Entity *player)
-{	
-	Fireball fireball;
-	
-	if (!player)return;
+typedef struct
+{
+	Projectile *projectile_list;
+	Uint8 projectile_count;
+}ProjectileManager;
 
-	if (fireball.ent = NULL)
+ProjectileManager rpg_projectiles = { 0 };
+
+void rpg_projectiles_free(Projectile *proj)
+{
+	if (!proj) return;
+	gf3d_entity_free(proj->ent);
+	memset(proj, 0, sizeof(Projectile));
+}
+
+void rpg_projectiles_close()
+{
+	int i;
+	if (rpg_projectiles.projectile_list != NULL)
 	{
-		fireball.ent = gf3d_entity_new();
-		if (!fireball.ent)return;
+		for (i = 0; i < rpg_projectiles.projectile_count; i++)
+		{
+			rpg_projectiles_free(&rpg_projectiles.projectile_list[i]);
+		}
+		free(rpg_projectiles.projectile_list);
 	}
-	fireball.ent->model = gf3d_model_load("fire");
-	if (!fireball.ent->model){
-		slog("Model Null"); 
+	memset(&rpg_projectiles, 0, sizeof(ProjectileManager));
+	slog("Projectile System Closed");
+}
+
+
+void rpg_projectile_init(Uint8 maxProjectiles)
+{
+	if (rpg_projectiles.projectile_list != NULL)
+	{
+		slog("WARNING: projectile system already initialized");
 		return;
 	}
-	fireball.ent->name = "Fire";
-	fireball.damage = 10;
-	fireball.ent->position.x = player->position.x;
-	fireball.ent->position.y = player->position.y + 2;
-	fireball.ent->position.z = player->position.z + 1;
-	gfc_matrix_new_translation(fireball.ent->modelMatrix,fireball.ent->position);
-	slog("Fireball Position: X: %f Y: %f Z: %f", fireball.ent->position.x, fireball.ent->position.y, fireball.ent->position.z);
-/*	fireball.ent->think = rpg_fireball_think;
-	fireball.ent->update = rpg_fireball_update;
-	fireball.collider.radius = 1;
-	fireball.collider.x = fireball.ent->position.x;
-	fireball.collider.y = fireball.ent->position.y;
-	fireball.collider.z = fireball.ent->position.z;
-	*/
+	rpg_projectiles.projectile_list = gfc_allocate_array(sizeof(Projectile), maxProjectiles);
+	if (!rpg_projectiles.projectile_list)
+	{
+		slog("failed to allocate projectile list");
+		return;
+	}
+	rpg_projectiles.projectile_count = maxProjectiles;
+	atexit(rpg_projectiles_close);
+	slog("Projectile System Initialized");
+}
+
+void rpg_fireball_spawn(Entity *player)
+{	
+	int i;
+	if (!player)return;
+
+	for (i = 0; i < rpg_projectiles.projectile_count; i++)
+	{
+		if (!rpg_projectiles.projectile_list[i]._inuse)
+		{
+			rpg_projectiles.projectile_list[i]._inuse = 1;
+
+			rpg_projectiles.projectile_list[i].ent = gf3d_entity_new();
+			rpg_projectiles.projectile_list[i].ent->model = gf3d_model_load("fireball");
+			
+			rpg_projectiles.projectile_list[i].ent->position = 
+				vector3d(player->position.x, player->position.y +2, player->position.z -2);
+			
+			rpg_projectiles.projectile_list[i].ent->name = "Fireball";
+			rpg_projectiles.projectile_list[i].ent->think = rpg_fireball_think;
+			rpg_projectiles.projectile_list[i].ent->update = rpg_fireball_update;
+			
+			rpg_projectiles.projectile_list[i].collider.x = rpg_projectiles.projectile_list[i].ent->position.x;
+			rpg_projectiles.projectile_list[i].collider.y = rpg_projectiles.projectile_list[i].ent->position.y;
+			rpg_projectiles.projectile_list[i].collider.z = rpg_projectiles.projectile_list[i].ent->position.z;
+			rpg_projectiles.projectile_list[i].collider.radius = 2;
+			
+			
+			gfc_matrix_new_translation(
+				rpg_projectiles.projectile_list[i].ent->modelMatrix, 
+				rpg_projectiles.projectile_list[i].ent->position);
+
+			return &rpg_projectiles.projectile_list[i];
+		}
+	}
+	slog("Failed to provide new fireball, no unused slots");
+	return NULL;
+	
 }
 
 void rpg_fireball_despawn()
@@ -42,12 +98,15 @@ void rpg_fireball_despawn()
 void rpg_fireball_think(Entity *self)
 {
 	if (!self)return;
-	self->velocity = vector3d(0, 0, 1);
+	self->velocity = vector3d(0,0,-1);
+
 }
 
 void rpg_fireball_update(Entity *self)
 {
 	if (!self)return;
+	vector3d_scale(self->velocity, self->velocity, 0.2);
 	vector3d_add(self->position, self->position, self->velocity);
-	vector3d_scale(self->velocity, self->velocity, 0.01);
+	gfc_matrix_new_translation(self->modelMatrix,self->position);
+	
 }

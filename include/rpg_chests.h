@@ -23,7 +23,7 @@ void rpg_chests_close();
 
 Chest *rpg_chest_new();
 
-void chest_init();
+void rpg_chest_init(Uint8 macChests);
 
 void rpg_chest_fill(Item *item, int lootSize);
 

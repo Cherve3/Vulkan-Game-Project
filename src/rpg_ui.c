@@ -73,7 +73,7 @@ void rpg_ui_init(SDL_Renderer *renderer, int screenWidth, int screenHeight)
 	SDL_RenderCopy(renderer, mana, NULL, &rectMana);
 	SDL_RenderCopy(renderer, stamina, NULL, &rectStamina);
 	SDL_RenderPresent(renderer);
-	SDL_Delay(2000);
+	//SDL_Delay(2000);
 /*	UI.hud->base = IMG_LoadTexture(renderer, "images/base_bars.png");
 	if (!UI.hud->base)
 	{

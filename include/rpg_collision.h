@@ -22,5 +22,12 @@ typedef struct {
 
 }SphereCollider;
 
+typedef struct
+{
+	Vector3D min;
+	Vector3D max;
+	
+}AABB;
+
 
 #endif

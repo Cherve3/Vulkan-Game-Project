@@ -14,9 +14,9 @@ void rpg_npc_init(){
 	npc->velocity = vector3d(0, 0, 0);
 	npc->rotation = vector3d(0,0,0);
 
-	npc->boxCollider.depth = 1.0;
-	npc->boxCollider.height = 1.0;
 	npc->boxCollider.width = 1.0;
+	npc->boxCollider.height = 1.0;
+	npc->boxCollider.depth = 1.0;
 	npc->boxCollider.x = npc->position.x;
 	npc->boxCollider.y = npc->position.y;
 	npc->boxCollider.z = npc->position.z;
@@ -68,7 +68,7 @@ void rpg_npc_think(Entity *self){
 
 	rpg_npc_move(self);
 
-	gf3d_entity_collision_test(self);
+	//gf3d_entity_collision_test(self);
 }
 
 void rpg_npc_move(Entity *self){

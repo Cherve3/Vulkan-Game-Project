@@ -7,13 +7,42 @@
 
 #include "rpg_collision.h"
 
+typedef enum{
+	Wind,
+	Fire,
+	Ice,
+	Lightning,
+	Water,
+	Earth,
+	Light,
+	Dark
+}Element;
+
+typedef enum{
+	ThrowItem,
+	Weapon,
+	Magic
+}ProjectileType;
+
 typedef struct
 {
+	Uint8 _inuse;
+	Element element;
+	ProjectileType type;
 	SphereCollider collider;
 	int damage;
 	float cooldown;
 	Entity *ent;
-}Fireball;
+	Entity *owner;
+}Projectile;
+
+void rpg_chest_loot_free(Projectile *proj);
+
+void rpg_chests_free(Projectile *proj);
+
+void rpg_projectiles_close();
+
+void rpg_projectile_init();
 
 void rpg_fireball_spawn(Entity *player);
 

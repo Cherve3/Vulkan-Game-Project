@@ -13,18 +13,14 @@ void gf3d_camera_init()
 {
 	camera.view = gf3d_vgraphics_get_ubo_view();
 	camera.position = vector3d(0, -10, 20);
-	camera.forward = vector3d(0, 1, 0);
-	camera.up = vector3d(0, 0, 1);
+	camera.forward = vector3d(0, 0, 1);
+	camera.up = vector3d(0, 1, 0);
 	camera.rotation = vector3d(0, 0, 0);
 
 	vector3d_normalize(&camera.forward);
 	vector3d_normalize(&camera.up);
 
-
-	gfc_matrix_new_translation(camera.view, camera.position);
-	float angle = 180 * GFC_DEGTORAD;
-	//gfc_matrix_rotate(camera.view,camera.view,angle, vector_up());
-	
+	gfc_matrix_new_translation(camera.view, camera.position);	
 }
 
 void camera_update()

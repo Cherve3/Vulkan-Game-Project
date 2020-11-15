@@ -24,9 +24,9 @@ void rpg_goblin_init(int type, Vector3D position){
 	goblin[count].ent->velocity = vector3d(0, 0, 0);
 	goblin[count].ent->rotation = vector3d(0, 0, 0);
 
-	goblin[count].ent->boxCollider.depth = 2.0;
-	goblin[count].ent->boxCollider.height = 2.0;
-	goblin[count].ent->boxCollider.width = 2.0;
+	goblin[count].ent->boxCollider.width = 1.0;
+	goblin[count].ent->boxCollider.height = 1.0;
+	goblin[count].ent->boxCollider.depth = 1.0;
 	goblin[count].ent->boxCollider.x = goblin[count].ent->position.x;
 	goblin[count].ent->boxCollider.y = goblin[count].ent->position.y;
 	goblin[count].ent->boxCollider.z = goblin[count].ent->position.z;
@@ -168,13 +168,23 @@ void rpg_goblin_think(Entity *self){
 
 	rpg_goblin_move(self);
 
-	gf3d_entity_collision_test(self);
+	//gf3d_entity_collision_test(self);
 }
 
 void rpg_goblin_move(Entity *self){
 
+	self->velocity = vector3d(gfc_crandom()*0.8, 0, gfc_crandom()*0.8);
+	vector3d_add(self->position,self->position, self->velocity);
+	gfc_matrix_new_translation(self->modelMatrix,self->position);
 	self->boxCollider.x = self->position.x;
 	self->boxCollider.y = self->position.y;
 	self->boxCollider.z = self->position.z;
 
+
+
+}
+
+void rpg_goblin_search(Entity *player)
+{
+	
 }

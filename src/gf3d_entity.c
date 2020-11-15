@@ -121,54 +121,59 @@ void gf3d_entity_draw_all(Uint32 bufferFrame, VkCommandBuffer commandBuffer)
 	}
 }
 
-int gf3d_entity_collision_test(Entity *self){
+Vector3D gf3d_entity_collision_test(Entity *self){
 	int i;
+	Vector3D collision = vector3d(0,0,0);
+	//if (self->name != "Player")return;
 	for (i = 0; i < gf3d_entity.entity_count; i++)
 	{
+		
 		if (!gf3d_entity.entity_list[i]._inuse) continue;
 		if (&gf3d_entity.entity_list[i] == self) continue;
 		//if (&gf3d_entity.entity_list[i] == self->parent) continue;
-		
-		if (((( self->boxCollider.x + self->boxCollider.width) < gf3d_entity.entity_list[i].boxCollider.x) || (( gf3d_entity.entity_list[i].boxCollider.x + gf3d_entity.entity_list[i].boxCollider.width) < self->boxCollider.x)) ||
-			((( self->boxCollider.y + self->boxCollider.height) < gf3d_entity.entity_list[i].boxCollider.y) || (( gf3d_entity.entity_list[i].boxCollider.y + gf3d_entity.entity_list[i].boxCollider.height) < self->boxCollider.y)) ||
-			((( self->boxCollider.z + self->boxCollider.depth) < gf3d_entity.entity_list[i].boxCollider.z) || (( gf3d_entity.entity_list[i].boxCollider.z + gf3d_entity.entity_list[i].boxCollider.depth) < self->boxCollider.z)))
+			//A Xmin <= B Xmax
+			//A Xmax >= B Xmin
+			//A Ymin <= B Ymax
+			//A Ymax >= B Ymin
+			//A Zmin <= B Zmax
+			//A Zmax >= B Zmin
+		if ( ((self->boxCollider.x - self->boxCollider.width) <= (gf3d_entity.entity_list[i].boxCollider.x + gf3d_entity.entity_list[i].boxCollider.width)) &&
+			 ((self->boxCollider.x + self->boxCollider.width) >= (gf3d_entity.entity_list[i].boxCollider.x - gf3d_entity.entity_list[i].boxCollider.width)) &&
+		     ((self->boxCollider.y - self->boxCollider.height) <= (gf3d_entity.entity_list[i].boxCollider.y + gf3d_entity.entity_list[i].boxCollider.height)) &&
+			 ((self->boxCollider.y + self->boxCollider.height) >= (gf3d_entity.entity_list[i].boxCollider.y - gf3d_entity.entity_list[i].boxCollider.height)) &&
+		     ((self->boxCollider.z - self->boxCollider.depth) <= (gf3d_entity.entity_list[i].boxCollider.z + gf3d_entity.entity_list[i].boxCollider.depth)) &&
+			 ((self->boxCollider.z + self->boxCollider.depth) >= (gf3d_entity.entity_list[i].boxCollider.z - gf3d_entity.entity_list[i].boxCollider.depth)) )
 		{
-			
-			return 0;
-			
-		}
-		else
-		{
-			if (((self->boxCollider.x + self->boxCollider.width) >= gf3d_entity.entity_list[i].boxCollider.x) ||
-				((gf3d_entity.entity_list[i].boxCollider.x + gf3d_entity.entity_list[i].boxCollider.width) >= self->boxCollider.x))
+			if (((self->boxCollider.x - self->boxCollider.width) <= (gf3d_entity.entity_list[i].boxCollider.x + gf3d_entity.entity_list[i].boxCollider.width) && gf3d_entity.entity_list[i].name != "World") ||
+				((self->boxCollider.x + self->boxCollider.width) >= (gf3d_entity.entity_list[i].boxCollider.x - gf3d_entity.entity_list[i].boxCollider.width) && gf3d_entity.entity_list[i].name != "World") )
 			{
+				self->position.x += (gf3d_entity.entity_list[i].boxCollider.x + gf3d_entity.entity_list[i].boxCollider.width) - (self->boxCollider.x - self->boxCollider.width);
+			}
+
+
+			if (((self->boxCollider.y - self->boxCollider.height) <= (gf3d_entity.entity_list[i].boxCollider.y + gf3d_entity.entity_list[i].boxCollider.height)) ||
+				((self->boxCollider.y + self->boxCollider.height) >= (gf3d_entity.entity_list[i].boxCollider.y - gf3d_entity.entity_list[i].boxCollider.height)))
+			{
+				self->position.y += (gf3d_entity.entity_list[i].boxCollider.y + gf3d_entity.entity_list[i].boxCollider.height) - (self->boxCollider.y - self->boxCollider.height);
+			}
+
+
+			if (((self->boxCollider.z - self->boxCollider.depth) <= (gf3d_entity.entity_list[i].boxCollider.z + gf3d_entity.entity_list[i].boxCollider.depth) && gf3d_entity.entity_list[i].name != "World") ||
+				((self->boxCollider.z + self->boxCollider.depth) >= (gf3d_entity.entity_list[i].boxCollider.z - gf3d_entity.entity_list[i].boxCollider.depth) && gf3d_entity.entity_list[i].name != "World"))
+			{
+				self->position.z += (gf3d_entity.entity_list[i].boxCollider.z + gf3d_entity.entity_list[i].boxCollider.depth) - (self->boxCollider.z - self->boxCollider.depth);
+			}
 				
-				self->position.x -= 1;
-				//self->position.z -= 1;
-			}
-			else if (((self->boxCollider.y + self->boxCollider.height) >= gf3d_entity.entity_list[i].boxCollider.y) ||
-				((gf3d_entity.entity_list[i].boxCollider.y + gf3d_entity.entity_list[i].boxCollider.height) >= self->boxCollider.y))
-			{
-
-				self->position.y -= 1;
-
-			}
-			else if (((self->boxCollider.z + self->boxCollider.depth) >= gf3d_entity.entity_list[i].boxCollider.z) ||
-				((gf3d_entity.entity_list[i].boxCollider.z + gf3d_entity.entity_list[i].boxCollider.depth) >= self->boxCollider.z))
-			{
-				//self->position.x -= 1;
-				self->position.z -= 1;
-			}
-			
-			slog("COLLISION detected.");
+			//slog("%s collided with %s",self->name, gf3d_entity.entity_list[i].name);
+			/*slog("COLLISION detected.");
 			slog("Self: boxCollider X: %f  boxCollider Y: %f   boxCollider Z: %f", (self->boxCollider.x + self->boxCollider.width), (self->boxCollider.y + self->boxCollider.height), (self->boxCollider.z + self->boxCollider.depth));
 			slog("Entity: boxCollider X: %f  boxCollider Y: %f   boxCollider Z: %f", gf3d_entity.entity_list[i].boxCollider.x + gf3d_entity.entity_list[i].boxCollider.width,
 				gf3d_entity.entity_list[i].boxCollider.y + gf3d_entity.entity_list[i].boxCollider.height,
 				gf3d_entity.entity_list[i].boxCollider.z + gf3d_entity.entity_list[i].boxCollider.depth);
-			slog("Entity: %s collision test with entity: %s", self->name, gf3d_entity.entity_list[i].name);
+			slog("Entity: %s collision test with entity: %s", self->name, gf3d_entity.entity_list[i].name);*/
 		}
-		
 	}
+	return collision;
 }
 
 Entity* gf3d_get_entity_list()

@@ -25,6 +25,7 @@ typedef struct Entity_S
 	Model		*model;
 	Matrix4		modelMatrix;
 	BoxCollider boxCollider;
+	Bool		hasCollided;
 
 	void		(*update)	(struct Entity_S *self);
 	void		(*think)	(struct Entity_S *self);
@@ -81,7 +82,7 @@ void gf3d_entity_free(Entity *self);
  *	@brief check if the entity collided with another entity
  *	@param self the entity colliding
  */
-int gf3d_entity_collision_test(Entity *self);
+Vector3D gf3d_entity_collision_test(Entity *self);
 
 
 #endif
