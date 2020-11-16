@@ -66,7 +66,7 @@ int main(int argc,char *argv[])
 	gf3d_camera_init();
 
 	gf3d_entity_init(1024);
-
+	
 	rpg_chests_init(10);
 
 	rpg_projectile_init(10);
@@ -76,7 +76,6 @@ int main(int argc,char *argv[])
 	wood		= gf3d_entity_new();
 	world		= gf3d_entity_new();
 	chest		= rpg_chest_new();
-	//fireball	= gf3d_entity_new();
 	box1		= gf3d_entity_new();
 	box2		= gf3d_entity_new();
 	
@@ -85,7 +84,7 @@ int main(int argc,char *argv[])
 	rpg_goblin_init(GoblinGrunt,vector3d(-10,2, -10));
 	rpg_goblin_init(GoblinHeavy, vector3d(10, 2, -10));
 	rpg_goblin_init(GoblinArcher, vector3d(10, 2, 10));
-
+	
 	slog_sync();
 	if (world)
 	{
@@ -145,14 +144,6 @@ int main(int argc,char *argv[])
 		gfc_matrix_new_translation(wood->modelMatrix,wood->position);
 	}
 
-	if (fireball)
-	{
-		fireball->model = gf3d_model_load("fireball");
-		fireball->position = vector3d(-5, 5, 5);
-		fireball->name = "Fireball";
-		gfc_matrix_new_translation(fireball->modelMatrix, fireball->position);
-	}
-	
 	SDL_ShowCursor(0);
 	SDL_SetRelativeMouseMode(SDL_TRUE);
     

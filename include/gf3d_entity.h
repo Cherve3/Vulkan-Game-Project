@@ -16,7 +16,7 @@ typedef struct Entity_S
 {
 	Uint8		_inuse;		/**<flag to make sure entities are not re-assigned while active*/
 	char *		name;
-	Entity      *parent;
+	struct Entity   *parent;
 
 	Vector3D	position;
 	Vector3D	rotation;
@@ -82,7 +82,7 @@ void gf3d_entity_free(Entity *self);
  *	@brief check if the entity collided with another entity
  *	@param self the entity colliding
  */
-Vector3D gf3d_entity_collision_test(Entity *self);
+void gf3d_entity_collision_test(Entity *self);
 
 
 #endif

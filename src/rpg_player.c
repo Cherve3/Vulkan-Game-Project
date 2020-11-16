@@ -137,9 +137,9 @@ void rpg_player_update(Entity *self)
 
 void rpg_player_think(Entity *self){
 	
-	Vector3D collision = gf3d_entity_collision_test(self);
+	gf3d_entity_collision_test(self);
 
-	rpg_player_move(self, collision);
+	rpg_player_move(self);
 	
 
 	
@@ -166,7 +166,7 @@ pInventory get_player_inventory()
 	return player->inventory;
 }
 
-void rpg_player_move(Entity *self, Vector3D collided){
+void rpg_player_move(Entity *self){
 	const Uint8 *keys;
 	const Uint32 x, y;
 	const int x_rel, y_rel;

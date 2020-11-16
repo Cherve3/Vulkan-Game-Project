@@ -87,7 +87,7 @@ void rpg_player_bag_free(Item *bag);
 
 Entity *get_player_entity();
 
-void rpg_player_move(Entity *self, Vector3D collided);
+void rpg_player_move(Entity *self);
 
 Player *get_player();
 
