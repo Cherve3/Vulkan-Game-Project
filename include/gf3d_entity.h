@@ -16,6 +16,7 @@ typedef struct Entity_S
 {
 	Uint8		_inuse;		/**<flag to make sure entities are not re-assigned while active*/
 	char *		name;
+	Entity      *parent;
 
 	Vector3D	position;
 	Vector3D	rotation;
@@ -25,7 +26,6 @@ typedef struct Entity_S
 	Model		*model;
 	Matrix4		modelMatrix;
 	BoxCollider boxCollider;
-	Bool		hasCollided;
 
 	void		(*update)	(struct Entity_S *self);
 	void		(*think)	(struct Entity_S *self);

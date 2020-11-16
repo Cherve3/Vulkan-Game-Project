@@ -116,7 +116,7 @@ void rpg_player_update(Entity *self)
 {
 	if (vector3d_magnitude(self->velocity) > 0.001)
 	{	
-		vector3d_scale(self->velocity, self->velocity, 0.3);
+		vector3d_scale(self->velocity, self->velocity, 0.05);
 		vector3d_add(self->position, self->position, self->velocity);
 		
 	}

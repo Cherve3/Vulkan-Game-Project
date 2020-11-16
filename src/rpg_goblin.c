@@ -186,5 +186,5 @@ void rpg_goblin_move(Entity *self){
 
 void rpg_goblin_search(Entity *player)
 {
-	
+	//TODO : have goblins search for the player to attack.
 }
