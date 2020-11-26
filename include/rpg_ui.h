@@ -4,6 +4,9 @@
 #include "SDL.h"
 #include "SDL_image.h"
 #include "SDL_surface.h"
+
+#include "gf3d_vgraphics.h"
+
 #include "rpg_player.h"
 
 typedef struct

@@ -1,5 +1,13 @@
 
 #include "simple_logger.h"
+#include "simple_json.h"
+#include "simple_json_object.h"
+#include "simple_json_parse.h"
+#include "simple_json_value.h"
+#include "simple_json_string.h"
+#include "simple_json_list.h"
+#include "simple_json_array.h"
+#include "simple_json_error.h"
 
 #include "gf3d_camera.h"
 
@@ -21,19 +29,44 @@ void rpg_player_init(){
 
 	player->ent = rpg_player_new();
 
+	/**
+	 *	Attempting to use the JSON Lib
+	 */
+	sj_enable_debug();
+
+	SJson *player_info = sj_load("json/player.json");
+	if (!player_info)
+		slog("player_info is NULL");
+	
+	sj_echo(player_info);
+
+	slog("Is SJson an object? %i",sj_is_object(player_info));
+
+	slog("Text: %s", player_info->get_string("life")->text);
+	slog("Length: %i", player_info->get_string("life")->length);
+	slog("Size: %i", player_info->get_string("life")->size);// player_info->get_string(player_info)->text);
+
+	slog("Array Count: %i", player_info->v.array->count);
+	slog("Array Elements: %i", player_info->v.array->elements);
+	slog("Array Size: %i", player_info->v.array->size);
+	slog("Array Count: %i", player_info->v.array->elements[0]);
+	
+	/**
+	 * Player Stats
+	 */
 	player->ent->model = gf3d_model_load("dino");
 	player->ent->think = rpg_player_think;
 	player->ent->update = rpg_player_update;
 	player->ent->name = "Player";
-	
-	player->ent->position = vector3d(0, 3.2, 6);
+
+	player->ent->position = vector3d(0, 3.2, -10);
 	player->ent->velocity = vector3d(0, 0, 0);
 	player->ent->rotation = vector3d(0, 0, 0);
 
 	player->ent->direction = vector3d(0, 0, 1);
 
 	player->ent->boxCollider.width = 3.0;
-	player->ent->boxCollider.height = 3.0;
+	player->ent->boxCollider.height = 2.8;
 	player->ent->boxCollider.depth = 3.0;
 	player->ent->boxCollider.x = player->ent->position.x;
 	player->ent->boxCollider.y = player->ent->position.y;
@@ -74,6 +107,7 @@ void rpg_player_init(){
 
 	player->stats.toggleStats = false;
 	
+	
 	player->inventory.bag = (Item *)gfc_allocate_array(sizeof(Item), 30);
 	player->inventory.spellbook = (Spell *)gfc_allocate_array(sizeof(Spell),5);
 	
@@ -89,7 +123,7 @@ void rpg_player_free(Player *player)
 	if (!player) return;
 	rpg_spellbook_free(player->inventory.spellbook);
 	rpg_player_bag_free(player->inventory.bag);
-	//rpg_player_inventory_free(player->inventory);
+	rpg_player_inventory_free(&player->inventory);
 	
 	gf3d_entity_free(player->ent);
 	memset(player, 0, sizeof(Player));
@@ -115,10 +149,16 @@ void rpg_player_bag_free(Item *bag)
 void rpg_player_update(Entity *self)
 {
 	if (vector3d_magnitude(self->velocity) > 0.001)
-	{	
-		vector3d_scale(self->velocity, self->velocity, 0.05);
-		vector3d_add(self->position, self->position, self->velocity);
-		
+	{
+		self->velocity.y += GRAVITY;
+		vector3d_scale(self->velocity, self->velocity, 0.3);
+		self->position.x += self->velocity.x;
+
+		if (player->state.onGround = true);
+			self->position.y += self->velocity.y;
+
+		self->position.z += self->velocity.z;
+		//vector3d_add(self->position, self->position, self->velocity);
 	}
 	else
 	{
@@ -177,48 +217,67 @@ void rpg_player_move(Entity *self){
 	SDL_GetRelativeMouseState(&x_rel, &y_rel);
 
 	float angle = x_rel*GFC_DEGTORAD;
-	vector3d_rotate_about_y(&self->direction, angle);
-	vector3d_normalize(&self->direction);
-
-	//slog("\nDirection: x:%f, y:%f, z:%f", self->direction.x, self->direction.y, self->direction.z);
 
 	//Player input
-	if (keys[SDL_SCANCODE_W])// && collided.z != negZ)
+	if (keys[SDL_SCANCODE_W])
 	{
-		//gfc_matrix_translate(self->modelMatrix,self->direction);
-		self->velocity.z -= 1;
+		if (player->state.crouched)
+			self->velocity.z -= 0.5;
+		else
+			self->velocity.z -= 1;
 	}
-	if (keys[SDL_SCANCODE_A])// && collided.x != negX)
+	if (keys[SDL_SCANCODE_A])
 	{
-		self->velocity.x -= 1;
+		if (player->state.crouched)
+			self->velocity.x -= 0.5;
+		else
+			self->velocity.x -= 1;
 	}
-	if (keys[SDL_SCANCODE_S])// && collided.z != posZ)
+	if (keys[SDL_SCANCODE_S])
 	{
-		self->velocity.z += 1;
+		if (player->state.crouched)
+			self->velocity.z += 0.5;
+		else
+			self->velocity.z += 1;
 	}
-	if (keys[SDL_SCANCODE_D])// && collided.x != posX)
+	if (keys[SDL_SCANCODE_D])
 	{
-		self->velocity.x += 1;
+		if (player->state.crouched)
+			self->velocity.x += 0.5;
+		else
+			self->velocity.x += 1;
 	}
-	if (keys[SDL_SCANCODE_SPACE] )//&& collided.y != posY)
+	if (keys[SDL_SCANCODE_SPACE])
 	{
-		self->velocity.y += 1;
+		player->state.inAir = true;
+		if (player->state.crouched)
+			self->velocity.y = 15;
+		else
+			self->velocity.y = 11;
 	}
-	if (keys[SDL_SCANCODE_LSHIFT] )//&& collided.y != negY)
+	
+	if (player->state.inAir)
 	{
-		self->velocity.y -= 1;
+		player->state.onGround = false;
+		player->state.inAir = true;
 	}
+	else
+	{
+		player->state.onGround = true;
+		player->state.inAir = false;
+	}
+	//Toggle Crouch state
+	if (keys[SDL_SCANCODE_LSHIFT])
+		player->state.crouched = true;
+	else
+		player->state.crouched = false;
 
-	//Changes location of camera
-	Vector3D negate;
-	vector3d_negate(negate, self->position);
-	negate.z -= 14;
-	negate.y -= 6;
-	gfc_matrix_new_translation(self->modelMatrix, self->position);
-	gfc_matrix_new_translation(camera, negate);
-	//Player and camera rotation?
-	gfc_matrix_rotate(self->modelMatrix, self->modelMatrix, x_rel*GFC_DEGTORAD, vector3d(0, 1, 0));
-	gfc_matrix_rotate(camera, camera, -x_rel*GFC_DEGTORAD, vector3d(0, 1, 0));
+	gfc_matrix_rotate(self->modelMatrix, self->modelMatrix, angle,vector_up());
+	
+	//Move model to position
+	gfc_matrix_new_translation(self->modelMatrix,self->position);
+	
+	camera_update(self->rotation, self->position, self->modelMatrix, x_rel, y_rel);
 	
 }
 
@@ -227,6 +286,8 @@ rpg_player_input(Entity *self)
 	const Uint8 *keys = SDL_GetKeyboardState(NULL);
 	int x_rel, y_rel;
 	SDL_GetRelativeMouseState(&x_rel, &y_rel);
+
+
 	if (keys[SDL_SCANCODE_E])
 	{
 		slog("Interact");
@@ -249,7 +310,14 @@ rpg_player_input(Entity *self)
 	{
 		slog("Button: %i", SDL_GetMouseState(NULL, NULL));
 		if (player->stats.mana > 10)
+		{
 			rpg_fireball_spawn(self);
+			player->stats.mana -= 10;
+		}
+		else
+		{
+			slog("Out of mana or cooling down");
+		}
 	}
 
 	SDL_Event event;

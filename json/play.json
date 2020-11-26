@@ -1,0 +1,38 @@
+{
+    "name":"Player 1",
+    "position":[0, 3.2, 6],
+    "velocity":[0,0,0],
+    "rotation":[0,0,0],
+    "direction":[0,0,1],
+
+    "level":1,
+    "exp":0,
+    "life":100,
+    "life_max":100,
+    "life_regen":10,
+    "mana":100,
+    "mana_max":100,
+    "mana_regen":10,
+    "stamina":100,
+    "stamina_max":100,
+    "stamina_regen":10,
+
+    "carry_weight":65.0,
+
+    "strength":1,
+    "strength_max":100,
+    "health":1,
+    "health_max":100,
+    "perception":1,
+    "perception_max":100,
+    "speed":1,
+    "speed_max":100,
+    "willpower":1,
+    "willpower_max":100,
+    "dexterity":1,
+    "dexterity_max":100,
+    "intelligence":1,
+    "intelligence_max":100,
+    "luck":1,
+    "luck_max":100
+}

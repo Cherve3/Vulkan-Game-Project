@@ -1,31 +1,14 @@
-#include <SDL.h>            
+#include "game.h"
 
-#include "simple_logger.h"
-#include "simple_json.h"
-#include "gfc_vector.h"
-#include "gfc_matrix.h"
-#include "gfc_types.h"
-
-#include "gf3d_vgraphics.h"
-#include "gf3d_pipeline.h"
-#include "gf3d_swapchain.h"
-#include "gf3d_model.h"
-#include "gf3d_camera.h"
-#include "gf3d_texture.h"
-#include "gf3d_entity.h"
-
-#include "rpg_chests.h"
-#include "rpg_projectile.h"
-#include "rpg_goblin.h"
-#include "rpg_player.h"
-#include "rpg_npc.h"
-#include "rpg_ui.h"
-#include "rpg_input.h"
+void subWindow();
+void render(SDL_Renderer *renderer);
 
 int main(int argc,char *argv[])
 {
     int done = 0;
     int a;
+	Uint32 old_time, time;
+	float deltaTime = 0;
     Uint8 validate = 1;
     const Uint8 * keys;
     Uint32 bufferFrame = 0;
@@ -39,6 +22,8 @@ int main(int argc,char *argv[])
 	Entity *fireball = NULL;
 	Entity *box1 = NULL;
 	Entity *box2 = NULL;
+
+	Sprite *base = NULL;
 
     for (a = 1; a < argc;a++)
     {
@@ -72,6 +57,8 @@ int main(int argc,char *argv[])
 	rpg_projectile_init(10);
 	
 	rpg_player_init();
+
+	base = gf3d_sprite_load("images/base_bars.png",-1,-1,0);
 
 	wood		= gf3d_entity_new();
 	world		= gf3d_entity_new();
@@ -146,40 +133,58 @@ int main(int argc,char *argv[])
 
 	SDL_ShowCursor(0);
 	SDL_SetRelativeMouseMode(SDL_TRUE);
-    
-	//UI TEST
-	/*SDL_Renderer *renderer = SDL_CreateRenderer(gf3d_vgraphics_get_window(), -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
-	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-	SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
-	SDL_RenderClear(renderer);
-	rpg_ui_init(renderer, 720, 480);*/
-	
-	//SDL_RenderClear(renderer);
-	while(!done)
-    {
+	//subWindow();
+
+	// SDL Renderer for UI 
+	SDL_Renderer *renderer = SDL_CreateRenderer(gf3d_vgraphics_get_window(), -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
+//	render(renderer);
+
+	unsigned int lastTime = 0, currentTime;
+	//Game Loop
+	while (!done)
+	{
+
+		currentTime = SDL_GetTicks();
+		if (currentTime > lastTime + 1000) {
+			slog("\ncurrent time: %i\n", currentTime);
+			slog("\nlast time: %i\n", lastTime);
+			lastTime = currentTime;
+		}
+
+		// Time
+		old_time = time;
+		time = SDL_GetTicks();
+		deltaTime = ((float)(time - old_time) / 1000);
 		
-       SDL_PumpEvents();   // update SDL's internal event structures
-       keys = SDL_GetKeyboardState(NULL); // get the keyboard state for this frame
 
-        //update game things here
-	   //SDL_RenderPresent(renderer);
-
+		SDL_PumpEvents();   // update SDL's internal event structures
+		keys = SDL_GetKeyboardState(NULL); // get the keyboard state for this frame
 		
-		// configure render command for graphics command pool
-        // for each mesh, get a command and configure it from the pool
-        bufferFrame = gf3d_vgraphics_render_begin();
-			gf3d_pipeline_reset_frame(gf3d_vgraphics_get_graphics_pipeline(),bufferFrame);
-            commandBuffer = gf3d_command_rendering_begin(bufferFrame);
-			
-			gf3d_entity_draw_all(bufferFrame, commandBuffer);
-
-            gf3d_command_rendering_end(commandBuffer);
-            
-        gf3d_vgraphics_render_end(bufferFrame);
-
+		//SDL_RenderPresent(renderer);
+		//update game things here
+		
 		gf3d_entity_think_all();
 		gf3d_entity_update_all();
 
+		// configure render command for graphics command pool
+		// for each mesh, get a command and configure it from the pool
+		bufferFrame = gf3d_vgraphics_render_begin();
+		gf3d_pipeline_reset_frame(gf3d_vgraphics_get_graphics_model_pipeline(), bufferFrame);
+		gf3d_pipeline_reset_frame(gf3d_vgraphics_get_graphics_overlay_pipeline(), bufferFrame);
+
+		//Model Buffer
+		commandBuffer = gf3d_command_rendering_begin(bufferFrame, gf3d_vgraphics_get_graphics_model_pipeline());
+		gf3d_entity_draw_all(bufferFrame, commandBuffer);
+		gf3d_command_rendering_end(commandBuffer);
+
+		//Sprite Buffer
+			commandBuffer = gf3d_command_rendering_begin(bufferFrame, gf3d_vgraphics_get_graphics_overlay_pipeline());
+
+				gf3d_sprite_draw(base,vector2d(0,0),vector2d(2,2),0,bufferFrame, commandBuffer);
+
+			gf3d_command_rendering_end(commandBuffer);
+
+        gf3d_vgraphics_render_end(bufferFrame);
 
         if (keys[SDL_SCANCODE_ESCAPE])done = 1; // exit condition
     }    
@@ -192,4 +197,45 @@ int main(int argc,char *argv[])
     return 0;
 }
 
+void subWindow(){
+	// Set postion and size for main window
+	int mainSizeX = 600;
+	int mainSizeY = 600;
+	int mainPosX = 100;
+	int mainPosY = 100;
+
+	// Set postion and size for sub window based on those of main window
+	int subSizeX = mainSizeX / 2;
+	int subSizeY = mainSizeY / 2;
+	int subPosX = mainPosX + mainSizeX / 4;
+	int subPosY = mainPosY + mainSizeY / 4;
+
+	// Set up main window
+	SDL_Window* mainWindow = SDL_CreateWindow("Main Window", mainPosX, mainPosY, mainSizeX, mainSizeY, 0);
+	SDL_Renderer* mainRenderer = SDL_CreateRenderer(mainWindow, -1, SDL_RENDERER_ACCELERATED);
+	SDL_SetRenderDrawColor(mainRenderer, 255, 0, 0, 255);
+
+	// Set up sub window
+	SDL_Window* subWindow = SDL_CreateWindow("Sub Window", subPosX, subPosY, subSizeX, subSizeY, 0);
+	SDL_Renderer* subRenderer = SDL_CreateRenderer(subWindow, -1, SDL_RENDERER_ACCELERATED);
+	SDL_SetRenderDrawColor(subRenderer, 0, 255, 0, 255);
+
+	// Render empty ( red ) background in mainWindow
+	SDL_RenderClear(mainRenderer);
+	SDL_RenderPresent(mainRenderer);
+
+	// Render empty ( green ) background in subWindow
+	SDL_RenderClear(subRenderer);
+	SDL_RenderPresent(subRenderer);
+}
+
+void render(SDL_Renderer *renderer)
+{
+	
+	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_TRANSPARENT);
+	SDL_RenderClear(renderer);
+
+	rpg_ui_init(renderer, 720, 480);
+}
 /*eol@eof*/

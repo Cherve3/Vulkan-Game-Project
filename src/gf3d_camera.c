@@ -2,6 +2,7 @@
 
 #include "simple_logger.h"
 #include "gfc_matrix.h"
+#include "gfc_vector.h"
 
 #include "gf3d_vgraphics.h"
 #include "gf3d_camera.h"
@@ -11,20 +12,58 @@ static Camera camera;
 
 void gf3d_camera_init()
 {
+	camera.proj = gf3d_vgraphics_get_ubo_proj();
+	camera.model = gf3d_vgraphics_get_ubo_model();
 	camera.view = gf3d_vgraphics_get_ubo_view();
-	camera.position = vector3d(0, -10, 20);
+	camera.position = vector3d(0, -10, 0);
 	camera.forward = vector3d(0, 0, 1);
 	camera.up = vector3d(0, 1, 0);
 	camera.rotation = vector3d(0, 0, 0);
+	camera.offset = vector3d(0, -10, -5);
 
 	vector3d_normalize(&camera.forward);
 	vector3d_normalize(&camera.up);
 
-	gfc_matrix_new_translation(camera.view, camera.position);	
+		
 }
 
-void camera_update()
+void camera_update(Vector3D rotation, Vector3D playerPosition, Matrix4 playerMat, const int x_rel, const int y_rel)
 {
+	//gfc_matrix_new_translation(camera.view, camera.position);
+	//gfc_matrix_rotate(camera.view, camera.view, -x_rel*GFC_DEGTORAD, camera.up);
+	
+	Vector3D negate;
+	vector3d_negate(negate, camera.position);
+
+	camera.yaw += x_rel;
+	camera.pitch += y_rel;
+	slog("\nYAW: %f\nPitch: %f", camera.yaw, camera.pitch);
+	
+	if (camera.pitch > 40.0f)
+		camera.pitch = 40.0f;
+	if (camera.pitch < -60.0f)
+		camera.pitch = -60.0f;
+		
+	if (camera.yaw >= 360.0f)
+		camera.yaw = 0.0f;
+	if (camera.yaw <= -360.0f)
+		camera.yaw = 0.0f;
+
+	camera.position.x = -playerPosition.x;
+	camera.position.y = -playerPosition.y -10;
+	camera.position.z = -playerPosition.z -20;
+
+	
+	//vector3d_negate(negate, playerPosition);
+	//gfc_matrix_translate(camera.view,negate);
+	gf3d_camera_look_at(negate,playerPosition,camera.up);
+	gfc_matrix_rotate(camera.view, camera.view, camera.pitch*GFC_DEGTORAD, vector_left());
+	gfc_matrix_rotate(camera.view,camera.view,camera.yaw*GFC_DEGTORAD,camera.up);
+	
+	gfc_matrix_translate(camera.view, camera.position);
+	
+
+	/*
 	SDL_Event event;
 	while (SDL_PollEvent(&event))
 	{
@@ -39,7 +78,7 @@ void camera_update()
 				gf3d_camera_move(vector3d(0, 0, event.wheel.y));
 			}
 		}
-	}
+	}*/
 }
 
 Matrix4 *gf3d_get_camera()

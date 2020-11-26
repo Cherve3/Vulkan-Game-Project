@@ -14,6 +14,8 @@ typedef struct
     VkDeviceMemory      textureImageMemory;
     VkImageView         textureImageView;
     VkSampler           textureSampler;
+	Uint32				height;
+	Uint32				width;
 }Texture;
 
 

@@ -36,7 +36,8 @@ void rpg_ui_init(SDL_Renderer *renderer, int screenWidth, int screenHeight)
 		slog("Font is NULL");
 		slog(SDL_GetError());
 	}
-	
+
+
 
 	SDL_Texture *base		= IMG_LoadTexture(renderer, "images/base_bars.png");
 	SDL_Texture *health		= IMG_LoadTexture(renderer, "images/health_bar.png");

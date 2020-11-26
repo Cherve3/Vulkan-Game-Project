@@ -2,12 +2,24 @@
 #define __RPG_PLAYER_H__
 
 #include "gf3d_entity.h"
+
+#include "game.h"
 #include "rpg_items.h"
 #include "rpg_spellbook.h"
 
 /**
 *	@purpose this is the definition file for a player character.
 */
+typedef struct
+{
+	Uint8 walking;
+	Uint8 crouched;
+	Uint8 inAir;
+	Uint8 attacking;
+	Uint8 onGround;
+	Uint8 idle;
+	
+}PlayerState;
 
 typedef struct PStats_S
 {
@@ -59,6 +71,7 @@ typedef struct Player_S
 	Entity *ent;
 	pStats stats;
 	pInventory inventory;
+	PlayerState state;
 }Player;
 /**
  *	@brief initialize a player character

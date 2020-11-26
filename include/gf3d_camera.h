@@ -2,21 +2,28 @@
 #define __GF3D_CAMERA_H__
 
 #include "gfc_matrix.h"
+#include "gfc_vector.h"
 
 typedef struct
 {
+	Matrix4 *proj;
+	Matrix4 *model;
 	Matrix4 *view;
 	Vector3D position;
 	Vector3D forward;
 	Vector3D up;
+	Vector3D right;
 	Vector3D offset;
 	Vector3D rotation;
+
+	float yaw;
+	float pitch;
 	
 }Camera;
 
 void gf3d_camera_init();
 
-void camera_update();
+void camera_update(Vector3D rotation, Vector3D playerPosition, Matrix4 playerMat);
 
 Matrix4 *gf3d_get_camera();
 
@@ -56,14 +63,5 @@ void gf3d_camera_set_position(Vector3D position);
 * @param move the ammount to move the camera
 */
 void gf3d_camera_move(Vector3D move);
-
-Vector3D *getLeft();
-Vector3D *getRight();
-
-void gf3d_camera_rotate_x(Camera *camera, float angle);
-void gf3d_camera_rotate_y(Camera *camera, float angle);
-
-
-void camera_rotate(Vector3D axis, float angle);
 
 #endif

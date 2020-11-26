@@ -25,7 +25,8 @@ static CommandManager gf3d_commands = {0};
 void gf3d_command_pool_close();
 void gf3d_command_free(Command *com);
 void gf3d_command_buffer_begin(Command *com,Pipeline *pipe);
-void gf3d_command_configure_render_pass(VkCommandBuffer commandBuffer, VkRenderPass renderPass,VkFramebuffer framebuffer,VkPipeline graphicsPipeline,VkPipelineLayout pipelineLayout);
+void gf3d_command_configure_render_pass(VkCommandBuffer commandBuffer, VkRenderPass renderPass,VkFramebuffer framebuffer,
+		VkPipeline graphicsPipeline,VkPipelineLayout pipelineLayout);
 
 void gf3d_command_system_close()
 {
@@ -168,11 +169,9 @@ void gf3d_command_configure_render_pass_end(VkCommandBuffer commandBuffer)
     vkCmdEndRenderPass(commandBuffer);
 }
 
-VkCommandBuffer gf3d_command_rendering_begin(Uint32 index)
+VkCommandBuffer gf3d_command_rendering_begin(Uint32 index, Pipeline *pipe)
 {
     VkCommandBuffer commandBuffer;
-    Pipeline *pipe;
-    pipe = gf3d_vgraphics_get_graphics_pipeline();
     
     commandBuffer = gf3d_command_begin_single_time(gf3d_vgraphics_get_graphics_command_pool());
     
@@ -192,7 +191,8 @@ void gf3d_command_rendering_end(VkCommandBuffer commandBuffer)
     gf3d_command_end_single_time(gf3d_vgraphics_get_graphics_command_pool(), commandBuffer);
 }
 
-void gf3d_command_configure_render_pass(VkCommandBuffer commandBuffer, VkRenderPass renderPass,VkFramebuffer framebuffer,VkPipeline graphicsPipeline,VkPipelineLayout pipelineLayout)
+void gf3d_command_configure_render_pass(VkCommandBuffer commandBuffer, VkRenderPass renderPass,VkFramebuffer framebuffer,
+		VkPipeline graphicsPipeline,VkPipelineLayout pipelineLayout)
 {
     VkClearValue clearValues[2] = {0};
     VkRenderPassBeginInfo renderPassInfo = {0};

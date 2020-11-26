@@ -12,8 +12,7 @@ void rpg_goblin_init(int type, Vector3D position){
 	
 	if (!goblin)
 		goblin = (NPC *)gfc_allocate_array(sizeof(NPC), 10);
-	//while(!goblin[count].ent)
-	//	count++;
+
 	slog("Count: %i", count);
 
 	goblin[count].ent = rpg_goblin_new();
@@ -47,9 +46,9 @@ void rpg_goblin_init(int type, Vector3D position){
 		goblin[count].stats.life = 25;
 		goblin[count].stats.life_max = 25;
 		goblin[count].stats.life_regen = 5;
-		goblin[count].stats.magic = 25;
-		goblin[count].stats.magic_max = 25;
-		goblin[count].stats.magic_regen = 5;
+		goblin[count].stats.mana = 25;
+		goblin[count].stats.mana_max = 25;
+		goblin[count].stats.mana_regen = 5;
 		goblin[count].stats.stamina = 50;
 		goblin[count].stats.stamina_max = 50;
 		goblin[count].stats.stamina_regen = 10;
@@ -87,12 +86,12 @@ void rpg_goblin_init(int type, Vector3D position){
 		goblin[count].stats.life = 100;
 		goblin[count].stats.life_max = 100;
 		goblin[count].stats.life_regen = 10;
-		goblin[count].stats.magic = 25;
-		goblin[count].stats.magic_max = 25;
-		goblin[count].stats.magic_regen = 10;
+		goblin[count].stats.mana = 25;
+		goblin[count].stats.mana_max = 25;
+		goblin[count].stats.mana_regen = 5;
 		goblin[count].stats.stamina = 50;
 		goblin[count].stats.stamina_max = 50;
-		goblin[count].stats.stamina_regen = 10;
+		goblin[count].stats.stamina_regen = 5;
 
 		goblin[count].stats.carry_weight = 65.00;	//Value is in kilograms
 
@@ -126,10 +125,10 @@ void rpg_goblin_init(int type, Vector3D position){
 
 		goblin[count].stats.life = 50;
 		goblin[count].stats.life_max = 50;
-		goblin[count].stats.life_regen = 10;
-		goblin[count].stats.magic = 25;
-		goblin[count].stats.magic_max = 25;
-		goblin[count].stats.magic_regen = 10;
+		goblin[count].stats.life_regen = 5;
+		goblin[count].stats.mana = 25;
+		goblin[count].stats.mana_max = 25;
+		goblin[count].stats.mana_regen = 5;
 		goblin[count].stats.stamina = 100;
 		goblin[count].stats.stamina_max = 100;
 		goblin[count].stats.stamina_regen = 10;

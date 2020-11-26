@@ -105,6 +105,7 @@
     <ClInclude Include="..\gfc\simple_json\include\simple_json_string.h" />
     <ClInclude Include="..\gfc\simple_json\include\simple_json_value.h" />
     <ClInclude Include="..\gfc\simple_logger\include\simple_logger.h" />
+    <ClInclude Include="..\include\game.h" />
     <ClInclude Include="..\include\gf3d_camera.h" />
     <ClInclude Include="..\include\gf3d_commands.h" />
     <ClInclude Include="..\include\gf3d_entity.h" />
@@ -112,6 +113,7 @@
     <ClInclude Include="..\include\gf3d_model.h" />
     <ClInclude Include="..\include\gf3d_pipeline.h" />
     <ClInclude Include="..\include\gf3d_shaders.h" />
+    <ClInclude Include="..\include\gf3d_sprite.h" />
     <ClInclude Include="..\include\gf3d_swapchain.h" />
     <ClInclude Include="..\include\gf3d_validation.h" />
     <ClInclude Include="..\include\gf3d_vgraphics.h" />
@@ -155,6 +157,7 @@
     <ClCompile Include="..\src\gf3d_obj_load.c" />
     <ClCompile Include="..\src\gf3d_pipeline.c" />
     <ClCompile Include="..\src\gf3d_shaders.c" />
+    <ClCompile Include="..\src\gf3d_sprite.c" />
     <ClCompile Include="..\src\gf3d_swapchain.c" />
     <ClCompile Include="..\src\gf3d_texture.c" />
     <ClCompile Include="..\src\gf3d_validation.c" />

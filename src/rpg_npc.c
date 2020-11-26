@@ -31,9 +31,9 @@ void rpg_npc_init(){
 	stats.life = 100;
 	stats.life_max = 100;
 	stats.life_regen = 100;
-	stats.magic = 100;
-	stats.magic_max = 100;
-	stats.magic_regen = 100;
+	stats.mana = 100;
+	stats.mana_max = 100;
+	stats.mana_regen = 100;
 	stats.stamina = 100;
 	stats.stamina_max = 100;
 	stats.stamina_regen = 100;
