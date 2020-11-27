@@ -14,12 +14,15 @@
 typedef enum {
 	GoblinGrunt,
 	GoblinHeavy,
-	GoblinArcher
+	GoblinArcher,
+	GoblinKing
 }GoblinType;
 
 /**
-*	@brief initialize a goblin grunt character
-*/
+ *	@brief initialize a goblin character
+ *	@param type an enum of the goblin type
+ *	@param position the initial spawn position of the goblin
+ */
 void rpg_goblin_init(int type, Vector3D position);
 
 /**

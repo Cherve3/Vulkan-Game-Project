@@ -12,11 +12,22 @@
  *	@purpose this is the file to access the entity management system
  */
 
+typedef enum{
+	ITEM,
+	INTERACT,
+	PICKUP,
+	PLAYER,
+	NONPLAYER,
+	MONSTER,
+	WORLD,
+}EntityType;
+
 typedef struct Entity_S
 {
 	Uint8		_inuse;		/**<flag to make sure entities are not re-assigned while active*/
 	char *		name;
 	struct Entity   *parent;
+	EntityType	type;
 
 	Vector3D	position;
 	Vector3D	rotation;
@@ -29,6 +40,7 @@ typedef struct Entity_S
 
 	void		(*update)	(struct Entity_S *self);
 	void		(*think)	(struct Entity_S *self);
+	void		(*interact) (struct Entity_S *self);
 	void		(*touch)	(struct Entity_S *self);
 	void		(*damage)	(struct Entity_S *self);
 	void		(*die)		(struct Entity_S *self);
@@ -84,5 +96,12 @@ void gf3d_entity_free(Entity *self);
  */
 void gf3d_entity_collision_test(Entity *self);
 
+/**
+*	@brief get the list of all entities 
+*	@return a pointer to entity list
+*/
+Entity* gf3d_get_entity_list();
+
+int gf3d_get_entity_list_count();
 
 #endif

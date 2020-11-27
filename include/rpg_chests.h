@@ -13,7 +13,6 @@ typedef struct
 	Uint8			_inuse;
 	Item			*loot;
 	Entity			*ent;
-	CircleCollider	interactBounds;
 
 }Chest;
 

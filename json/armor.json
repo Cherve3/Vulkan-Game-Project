@@ -1,9 +1,9 @@
 {
     "armor":[
-        {"ItemType":3, "armor":10, "weight": 5, "name":"helmet", "description":"Armor to protect your head."},
-        {"ItemType":3, "armor":10, "weight": 20, "name":"chestplate", "description":"Armor to protect your torso."},
-        {"ItemType":3, "armor":10, "weight": 15, "name":"leggings", "description":"Armor to protect your legs."},
-        {"ItemType":3, "armor":10, "weight": 5, "name":"boots", "description":"Armor to protect your feet."}
+        {"ItemType":3, "armor":1, "weight": 5.0,   "name":"Leather Cap",     "description":"A worn leather cap. It is your cap right?"},
+        {"ItemType":3, "armor":15, "weight": 20.0, "name":"Leather Cuirass", "description":"A cuirass crafted from leather. It is better than nothing."},
+        {"ItemType":3, "armor":5, "weight": 5.0,   "name":"Leather Greaves", "description":"A small leather covering for your legs."},
+        {"ItemType":3, "armor":5, "weight": 5.0,   "name":"Leather Boots",   "description":"A fairly comfy pair of leather boots. Keep your toes out of the dirt."}
         
     ]
 }

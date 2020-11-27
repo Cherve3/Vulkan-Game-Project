@@ -2,8 +2,9 @@
 #define __RPG_ITEMS_H__
 
 #include "gfc_vector.h"
-
 #include "gfc_types.h"
+
+#include "gf3d_entity.h"
 
 typedef enum
 {
@@ -27,8 +28,23 @@ typedef struct
 
 }Item;
 
-Item rpg_item_new();
+typedef struct
+{
+	Item item;
+	Entity *ent;
 
-Item *rpg_item_spawn(Vector3D position);
+}ItemEntity;
+
+Item rpg_item_new_random(int random);
+
+Item rpg_item_new_consumable(char* name, Uint8 quantity);
+
+Item rpg_item_new_material(char* name, Uint8 quantity);
+
+Item rpg_item_new_weapon(char* name, Uint8 quantity);
+
+Item rpg_item_new_armor(char* name, Uint8 quantity);
+
+Item *rpg_item_spawn(ItemType type, Vector3D position);
 
 #endif

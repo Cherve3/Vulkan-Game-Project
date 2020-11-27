@@ -12,6 +12,10 @@ typedef struct
 
 ChestManager rpg_chests = { 0 };
 
+time_t t;
+
+
+
 void rpg_chest_loot_free(Item *item)
 {
 	if (!item) return;
@@ -53,24 +57,23 @@ Chest *rpg_chest_new()
 			rpg_chests.chest_list[i].ent = gf3d_entity_new();
 			rpg_chests.chest_list[i].ent->model = gf3d_model_load("chest");
 			rpg_chests.chest_list[i].ent->position = vector3d(-15, 1, 0);
-			rpg_chests.chest_list[i].ent->name = "Chest";
-			rpg_chests.chest_list[i].ent->boxCollider.width  = 2;
+			rpg_chests.chest_list[i].ent->type = INTERACT;
+			rpg_chests.chest_list[i].ent->name = "Chest" ;
+			rpg_chests.chest_list[i].ent->boxCollider.width  = 1;
 			rpg_chests.chest_list[i].ent->boxCollider.height = 2;
 			rpg_chests.chest_list[i].ent->boxCollider.depth  = 2;
+			rpg_chests.chest_list[i].ent->interact = rpg_chest_open;
 			rpg_chests.chest_list[i].ent->boxCollider.x = rpg_chests.chest_list[i].ent->position.x;
 			rpg_chests.chest_list[i].ent->boxCollider.y = rpg_chests.chest_list[i].ent->position.y;
 			rpg_chests.chest_list[i].ent->boxCollider.z = rpg_chests.chest_list[i].ent->position.z;
 			gfc_matrix_new_translation(rpg_chests.chest_list[i].ent->modelMatrix, rpg_chests.chest_list[i].ent->position);
 
-			rpg_chests.chest_list[i].interactBounds.radius = 2;
-
-			srand(time(NULL));
+			
 			float lootSize = rand() % 10;
 			slog("LootSize: %f", lootSize);
 			rpg_chests.chest_list[i].loot = (Item *)gfc_allocate_array(sizeof(Item), (int)lootSize);
 
 			rpg_chest_fill(rpg_chests.chest_list[i].loot, (int)lootSize);
-			//rpg_chests.chest_list[i].loot[i] = rpg_item_new();
 
 			return &rpg_chests.chest_list[i];
 		}
@@ -94,6 +97,7 @@ void rpg_chests_init(Uint8 maxChests)
 		return;
 	}
 	rpg_chests.chest_count = maxChests;
+	srand((unsigned)time(&t));
 	atexit(rpg_chests_close);
 	slog("Chest System Initialized");
 }
@@ -109,12 +113,13 @@ void rpg_chest_fill(Item *item, int lootSize)
 	int i;
 	for (i = 0; i < lootSize; i++)
 	{
-		item[i] = rpg_item_new();
+		
+		item[i] = rpg_item_new_random((int)rand() % 4);
 	}
 
 }
 
 void rpg_chest_open()
 {
-
+	slog("Opening Chest");
 }

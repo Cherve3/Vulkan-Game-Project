@@ -18,7 +18,8 @@ void rpg_goblin_init(int type, Vector3D position){
 	goblin[count].ent = rpg_goblin_new();
 
 	goblin[count].ent->name = "Goblin ";
-	
+	goblin[count].ent->type = MONSTER;
+
 	goblin[count].ent->position = position;
 	goblin[count].ent->velocity = vector3d(0, 0, 0);
 	goblin[count].ent->rotation = vector3d(0, 0, 0);
@@ -34,7 +35,7 @@ void rpg_goblin_init(int type, Vector3D position){
 
 	switch (type)
 	{
-	case 0:
+	case GoblinGrunt:
 
 		goblin[count].ent->model = gf3d_model_load("goblingrunt");
 		goblin[count].ent->think = rpg_goblin_think;
@@ -42,7 +43,7 @@ void rpg_goblin_init(int type, Vector3D position){
 		goblin[count].stats.name = "Goblin Grunt";
 		goblin[count].stats.level = 1;
 		goblin[count].stats.exp = 0;
-		
+
 		goblin[count].stats.life = 25;
 		goblin[count].stats.life_max = 25;
 		goblin[count].stats.life_regen = 5;
@@ -74,7 +75,7 @@ void rpg_goblin_init(int type, Vector3D position){
 
 		count++;
 		break;
-	case 1:							//Goblin Heavy
+	case GoblinHeavy:							//Goblin Heavy
 
 		goblin[count].ent->model = gf3d_model_load("goblinheavy");
 		goblin[count].ent->think = rpg_goblin_think;
@@ -114,7 +115,7 @@ void rpg_goblin_init(int type, Vector3D position){
 
 		count++;
 		break;
-	case 2:							//Goblin Archer
+	case GoblinArcher:							//Goblin Archer
 
 		goblin[count].ent->model = gf3d_model_load("goblinarcher");
 		goblin[count].ent->think = rpg_goblin_think;
@@ -154,8 +155,48 @@ void rpg_goblin_init(int type, Vector3D position){
 
 		count++;
 		break;
+
+	case GoblinKing:							//Goblin King
+
+		goblin[count].ent->model = gf3d_model_load("goblinking");
+		goblin[count].ent->think = rpg_goblin_think;
+
+		goblin[count].stats.name = "Goblin King";
+		goblin[count].stats.level = 5;
+		goblin[count].stats.exp = 0;
+
+		goblin[count].stats.life = 200;
+		goblin[count].stats.life_max = 200;
+		goblin[count].stats.life_regen = 15;
+		goblin[count].stats.mana = 100;
+		goblin[count].stats.mana_max = 100;
+		goblin[count].stats.mana_regen = 15;
+		goblin[count].stats.stamina = 200;
+		goblin[count].stats.stamina_max = 200;
+		goblin[count].stats.stamina_regen = 15;
+
+		goblin[count].stats.carry_weight = 100.00;	//Value is in kilograms
+
+		goblin[count].stats.strength = 10;
+		goblin[count].stats.strength_max = 100;
+		goblin[count].stats.health = 5;
+		goblin[count].stats.health_max = 100;
+		goblin[count].stats.perception = 2;
+		goblin[count].stats.perception_max = 100;
+		goblin[count].stats.speed = 5;
+		goblin[count].stats.speed_max = 100;
+		goblin[count].stats.willpower = 10;
+		goblin[count].stats.willpower_max = 100;
+		goblin[count].stats.dexterity = 2;
+		goblin[count].stats.dexterity_max = 100;
+		goblin[count].stats.intelligence = 1;
+		goblin[count].stats.intelligence_max = 100;
+		goblin[count].stats.luck = 5;
+		goblin[count].stats.luck_max = 100;
+
+		count++;
+		break;
 	}
-	
 }
 
 Entity *rpg_goblin_new(){

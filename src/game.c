@@ -143,11 +143,11 @@ int main(int argc,char *argv[])
 	//Game Loop
 	while (!done)
 	{
-
+		
 		currentTime = SDL_GetTicks();
 		if (currentTime > lastTime + 1000) {
-			slog("\ncurrent time: %i\n", currentTime);
-			slog("\nlast time: %i\n", lastTime);
+			//slog("\ncurrent time: %i\n", currentTime);
+			//slog("\nlast time: %i\n", lastTime);
 			lastTime = currentTime;
 		}
 
@@ -170,7 +170,7 @@ int main(int argc,char *argv[])
 		// for each mesh, get a command and configure it from the pool
 		bufferFrame = gf3d_vgraphics_render_begin();
 		gf3d_pipeline_reset_frame(gf3d_vgraphics_get_graphics_model_pipeline(), bufferFrame);
-		gf3d_pipeline_reset_frame(gf3d_vgraphics_get_graphics_overlay_pipeline(), bufferFrame);
+//		gf3d_pipeline_reset_frame(gf3d_vgraphics_get_graphics_overlay_pipeline(), bufferFrame);
 
 		//Model Buffer
 		commandBuffer = gf3d_command_rendering_begin(bufferFrame, gf3d_vgraphics_get_graphics_model_pipeline());
@@ -178,11 +178,11 @@ int main(int argc,char *argv[])
 		gf3d_command_rendering_end(commandBuffer);
 
 		//Sprite Buffer
-			commandBuffer = gf3d_command_rendering_begin(bufferFrame, gf3d_vgraphics_get_graphics_overlay_pipeline());
+//			commandBuffer = gf3d_command_rendering_begin(bufferFrame, gf3d_vgraphics_get_graphics_overlay_pipeline());
 
-				gf3d_sprite_draw(base,vector2d(0,0),vector2d(2,2),0,bufferFrame, commandBuffer);
+//				gf3d_sprite_draw(base,vector2d(0,0),vector2d(2,2),0,bufferFrame, commandBuffer);
 
-			gf3d_command_rendering_end(commandBuffer);
+//			gf3d_command_rendering_end(commandBuffer);
 
         gf3d_vgraphics_render_end(bufferFrame);
 

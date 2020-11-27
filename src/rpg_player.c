@@ -42,7 +42,7 @@ void rpg_player_init(){
 
 	slog("Is SJson an object? %i",sj_is_object(player_info));
 
-	slog("Text: %s", player_info->get_string("life")->text);
+	slog("Text: %i", player_info->get_string("life")->text);
 	slog("Length: %i", player_info->get_string("life")->length);
 	slog("Size: %i", player_info->get_string("life")->size);// player_info->get_string(player_info)->text);
 
@@ -57,12 +57,12 @@ void rpg_player_init(){
 	player->ent->model = gf3d_model_load("dino");
 	player->ent->think = rpg_player_think;
 	player->ent->update = rpg_player_update;
+	player->ent->type = PLAYER;
 	player->ent->name = "Player";
-
+	player->ent->type = PLAYER;
 	player->ent->position = vector3d(0, 3.2, -10);
 	player->ent->velocity = vector3d(0, 0, 0);
 	player->ent->rotation = vector3d(0, 0, 0);
-
 	player->ent->direction = vector3d(0, 0, 1);
 
 	player->ent->boxCollider.width = 3.0;
@@ -71,6 +71,10 @@ void rpg_player_init(){
 	player->ent->boxCollider.x = player->ent->position.x;
 	player->ent->boxCollider.y = player->ent->position.y;
 	player->ent->boxCollider.z = player->ent->position.z;
+
+	player->interactBound.radius = 6;
+	player->interactBound.x = player->ent->position.x;
+	player->interactBound.y = player->ent->position.z;
 	
 	player->stats.name				= "Player 1";
 	player->stats.level				= 1;
@@ -181,8 +185,6 @@ void rpg_player_think(Entity *self){
 
 	rpg_player_move(self);
 	
-
-	
 	rpg_player_input(self);
 }
 
@@ -286,11 +288,13 @@ rpg_player_input(Entity *self)
 	const Uint8 *keys = SDL_GetKeyboardState(NULL);
 	int x_rel, y_rel;
 	SDL_GetRelativeMouseState(&x_rel, &y_rel);
+	Uint32 time, old_time = 0;
 
 
 	if (keys[SDL_SCANCODE_E])
 	{
 		slog("Interact");
+		player_interaction();
 
 	}
 	if (keys[SDL_SCANCODE_I])
@@ -309,6 +313,7 @@ rpg_player_input(Entity *self)
 	if (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_RIGHT))
 	{
 		slog("Button: %i", SDL_GetMouseState(NULL, NULL));
+		if (time > old_time)
 		if (player->stats.mana > 10)
 		{
 			rpg_fireball_spawn(self);
@@ -332,6 +337,33 @@ rpg_player_input(Entity *self)
 			else if (event.wheel.y < 0) // scroll down
 			{
 				gf3d_camera_move(vector_backward());
+			}
+		}
+	}
+}
+
+void player_interaction()
+{
+	int i;
+	slog("Initial interacting...");
+	for (i = 0; i < gf3d_get_entity_list_count(); i++)
+	{
+		if (!gf3d_get_entity_list()[i]._inuse) continue;
+		if (gf3d_get_entity_list()[i].name == player->ent->name) continue;
+		slog("Interacting...");
+		if (gf3d_get_entity_list()[i].type == INTERACT)
+		{
+
+			float x = player->ent->position.x - gf3d_get_entity_list()[i].position.x;
+			float y = player->ent->position.z - gf3d_get_entity_list()[i].position.z;
+			
+			float result = sqrt( (x * x) + (y * y));
+			slog("checking distance...");
+			slog("Result: %f", result);
+			if (result < player->interactBound.radius)
+			{
+				slog("Interacting with %s",gf3d_get_entity_list()[i].name);
+				gf3d_get_entity_list()[i].interact(&gf3d_get_entity_list()[i]);
 			}
 		}
 	}

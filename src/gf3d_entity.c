@@ -179,4 +179,9 @@ Entity* gf3d_get_entity_list()
 	return gf3d_entity.entity_list;
 }
 
+int gf3d_get_entity_list_count()
+{
+	return gf3d_entity.entity_count;
+}
+
 /*eol@eof*/

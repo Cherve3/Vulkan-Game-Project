@@ -1,10 +1,10 @@
 {
     "items":[
-        {"ItemType":0, "weight":0.5, "name":"health",  "description":"A potion to accelerate health regeneration."},
-        {"ItemType":0, "weight":0.5, "name":"mana",    "description":"A potion to accelerate mana regeneration."},
-        {"ItemType":0, "weight":0.5, "name":"stamina", "description":"A potion to accelerate stamina regeneration."},
+        {"ItemType":0, "weight":0.1, "name":"health_potion",  "description":"A glass bottle filled with a red glowing liquid. It will fortify your health."},
+        {"ItemType":0, "weight":0.1, "name":"mana_potion",    "description":"A glass bottle filled with a blue glowing liquid. It will fortify your mana."},
+        {"ItemType":0, "weight":0.1, "name":"stamina_potion", "description":"A glass bottle filled with a green glowing liquid. It will fortify your stamina."},
         
-        {"ItemType":1, "weight":2, "name":"wood", "description":"A wood log."},
-        {"ItemType":1, "weight":0.1, "name":"plant", "description":"A small plant. Can be used in crafting."}
+        {"ItemType":1, "weight":2.0, "name":"wood", "description":"A sturdy looking wood log. It can be used for crafting."},
+        {"ItemType":1, "weight":0.1, "name":"plant", "description":"A small herbal plant. Can be used in crafting."}
     ]
 }

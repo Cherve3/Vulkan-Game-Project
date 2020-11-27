@@ -1,9 +1,10 @@
 {
     "weapons":[
-        {"ItemType":2, "damage":5, "weight": 5, "name":"dagger", "description":"A Small pointy blade."},
-        {"ItemType":2, "damage":10, "weight": 20, "name":"hammer", "description":"A midsize blunt weapon."},
-        {"ItemType":2, "damage":10, "weight": 15, "name":"sword", "description":"A midsize pointy blade."},
-        {"ItemType":2, "damage":5, "weight": 5, "name":"bow", "description":"A curved wood with a string attached.."}
+        {"ItemType":2, "damage":10, "weight": 3.0,  "name":"Dagger",       "description":"A small thin metal weapon. Stick 'em with the pointy end."},
+        {"ItemType":2, "damage":10, "weight": 20.0, "name":"Hammer",       "description":"A thick blunt metal object with a tiny handle. That's what she said..."},
+        {"ItemType":2, "damage":5,  "weight": 5.0,  "name":"Wooden Sword", "description":"A mid-sized sword made of a solid wood. It is not very sharp but I don't want to get hit by it."},
+        {"ItemType":2, "damage":15, "weight": 10.0, "name":"Iron Sword",   "description":"A mid-sized cast iron sword. The quality is questionable but it will work."},
+        {"ItemType":2, "damage":5,  "weight": 3.0,  "name":"Bow",          "description":"A curved wood with a string attached.."}
         
     ]
 }

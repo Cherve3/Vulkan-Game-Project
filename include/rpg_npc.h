@@ -21,7 +21,7 @@ typedef struct{
 	Uint8 life_max;				//100
 	Uint8 life_regen;			//10
 	Uint8 mana;
-	Uint8 mana_max;			//100
+	Uint8 mana_max;				//100
 	Uint8 mana_regen;			//10
 	Uint8 stamina;
 	Uint8 stamina_max;			//100

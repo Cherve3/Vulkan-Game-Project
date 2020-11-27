@@ -37,7 +37,7 @@ void camera_update(Vector3D rotation, Vector3D playerPosition, Matrix4 playerMat
 
 	camera.yaw += x_rel;
 	camera.pitch += y_rel;
-	slog("\nYAW: %f\nPitch: %f", camera.yaw, camera.pitch);
+	
 	
 	if (camera.pitch > 40.0f)
 		camera.pitch = 40.0f;
@@ -49,14 +49,16 @@ void camera_update(Vector3D rotation, Vector3D playerPosition, Matrix4 playerMat
 	if (camera.yaw <= -360.0f)
 		camera.yaw = 0.0f;
 
-	camera.position.x = -playerPosition.x;
-	camera.position.y = -playerPosition.y -10;
-	camera.position.z = -playerPosition.z -20;
+	//slog("\nYAW: %f\nPitch: %f", camera.yaw, camera.pitch);
+
+	camera.position.x = playerPosition.x;
+	camera.position.y = playerPosition.y -10;
+	camera.position.z = playerPosition.z -20;
 
 	
 	//vector3d_negate(negate, playerPosition);
 	//gfc_matrix_translate(camera.view,negate);
-	gf3d_camera_look_at(negate,playerPosition,camera.up);
+	gf3d_camera_look_at(camera.position,playerPosition,camera.up);
 	gfc_matrix_rotate(camera.view, camera.view, camera.pitch*GFC_DEGTORAD, vector_left());
 	gfc_matrix_rotate(camera.view,camera.view,camera.yaw*GFC_DEGTORAD,camera.up);
 	

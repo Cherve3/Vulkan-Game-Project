@@ -29,7 +29,4 @@
 
 #define GRAVITY -9.8
 
-Uint32 time, old_time;
-
-#define DELTA_TIME (time - oldtime)/1000
 #endif
