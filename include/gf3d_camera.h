@@ -18,6 +18,7 @@ typedef struct
 
 	float yaw;
 	float pitch;
+	float speed;
 	
 }Camera;
 

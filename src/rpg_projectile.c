@@ -75,7 +75,7 @@ void rpg_fireball_spawn(Entity *player)
 			rpg_projectiles.projectile_list[i].collider.x = rpg_projectiles.projectile_list[i].ent->position.x;
 			rpg_projectiles.projectile_list[i].collider.y = rpg_projectiles.projectile_list[i].ent->position.y;
 			rpg_projectiles.projectile_list[i].collider.z = rpg_projectiles.projectile_list[i].ent->position.z;
-			rpg_projectiles.projectile_list[i].collider.radius = 2;
+			rpg_projectiles.projectile_list[i].collider.radius = 5;
 			
 			
 			gfc_matrix_new_translation(

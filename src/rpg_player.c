@@ -19,6 +19,9 @@
 static Player *player = { 0 };
 Matrix4 *camera = { 0 };
 
+Uint32 timer;
+Uint32 old_time;
+
 void rpg_player_move(Entity *self);
 void rpg_player_update();
 void print_inventory();
@@ -30,6 +33,8 @@ void rpg_player_init(){
 
 	player->ent = rpg_player_new();
 
+	
+	old_time = 0;
 	/**
 	 *	Attempting to use the JSON Lib
 	 */
@@ -186,7 +191,7 @@ void rpg_player_think(Entity *self){
 	gf3d_entity_collision_test(self);
 
 	rpg_player_move(self);
-	
+	timer = SDL_GetTicks();
 	rpg_player_input(self);
 }
 
@@ -300,8 +305,6 @@ rpg_player_input(Entity *self)
 	const Uint8 *keys = SDL_GetKeyboardState(NULL);
 	int x_rel, y_rel;
 	SDL_GetRelativeMouseState(&x_rel, &y_rel);
-	Uint32 time, old_time = 0;
-
 
 	if (keys[SDL_SCANCODE_E])
 	{
@@ -325,15 +328,23 @@ rpg_player_input(Entity *self)
 	if (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_RIGHT))
 	{
 		slog("Button: %i", SDL_GetMouseState(NULL, NULL));
-		if (time > old_time)
-		if (player->stats.mana > 10)
+		slog("\n      Time: %i\nLast Time: %i", timer, old_time);
+		if (timer > old_time + 5000)
 		{
-			rpg_fireball_spawn(self);
-			player->stats.mana -= 10;
+			if (player->stats.mana >= 10)
+			{
+				rpg_fireball_spawn(self);
+				player->stats.mana -= 10;
+				old_time = timer;
+			}
+			else
+			{
+				slog("Not enough mana");
+			}
 		}
 		else
 		{
-			slog("Out of mana or cooling down");
+			slog("fireball cool down");
 		}
 	}
 

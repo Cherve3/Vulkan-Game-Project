@@ -20,6 +20,7 @@ void gf3d_camera_init()
 	camera.up = vector3d(0, 1, 0);
 	camera.rotation = vector3d(0, 0, 0);
 	camera.offset = vector3d(0, -10, -5);
+	camera.speed = 0.5;
 
 	vector3d_normalize(&camera.forward);
 	vector3d_normalize(&camera.up);
@@ -38,31 +39,27 @@ void camera_update(Vector3D rotation, Vector3D playerPosition, Matrix4 playerMat
 	camera.yaw += x_rel;
 	camera.pitch += y_rel;
 	
-	
-	if (camera.pitch > 40.0f)
-		camera.pitch = 40.0f;
+	if (camera.pitch > 89.0f)
+		camera.pitch = 89.0f;
 	if (camera.pitch < -60.0f)
 		camera.pitch = -60.0f;
 		
 	if (camera.yaw >= 360.0f)
-		camera.yaw = 0.0f;
+		camera.yaw = 0;
 	if (camera.yaw <= -360.0f)
-		camera.yaw = 0.0f;
-
+		camera.yaw = 0;
 	//slog("\nYAW: %f\nPitch: %f", camera.yaw, camera.pitch);
-
-	camera.position.x = playerPosition.x;
-	camera.position.y = playerPosition.y -10;
-	camera.position.z = playerPosition.z -20;
-
 	
-	//vector3d_negate(negate, playerPosition);
-	//gfc_matrix_translate(camera.view,negate);
-	gf3d_camera_look_at(camera.position,playerPosition,camera.up);
-	gfc_matrix_rotate(camera.view, camera.view, camera.pitch*GFC_DEGTORAD, vector_left());
-	gfc_matrix_rotate(camera.view,camera.view,camera.yaw*GFC_DEGTORAD,camera.up);
-	
-	gfc_matrix_translate(camera.view, camera.position);
+	gfc_matrix_new_translation(camera.view, vector3d(0,-10,0));
+	//gf3d_camera_look_at(camera.position,playerPosition,camera.up);
+	gfc_matrix_rotate(camera.view, camera.view, camera.pitch*GFC_DEGTORAD, vector_right());
+	gfc_matrix_rotate(camera.view, camera.view, camera.yaw*GFC_DEGTORAD, camera.up);
+	/*
+	camera.position.x = -playerPosition.x;
+	camera.position.y = -playerPosition.y - 10;
+	camera.position.z = -playerPosition.z - 20;
+	gfc_matrix_translate(camera.view,camera.position);
+*/
 	
 
 	/*
