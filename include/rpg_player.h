@@ -64,6 +64,8 @@ typedef struct PStats_S
 typedef struct PInventory_S{
 	Spell *spellbook;
 	Item *bag;
+	Uint8 bagSize;
+	Uint8 spellbookSize;
 }pInventory;
 
 typedef struct Player_S

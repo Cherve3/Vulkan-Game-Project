@@ -21,6 +21,7 @@ Matrix4 *camera = { 0 };
 
 void rpg_player_move(Entity *self);
 void rpg_player_update();
+void print_inventory();
 
 void rpg_player_init(){
 	camera = gf3d_get_camera();
@@ -111,9 +112,10 @@ void rpg_player_init(){
 
 	player->stats.toggleStats = false;
 	
-	
-	player->inventory.bag = (Item *)gfc_allocate_array(sizeof(Item), 30);
-	player->inventory.spellbook = (Spell *)gfc_allocate_array(sizeof(Spell),5);
+	player->inventory.bagSize = 30;
+	player->inventory.spellbookSize = 5;
+	player->inventory.bag = (Item *)gfc_allocate_array(sizeof(Item), player->inventory.bagSize);
+	player->inventory.spellbook = (Spell *)gfc_allocate_array(sizeof(Spell), player->inventory.spellbookSize);
 	
 }
 
@@ -206,6 +208,16 @@ pStats get_player_stats()
 pInventory get_player_inventory()
 {
 	return player->inventory;
+}
+
+int get_player_inventory_size()
+{
+	return player->inventory.bagSize;
+}
+
+int get_player_spellbook_size()
+{
+	return player->inventory.spellbookSize;
 }
 
 void rpg_player_move(Entity *self){
@@ -364,7 +376,24 @@ void player_interaction()
 			{
 				slog("Interacting with %s",gf3d_get_entity_list()[i].name);
 				gf3d_get_entity_list()[i].interact(&gf3d_get_entity_list()[i]);
+				slog("%s\n", player->inventory.bag[0].description);
+				print_inventory();
 			}
 		}
+	}
+}
+
+void print_inventory()
+{
+	int i;
+	for (i = 0; i < get_player_inventory_size(); i++)
+	{
+		slog("\n       Name: %s\n", player->inventory.bag[i].name);
+		slog("       Type: %i\n", player->inventory.bag[i].type);
+		slog("Description: %s\n", player->inventory.bag[i].description);
+		slog("      Armor: %i\n", player->inventory.bag[i].armor);
+		slog("     Damage: %i", player->inventory.bag[i].damage);
+		slog("   Quantity: %i", player->inventory.bag[i].quantity);
+		slog("     Weight: %f", player->inventory.bag[i].weight);
 	}
 }

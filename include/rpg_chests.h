@@ -10,9 +10,10 @@
 
 typedef struct
 {
-	Uint8			_inuse;
-	Item			*loot;
-	Entity			*ent;
+	Uint8	_inuse;
+	Item	*loot;
+	int		lootSize;
+	Entity	*ent;
 
 }Chest;
 

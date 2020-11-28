@@ -17,14 +17,15 @@ typedef enum
 typedef struct
 {
 	ItemType type;
-	char *name;
-	char *description;
+	Uint8	 _inuse;
+	char	 *name;
+	char	 *description;
 
-	Uint8 armor;
-	Uint8 damage;
+	Uint8	 armor;
+	Uint8	 damage;
 
-	Uint8 quantity;
-	float weight;
+	Uint8	 quantity;
+	float	 weight;
 
 }Item;
 

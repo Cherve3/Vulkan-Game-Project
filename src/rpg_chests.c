@@ -3,6 +3,7 @@
 
 #include "rpg_chests.h"
 #include "rpg_items.h"
+#include "rpg_player.h"
 
 typedef struct
 {
@@ -13,8 +14,6 @@ typedef struct
 ChestManager rpg_chests = { 0 };
 
 time_t t;
-
-
 
 void rpg_chest_loot_free(Item *item)
 {
@@ -28,6 +27,19 @@ void rpg_chests_free(Chest *chest)
 	rpg_chest_loot_free(chest->loot);
 	gf3d_entity_free(chest->ent);
 	memset(chest, 0, sizeof(Chest));
+}
+
+void rpg_chest_despawn(Chest *chest)
+{
+	int i;
+	if (!chest) return;
+	for (i = 0; i < chest->lootSize; i++)
+	{
+		chest->loot[i]._inuse = 0;
+	}
+	chest->_inuse = 0;
+	memset(chest, 0, sizeof(Chest));
+
 }
 
 void rpg_chests_close()
@@ -71,8 +83,10 @@ Chest *rpg_chest_new()
 			
 			float lootSize = rand() % 10;
 			slog("LootSize: %f", lootSize);
+			rpg_chests.chest_list[i].lootSize = lootSize;
+			
 			rpg_chests.chest_list[i].loot = (Item *)gfc_allocate_array(sizeof(Item), (int)lootSize);
-
+			
 			rpg_chest_fill(rpg_chests.chest_list[i].loot, (int)lootSize);
 
 			return &rpg_chests.chest_list[i];
@@ -115,6 +129,7 @@ void rpg_chest_fill(Item *item, int lootSize)
 	{
 		
 		item[i] = rpg_item_new_random((int)rand() % 4);
+		item[i]._inuse = 1;
 	}
 
 }
@@ -122,4 +137,34 @@ void rpg_chest_fill(Item *item, int lootSize)
 void rpg_chest_open()
 {
 	slog("Opening Chest");
+	int i = 0, j;
+
+	for (j = 0; j < rpg_chests.chest_list[0].lootSize; j++)
+	{
+		do{
+			if (get_player()->inventory.bag[i].name == rpg_chests.chest_list[0].loot[j].name)
+			{
+				slog("updating quantity");
+				get_player()->inventory.bag[i].quantity++;
+				rpg_chests.chest_list[0].loot[j]._inuse = 0;
+			}
+			else if (!get_player()->inventory.bag[i]._inuse)
+			{
+				slog("adding item to inventory");
+				get_player()->inventory.bag[i] = rpg_chests.chest_list[0].loot[j];
+				rpg_chests.chest_list[0].loot[j]._inuse = 0;
+				
+			}
+			i++;
+			if (i == get_player()->inventory.bagSize + 1)
+			{
+				slog("There is no space in player inventory");
+				break;
+			}
+		} while (rpg_chests.chest_list[0].loot[j]._inuse);
+		i = 0;
+	}
+	rpg_chests_free(&rpg_chests.chest_list[0]);
+	gf3d_entity_free(rpg_chests.chest_list[0].ent);
+
 }
