@@ -25,8 +25,7 @@ static CommandManager gf3d_commands = {0};
 void gf3d_command_pool_close();
 void gf3d_command_free(Command *com);
 void gf3d_command_buffer_begin(Command *com,Pipeline *pipe);
-void gf3d_command_configure_render_pass(VkCommandBuffer commandBuffer, VkRenderPass renderPass,VkFramebuffer framebuffer,
-		VkPipeline graphicsPipeline,VkPipelineLayout pipelineLayout);
+void gf3d_command_configure_render_pass(VkCommandBuffer commandBuffer, VkRenderPass renderPass,VkFramebuffer framebuffer, VkPipeline graphicsPipeline,VkPipelineLayout pipelineLayout);
 
 void gf3d_command_system_close()
 {
@@ -86,53 +85,52 @@ void gf3d_command_free(Command *com)
     memset(com,0,sizeof(Command));
 }
 
-
-Command * gf3d_command_graphics_pool_setup(Uint32 count,Pipeline *pipe)
+Command * gf3d_command_graphics_pool_setup(Uint32 count)
 {
-    Command *com;
-    VkCommandPoolCreateInfo poolInfo = {0};
-    VkCommandBufferAllocateInfo allocInfo = {0};
-    
-    com = gf3d_command_pool_new();
-    
-    if (!com)
-    {
-        return NULL;
-    }
-    
-    poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-    poolInfo.queueFamilyIndex = gf3d_vqueues_get_graphics_queue_family();
-    poolInfo.flags = 0; // Optional    
-    
-    if (vkCreateCommandPool(gf3d_commands.device, &poolInfo, NULL, &com->commandPool) != VK_SUCCESS)
-    {
-        slog("failed to create command pool!");
-        return NULL;
-    }
-    
-    com->commandBuffers = (VkCommandBuffer*)gfc_allocate_array(sizeof(VkCommandBuffer),count);
-    if (!com->commandBuffers)
-    {
-        slog("failed to allocate command buffer array");
-        gf3d_command_free(com);
-        return NULL;
-    }
-    
-    allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    allocInfo.commandPool = com->commandPool;
-    allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    allocInfo.commandBufferCount = count;
-    com->commandBufferCount = count;
+	Command *com;
+	VkCommandPoolCreateInfo poolInfo = { 0 };
+	VkCommandBufferAllocateInfo allocInfo = { 0 };
 
-    if (vkAllocateCommandBuffers(gf3d_commands.device, &allocInfo, com->commandBuffers) != VK_SUCCESS)
-    {
-        slog("failed to allocate command buffers!");
-        gf3d_command_free(com);
-        return NULL;
-    }
-    
-    slog("created command buffer pool");
-    return com;
+	com = gf3d_command_pool_new();
+
+	if (!com)
+	{
+		return NULL;
+	}
+
+	poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+	poolInfo.queueFamilyIndex = gf3d_vqueues_get_graphics_queue_family();
+	poolInfo.flags = 0; // Optional    
+
+	if (vkCreateCommandPool(gf3d_commands.device, &poolInfo, NULL, &com->commandPool) != VK_SUCCESS)
+	{
+		slog("failed to create command pool!");
+		return NULL;
+	}
+
+	com->commandBuffers = (VkCommandBuffer*)gfc_allocate_array(sizeof(VkCommandBuffer), count);
+	if (!com->commandBuffers)
+	{
+		slog("failed to allocate command buffer array");
+		gf3d_command_free(com);
+		return NULL;
+	}
+
+	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+	allocInfo.commandPool = com->commandPool;
+	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+	allocInfo.commandBufferCount = count;
+	com->commandBufferCount = count;
+
+	if (vkAllocateCommandBuffers(gf3d_commands.device, &allocInfo, com->commandBuffers) != VK_SUCCESS)
+	{
+		slog("failed to allocate command buffers!");
+		gf3d_command_free(com);
+		return NULL;
+	}
+
+	slog("created command buffer pool");
+	return com;
 }
 
 VkCommandBuffer * gf3d_command_pool_get_used_buffers(Command *com)
@@ -223,8 +221,8 @@ VkCommandBuffer gf3d_command_begin_single_time(Command* com)
     {
         slog("com is NULL");
     }
-    
-    allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+ 
+    allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;  
     allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     allocInfo.commandPool = com->commandPool;
     allocInfo.commandBufferCount = 1;
@@ -235,7 +233,7 @@ VkCommandBuffer gf3d_command_begin_single_time(Command* com)
     beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
 
     vkBeginCommandBuffer(commandBuffer, &beginInfo);
-
+	
     return commandBuffer;
 }
 

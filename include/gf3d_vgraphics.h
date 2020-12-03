@@ -44,6 +44,7 @@ uint32_t gf3d_vgraphics_find_memory_type(uint32_t typeFilter, VkMemoryPropertyFl
 
 void gf3d_vgraphics_rotate_z(float degrees);
 void gf3d_vgraphics_rotate_x(float degrees);
+void gf3d_vgraphics_rotate_y(float degrees);
 
 VkBuffer gf3d_vgraphics_get_uniform_buffer_by_index(Uint32 index);
 
@@ -53,7 +54,7 @@ Matrix4 *gf3d_vgraphics_get_ubo_view();
 
 Matrix4 *gf3d_vgraphics_get_ubo_model();
 
-Matrix4 *gf3d_vgraphics_get_ubo_model();
+Matrix4 *gf3d_vgraphics_get_ubo_proj();
 
 SDL_Window *gf3d_vgraphics_get_window();
 

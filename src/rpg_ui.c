@@ -16,16 +16,23 @@
 
 typedef struct
 {
-	HUD *hud;
-	Menu *menu;
+	HUD hud;
+	Menu menu;
 	TTF_Font *font;
 	SDL_Rect *rect_list;
 }UIManager;
 
-UIManager UI = { 0 };
+static UIManager UI = { 0 };
 
-void rpg_ui_init(SDL_Renderer *renderer, int screenWidth, int screenHeight)
+void rpg_ui_init()
 {
+
+	UI.hud.base = NULL;
+	UI.hud.health = NULL;
+	UI.hud.mana = NULL;
+	UI.hud.stamina = NULL;
+
+
 	if (TTF_Init() < 0) {
 		SDL_GetError();
 	}
@@ -37,92 +44,39 @@ void rpg_ui_init(SDL_Renderer *renderer, int screenWidth, int screenHeight)
 		slog(SDL_GetError());
 	}
 
+	UI.hud.base = gf3d_sprite_load("images/base_bars.png", -1, -1, 0);
+	if (!UI.hud.base) slog("base sprite not loaded");
 
+	UI.hud.health = gf3d_sprite_load("images/health_bar.png", -1, -1, 0);
+	if (!UI.hud.health) slog("health sprite not loaded");
 
-	SDL_Texture *base		= IMG_LoadTexture(renderer, "images/base_bars.png");
-	SDL_Texture *health		= IMG_LoadTexture(renderer, "images/health_bar.png");
-	SDL_Texture *mana		= IMG_LoadTexture(renderer, "images/mana_bar.png");
-	SDL_Texture *stamina	= IMG_LoadTexture(renderer, "images/stamina_bar.png");
+	UI.hud.mana = gf3d_sprite_load("images/mana_bar.png", -1, -1, 0);
+	if (!UI.hud.mana) slog("mana sprite not loaded");
 
+	UI.hud.stamina = gf3d_sprite_load("images/stamina_bar.png", -1, -1, 0);
+	if (!UI.hud.stamina) slog("stamina sprite not loaded");
 
-	SDL_Rect rectBase, rectHealth, rectMana, rectStamina;
+}
 
-	rectBase.w = screenWidth * 0.25;	//250
-	rectBase.h = screenHeight * 0.20;	//100
-	rectBase.x = 10;
-	rectBase.y = 10;
+void rpg_ui_draw_all(Uint32 bufferFrame, VkCommandBuffer commandbuffer)
+{
+	float mana_size = 1;
+	float mana_ratio = (float)get_player_stats().mana / (float)get_player_stats().mana_max;
+	if (mana_ratio != 1)
+		mana_size = mana_size * mana_ratio;
 
-	rectHealth.w = screenWidth * 0.24;	//241
-	rectHealth.h = screenHeight * 0.03; //14
-	rectHealth.x = 15;
-	rectHealth.y = 16;
+	slog("mana size: %f", mana_size);
+	slog("mana ratio: %f", mana_ratio);
 
-	rectMana.w = screenWidth * 0.24;	//241
-	rectMana.h = screenHeight * 0.03;	//14
-	rectMana.x = 15;
-	rectMana.y = 50;
+	gf3d_sprite_draw(UI.hud.base, vector2d(10, 10), vector2d(1, 1), 0, bufferFrame, commandbuffer);
+	gf3d_sprite_draw(UI.hud.health, vector2d(12, 13), vector2d(1, 1), 0, bufferFrame, commandbuffer);
+	gf3d_sprite_draw(UI.hud.mana, vector2d(12, 31), vector2d(mana_ratio, 1), 0, bufferFrame, commandbuffer);
+	gf3d_sprite_draw(UI.hud.stamina, vector2d(12, 51), vector2d(1, 1), 0, bufferFrame, commandbuffer);
+}
 
-	rectStamina.w = screenWidth * 0.24;	//241
-	rectStamina.h = screenHeight * 0.03;//14
-	rectStamina.x = 15;
-	rectStamina.y = 87;
-
-	SDL_RenderClear(renderer);
-
-	SDL_RenderCopy(renderer, base, NULL, &rectBase);
-	SDL_RenderCopy(renderer, health, NULL, &rectHealth);
-	SDL_RenderCopy(renderer, mana, NULL, &rectMana);
-	SDL_RenderCopy(renderer, stamina, NULL, &rectStamina);
-	SDL_RenderPresent(renderer);
-	//SDL_Delay(2000);
-/*	UI.hud->base = IMG_LoadTexture(renderer, "images/base_bars.png");
-	if (!UI.hud->base)
-	{
-		slog("TExture NULL");
-		slog(SDL_GetError());
-	}
-	UI.rect_list[0].w = 250 * (screenWidth * 0.25);
-	UI.rect_list[0].h = 100 * (screenHeight * 0.25);
-	UI.rect_list[0].x = 10;
-	UI.rect_list[0].y = 10;
-
-	UI.hud->health	= IMG_LoadTexture(renderer, "images/health_bar.png");
-	UI.rect_list[1].w = 240 * (screenWidth * 0.25);
-	UI.rect_list[1].h = 15  * (screenHeight * 0.25);
-	UI.rect_list[1].x = 15;
-	UI.rect_list[1].y = 15;
-	
-	UI.hud->mana	= IMG_LoadTexture(renderer, "images/mana_bar.png");
-	UI.rect_list[2].w = 240 * (screenWidth * 0.25);
-	UI.rect_list[2].h = 15  * (screenHeight * 0.25);
-	UI.rect_list[2].x = 15;
-	UI.rect_list[2].y = 35;
-	
-	UI.hud->stamina = IMG_LoadTexture(renderer, "images/stamina_bar.png");
-	UI.rect_list[3].w = 240 * (screenWidth * 0.25);
-	UI.rect_list[3].h = 15  * (screenHeight * 0.25);
-	UI.rect_list[3].x = 15;
-	UI.rect_list[3].y = 55;
-
-	UI.menu->stats	= IMG_LoadTexture(renderer, "images/statmenu.png");
-	UI.rect_list[4].w = 400 * (screenWidth * 0.25);
-	UI.rect_list[4].h = 500 * (screenHeight * 0.25);
-	UI.rect_list[4].x = 50;
-	UI.rect_list[4].y = 40;
-	
-	UI.menu->white.a = 255;
-	UI.menu->white.a = 255;
-	UI.menu->white.a = 255;
-	UI.menu->white.a = 255;
-
-	UI.menu->menuSurface = TTF_RenderText_Blended(UI.font, UI.menu->text, UI.menu->white);
-	UI.menu->text	= SDL_CreateTextureFromSurface(renderer, UI.menu->menuSurface);
-	UI.rect_list[5].w = 100 * (screenWidth * 0.25);
-	UI.rect_list[5].h = 40  * (screenHeight * 0.25);
-	UI.rect_list[5].x = 90;
-	UI.rect_list[5].y = 70;
-	
-	*/
+void rpg_ui_update()
+{
+	float mana_ratio = get_player_stats().mana / get_player_stats().mana_max;
 }
 
 void toggle_stats(SDL_Renderer *renderer, Bool toggle)

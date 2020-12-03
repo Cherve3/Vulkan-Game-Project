@@ -25,6 +25,7 @@ Uint32 old_time;
 void rpg_player_move(Entity *self);
 void rpg_player_update();
 void print_inventory();
+void print_stats();
 
 void rpg_player_init(){
 	camera = gf3d_get_camera();
@@ -33,46 +34,32 @@ void rpg_player_init(){
 
 	player->ent = rpg_player_new();
 
-	
 	old_time = 0;
-	/**
-	 *	Attempting to use the JSON Lib
-	 */
-	sj_enable_debug();
 
+	// Load player json file
 	SJson *player_info = sj_load("json/player.json");
+
 	if (!player_info)
-		slog("player_info is NULL");
+		slog("Failed to load json data %s",sj_get_error());
 	
-	sj_echo(player_info);
+	player_info = sj_object_get_value(player_info, "Player");
 
-	slog("Is SJson an object? %i",sj_is_object(player_info));
-
-	slog("Text: %i", player_info->get_string("life")->text);
-	slog("Length: %i", player_info->get_string("life")->length);
-	slog("Size: %i", player_info->get_string("life")->size);// player_info->get_string(player_info)->text);
-
-	slog("Array Count: %i", player_info->v.array->count);
-	slog("Array Elements: %i", player_info->v.array->elements);
-	slog("Array Size: %i", player_info->v.array->size);
-	slog("Array Count: %i", player_info->v.array->elements[0]);
-	
 	/**
 	 * Player Stats
 	 */
-	player->ent->model = gf3d_model_load("dino");
+	player->ent->model = gf3d_model_load("player");
 	player->ent->think = rpg_player_think;
 	player->ent->update = rpg_player_update;
 	player->ent->type = PLAYER;
 	player->ent->name = "Player";
 	player->ent->type = PLAYER;
-	player->ent->position = vector3d(0, 3.2, -10);
+	player->ent->position = vector3d(0, 8, -10);
 	player->ent->velocity = vector3d(0, 0, 0);
 	player->ent->rotation = vector3d(0, 0, 0);
 	player->ent->direction = vector3d(0, 0, 1);
 
 	player->ent->boxCollider.width = 3.0;
-	player->ent->boxCollider.height = 2.8;
+	player->ent->boxCollider.height = 8.5;
 	player->ent->boxCollider.depth = 3.0;
 	player->ent->boxCollider.x = player->ent->position.x;
 	player->ent->boxCollider.y = player->ent->position.y;
@@ -82,16 +69,57 @@ void rpg_player_init(){
 	player->interactBound.x = player->ent->position.x;
 	player->interactBound.y = player->ent->position.z;
 	
-	player->stats.name				= "Player 1";
-	player->stats.level				= 1;
-	player->stats.exp				= 0;
+	print_stats();
+
+	player->stats.name = sj_get_string_value(sj_object_get_value(player_info, "name"));
+
+	sj_get_integer_value(sj_object_get_value(player_info, "level"), &player->stats.level);
+	sj_get_integer_value(sj_object_get_value(player_info, "exp"), &player->stats.exp);
+	sj_get_integer_value(sj_object_get_value(player_info, "bits"), &player->stats.bits);
+
+	sj_get_integer_value(sj_object_get_value(player_info, "life"), &player->stats.life);
+	sj_get_integer_value(sj_object_get_value(player_info, "life_max"), &player->stats.life_max);
+	sj_get_integer_value(sj_object_get_value(player_info, "life_regen"), &player->stats.life_regen);
+
+	slog("CHECKING STAT: %i", player->stats.life_regen);
+	player->stats.life_regen = sj_get_integer_value(sj_object_get_value(player_info, "life_regen"), NULL);
+	slog("CHECKING STAT: %i", player->stats.life_regen);
+	sj_get_integer_value(sj_object_get_value(player_info, "mana"), &player->stats.mana);
+	sj_get_integer_value(sj_object_get_value(player_info, "mana_max"), &player->stats.mana_max);
+	sj_get_integer_value(sj_object_get_value(player_info, "mana_regen"), &player->stats.mana_regen);
+	sj_get_integer_value(sj_object_get_value(player_info, "stamina"), &player->stats.stamina);
+	sj_get_integer_value(sj_object_get_value(player_info, "stamina_max"), &player->stats.stamina_max);
+	sj_get_integer_value(sj_object_get_value(player_info, "stamina_regen"), &player->stats.stamina_regen);
+
+	player->stats.carry_weight = sj_get_float_value(sj_object_get_value(player_info, "carry_weight"), NULL);
+	player->stats.carry_weight_max = sj_get_float_value(sj_object_get_value(player_info, "carry_weight_max"), NULL);
+
+	sj_get_integer_value(sj_object_get_value(player_info, "strength"), &player->stats.strength);
+	sj_get_integer_value(sj_object_get_value(player_info, "strength_max"), &player->stats.strength_max);
+	sj_get_integer_value(sj_object_get_value(player_info, "health"), &player->stats.health);
+	sj_get_integer_value(sj_object_get_value(player_info, "health_max"), &player->stats.health_max);
+	sj_get_integer_value(sj_object_get_value(player_info, "perception"), &player->stats.perception);
+	sj_get_integer_value(sj_object_get_value(player_info, "perception_max"), &player->stats.perception_max);
+	sj_get_integer_value(sj_object_get_value(player_info, "speed"), &player->stats.speed);
+	sj_get_integer_value(sj_object_get_value(player_info, "speed_max"), &player->stats.speed_max);
+	sj_get_integer_value(sj_object_get_value(player_info, "willpower"), &player->stats.willpower);
+	sj_get_integer_value(sj_object_get_value(player_info, "willpower_max"), &player->stats.willpower_max);
+	sj_get_integer_value(sj_object_get_value(player_info, "dexterity"), &player->stats.dexterity);
+	sj_get_integer_value(sj_object_get_value(player_info, "dexterity_max"), &player->stats.dexterity_max);
+	sj_get_integer_value(sj_object_get_value(player_info, "intelligence"), &player->stats.intelligence);
+	sj_get_integer_value(sj_object_get_value(player_info, "intelligence_max"), &player->stats.intelligence_max);
+	sj_get_integer_value(sj_object_get_value(player_info, "luck"), &player->stats.luck);
+	sj_get_integer_value(sj_object_get_value(player_info, "luck_max"), &player->stats.luck);
+
+/*	player->stats.exp				= 0;
+	player->stats.bits				= 1000;
 
 	player->stats.life				= 100;
 	player->stats.life_max			= 100;
 	player->stats.life_regen		= 100;
 	player->stats.mana				= 100;
 	player->stats.mana_max			= 100;
-	player->stats.magic_regen		= 100;
+	player->stats.mana_regen		= 100;
 	player->stats.stamina			= 100;
 	player->stats.stamina_max		= 100;
 	player->stats.stamina_regen		= 100;
@@ -114,7 +142,7 @@ void rpg_player_init(){
 	player->stats.intelligence_max	= 100;
 	player->stats.luck				= 1;
 	player->stats.luck_max			= 100;
-
+	*/
 	player->stats.toggleStats = false;
 	
 	player->inventory.bagSize = 30;
@@ -315,6 +343,7 @@ rpg_player_input(Entity *self)
 	if (keys[SDL_SCANCODE_I])
 	{
 		slog("Inventory");
+		print_inventory();
 	}
 	if (keys[SDL_SCANCODE_TAB])
 	{
@@ -323,6 +352,8 @@ rpg_player_input(Entity *self)
 			player->stats.toggleStats = true;
 		else
 			player->stats.toggleStats = false;
+
+		print_stats();
 	}
 
 	if (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_RIGHT))
@@ -387,8 +418,6 @@ void player_interaction()
 			{
 				slog("Interacting with %s",gf3d_get_entity_list()[i].name);
 				gf3d_get_entity_list()[i].interact(&gf3d_get_entity_list()[i]);
-				slog("%s\n", player->inventory.bag[0].description);
-				print_inventory();
 			}
 		}
 	}
@@ -399,12 +428,50 @@ void print_inventory()
 	int i;
 	for (i = 0; i < get_player_inventory_size(); i++)
 	{
-		slog("\n       Name: %s\n", player->inventory.bag[i].name);
-		slog("       Type: %i\n", player->inventory.bag[i].type);
-		slog("Description: %s\n", player->inventory.bag[i].description);
-		slog("      Armor: %i\n", player->inventory.bag[i].armor);
+		slog("       Name: %s", player->inventory.bag[i].name);
+		slog("       Type: %i", player->inventory.bag[i].type);
+		slog("Description: %s", player->inventory.bag[i].description);
+		slog("      Armor: %i", player->inventory.bag[i].armor);
 		slog("     Damage: %i", player->inventory.bag[i].damage);
 		slog("   Quantity: %i", player->inventory.bag[i].quantity);
 		slog("     Weight: %f", player->inventory.bag[i].weight);
 	}
+}
+
+void print_stats()
+{
+	slog("            Name: %s", player->stats.name);
+	slog("           Level: %i", player->stats.level);
+	slog("             Exp: %i", player->stats.exp);
+	slog("            Bits: %i", player->stats.bits);
+
+	slog("            Life: %i", player->stats.life);
+	slog("        Life Max: %i", player->stats.life_max);
+	slog("      Life Regen: %i", player->stats.life_regen);
+	slog("            Mana: %i", player->stats.mana);
+	slog("        Mana Max: %i", player->stats.mana_max);
+	slog("      Mana Regen: %i", player->stats.mana_regen);
+	slog("         Stamina: %i", player->stats.stamina);
+	slog("     Stamina Max: %i", player->stats.stamina_max);
+	slog("   Stamina Regen: %i", player->stats.stamina_regen);
+
+	slog("    Carry Weight: %f", player->stats.carry_weight);
+	slog("Carry Weight Max: %f", player->stats.carry_weight_max);
+
+	slog("        Strength: %i", player->stats.strength);
+	slog("    Strength Max: %i", player->stats.strength_max);
+	slog("          Health: %i", player->stats.health);
+	slog("      Health Max: %i", player->stats.health_max);
+	slog("      Perception: %i", player->stats.perception);
+	slog("  Perception Max: %i", player->stats.perception_max);
+	slog("           Speed: %i", player->stats.speed);
+	slog("       Speed Max: %i", player->stats.speed_max);
+	slog("       Willpower: %i", player->stats.willpower);
+	slog("   Willpower Max: %i", player->stats.willpower_max);
+	slog("       Dexterity: %i", player->stats.dexterity);
+	slog("   Dexterity Max: %i", player->stats.dexterity_max);
+	slog("    Intelligence: %i", player->stats.intelligence);
+	slog("Intelligence Max: %i", player->stats.intelligence_max);
+	slog("            Luck: %i", player->stats.luck);
+	slog("        Luck Max: %i", player->stats.luck_max);
 }

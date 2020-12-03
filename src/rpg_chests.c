@@ -68,16 +68,17 @@ Chest *rpg_chest_new()
 
 			rpg_chests.chest_list[i].ent = gf3d_entity_new();
 			rpg_chests.chest_list[i].ent->model = gf3d_model_load("chest");
-			rpg_chests.chest_list[i].ent->position = vector3d(-15, 1, 0);
+			rpg_chests.chest_list[i].ent->position = vector3d(-15, 2.1, 0);
 			rpg_chests.chest_list[i].ent->type = INTERACT;
 			rpg_chests.chest_list[i].ent->name = "Chest" ;
-			rpg_chests.chest_list[i].ent->boxCollider.width  = 1;
-			rpg_chests.chest_list[i].ent->boxCollider.height = 2;
+			rpg_chests.chest_list[i].ent->boxCollider.width  = 3;
+			rpg_chests.chest_list[i].ent->boxCollider.height = 4;
 			rpg_chests.chest_list[i].ent->boxCollider.depth  = 2;
 			rpg_chests.chest_list[i].ent->interact = rpg_chest_open;
 			rpg_chests.chest_list[i].ent->boxCollider.x = rpg_chests.chest_list[i].ent->position.x;
 			rpg_chests.chest_list[i].ent->boxCollider.y = rpg_chests.chest_list[i].ent->position.y;
 			rpg_chests.chest_list[i].ent->boxCollider.z = rpg_chests.chest_list[i].ent->position.z;
+	
 			gfc_matrix_new_translation(rpg_chests.chest_list[i].ent->modelMatrix, rpg_chests.chest_list[i].ent->position);
 
 			

@@ -9,25 +9,32 @@
 /**
  *	@purpose this is the definition file for an NPC character.
  */
-
+typedef enum {
+	ItemShop,
+	WeaponShop,
+	SpellShop,
+	General,
+	Questgiver
+}NPCType;
 
 typedef struct{
 	char* name;
 
 	Uint8 level;
 	Uint32 exp;
+	Uint32 bits;			//currency
 
 	Uint8 life;
-	Uint8 life_max;				//100
-	Uint8 life_regen;			//10
+	Uint8 life_max;
+	Uint8 life_regen;
 	Uint8 mana;
-	Uint8 mana_max;				//100
-	Uint8 mana_regen;			//10
+	Uint8 mana_max;
+	Uint8 mana_regen;
 	Uint8 stamina;
-	Uint8 stamina_max;			//100
-	Uint8 stamina_regen;		//10
+	Uint8 stamina_max;
+	Uint8 stamina_regen;
 
-	float carry_weight;
+	float carry_weight;		//kilograms
 
 	Uint8 strength;
 	Uint8 strength_max;
@@ -56,6 +63,7 @@ typedef struct{
 
 typedef struct NPC_S
 {
+	NPCType type;
 	Entity *ent;
 	npcStats stats;
 	npcInventory inventory;
@@ -63,7 +71,7 @@ typedef struct NPC_S
 /**
 *	@brief initialize an NPC character
 */
-void rpg_npc_init();
+void rpg_npc_init(int type, Vector3D position);
 
 /**
 *	@brief runs gf3d_entity_new function to add an NPC to entity system

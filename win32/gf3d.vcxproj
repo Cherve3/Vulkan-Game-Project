@@ -115,6 +115,7 @@
     <ClInclude Include="..\include\gf3d_shaders.h" />
     <ClInclude Include="..\include\gf3d_sprite.h" />
     <ClInclude Include="..\include\gf3d_swapchain.h" />
+    <ClInclude Include="..\include\gf3d_texture.h" />
     <ClInclude Include="..\include\gf3d_validation.h" />
     <ClInclude Include="..\include\gf3d_vgraphics.h" />
     <ClInclude Include="..\include\gf3d_vqueues.h" />
@@ -129,6 +130,7 @@
     <ClInclude Include="..\include\rpg_spell.h" />
     <ClInclude Include="..\include\rpg_spellbook.h" />
     <ClInclude Include="..\include\rpg_ui.h" />
+    <ClInclude Include="..\include\rpg_world.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\gfc\simple_json\src\simple_json.c" />
@@ -172,6 +174,7 @@
     <ClCompile Include="..\src\rpg_projectile.c" />
     <ClCompile Include="..\src\rpg_spellbook.c" />
     <ClCompile Include="..\src\rpg_ui.c" />
+    <ClCompile Include="..\src\rpg_world.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

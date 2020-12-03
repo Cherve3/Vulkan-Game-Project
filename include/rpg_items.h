@@ -18,14 +18,15 @@ typedef struct
 {
 	ItemType type;
 	Uint8	 _inuse;
-	char	 *name;
-	char	 *description;
+	char *name;
+	char *description;
 
-	Uint8	 armor;
-	Uint8	 damage;
+	Uint8 armor;
+	Uint8 damage;
 
-	Uint8	 quantity;
-	float	 weight;
+	Uint8 cost;
+	Uint8 quantity;
+	float weight;
 
 }Item;
 
@@ -46,6 +47,6 @@ Item rpg_item_new_weapon(char* name, Uint8 quantity);
 
 Item rpg_item_new_armor(char* name, Uint8 quantity);
 
-Item *rpg_item_spawn(ItemType type, Vector3D position);
+ItemEntity *rpg_item_spawn(ItemType type, char* name, Vector3D position);
 
 #endif

@@ -27,18 +27,20 @@ typedef struct PStats_S
 	
 	Uint8 level;
 	Uint32 exp;
+	Uint32 bits;			//currency
 
 	Uint8 life;
-	Uint8 life_max;				//100
-	Uint8 life_regen;			//10
+	Uint8 life_max;
+	Uint8 life_regen;
 	Uint8 mana;
-	Uint8 mana_max;			//100
-	Uint8 magic_regen;			//10
+	Uint8 mana_max;
+	Uint8 mana_regen;
 	Uint8 stamina;
-	Uint8 stamina_max;			//100
-	Uint8 stamina_regen;		//10
+	Uint8 stamina_max;
+	Uint8 stamina_regen;
 	
-	float carry_weight;
+	float carry_weight;		//Kilograms
+	float carry_weight_max;		//Kilograms
 
 	Uint8 strength;
 	Uint8 strength_max;

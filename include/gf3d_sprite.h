@@ -1,78 +1,90 @@
 #ifndef __GF3D_SPRITE_H__
 #define __GF3D_SPRITE_H__
 
+/**
+* gf3d_sprite
+* @license The MIT License (MIT)
+@copyright Copyright (c) 2019 EngineerOfLies
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
 #include "gfc_types.h"
 #include "gfc_vector.h"
 #include "gfc_matrix.h"
 #include "gfc_text.h"
 
 #include "gf3d_texture.h"
-#include "gf3d_mesh.h"
 
-#define SPRITE_ATTRIBUTE_COUNT 2
-
-/**
-* @purpose the sprite is a 2D texture.  Each can be drawn individually in the rendering pipeline.
-*/
 typedef struct
 {
 	Uint8                       _inuse;
-	TextLine                    filename;
-	Texture                    *texture;
-	int							frameWidth;
-	int							frameHeight;
-	Uint32						FramesPerLine;
-	VkDescriptorSet            *descriptorSet;
-	VkBuffer                   *uniformBuffer;
-	VkDeviceMemory             *uniformBufferMemory;
-	Uint32                      uniformBufferCount;
+	TextLine                    filename;               /**<the name of the file used to create the sprite*/
+	Uint32                      frameCount;             /**<how many frames are loaded for this model*/
+	Texture                    *texture;                /**<texture memory pointer*/
+	Uint8                       framesPerLine;          /**<how many frames are per line in the sprite sheet*/
+	Uint32                      frameWidth, frameHeight; /*<the size, in pixels, of the individual sprite frames*/
+	VkBuffer                    buffer;                 /**<vertex buffer for the sprite (always 4 vertices)*/
+	VkDeviceMemory              bufferMemory;           /**<memory handle for the vertex buffer*/
+	VkDescriptorSet            *descriptorSet;          /**<descriptor sets used for this sprite to render*/
+	VkBuffer                   *uniformBuffers;         /**<handles for the UBO*/
+	VkDeviceMemory             *uniformBuffersMemory;   /**<memory handle for the UBO memory*/
+	Uint32                      uniformBufferCount;     /**<how many UBOs for the sprite*/
 }Sprite;
 
-
+/**
+* @brief initialize the internal management system for sprites, auto-cleaned up on program exit
+* @param max_sprites how many concurrent sprites to support
+* @param chain_length how many images are available in the swap chain
+* @param device the logical vulkan device to be rendering to
+*/
 void gf3d_sprite_manager_init(Uint32 max_sprites, Uint32 chain_length, VkDevice device);
 
-void gf3d_sprite_manager_close();
-
-Sprite *gf3d_sprite_get_by_filename(char *filename);
-
-Sprite * gf3d_sprite_new();
-
 /**
- * @brief load a sprite for rendering
- * @param filename the file location of the sprite being loaded
- * @param frame_width the width of a sprite frame (-1 for full texture)
- * @param frame_height the height of a sprite frame (-1 for full texture)
- * @param frames_per_line how many frames are there for the sprite
- * @return returns the loaded sprite
- */
+* @brief loads a sprite sheet into memory
+* @param frame_width how wide an individual frame is on the sprite sheet
+* @param frame_height how high an individual frame is on the sprite sheet
+* @param frames_per_line how many frames across are on the sprite sheet
+* @return NULL on error (check logs) or a pointer to a sprite that can be draw to the 2d overlay
+*/
 Sprite * gf3d_sprite_load(char * filename, int frame_width, int frame_height, Uint32 frames_per_line);
 
+/**
+* @brief free a previously loaded sprite
+* @param sprite a pointer to the sprite to be freed
+*/
 void gf3d_sprite_free(Sprite *sprite);
 
 /**
-* @brief update the descriptorSet with the sprite data needed to submit the draw command for the sprite provided
-* @param sprite the sprite data to populate the descriptor set with
-* @param descriptSet the descriptorSet to populate
-* @param chainIndex the swap chain frame to do this for
-* @param spriteMat the matrix to transform the sprite by
+* @brief draw a sprite frame to the current buffer frame
+* @param sprite the sprite to draw
+* @param position where on the screen to draw the sprite
+* @param scale amount to scale the sprite by.  (1,1) is no scale
+* @param frame the frame of the sprite to draw
+* @param buffer_frame the current rendering context
+* @param commandBuffer the command to use to execute the draw call
 */
-void gf3d_sprite_update_basic_descriptor_set(Sprite *sprite, VkDescriptorSet descriptorSet, Uint32 chainIndex, Matrix4 spriteMat, Uint32 frame);
+void gf3d_sprite_draw(Sprite *sprite, Vector2D position, Vector2D scale, Uint32 frame, Uint32 buffer_frame, VkCommandBuffer commandBuffer);
 
-void gf3d_sprite_delete(Sprite *sprite);
+/**
+* @brief get the binding description for a sprite
+*/
+VkVertexInputBindingDescription * gf3d_sprite_get_bind_description();
 
-void gf3d_sprite_render(Sprite *sprite, VkCommandBuffer commandBuffer, VkDescriptorSet *descriptorSet);
-
-void gf3d_sprite_draw(Sprite *sprite, Vector2D position, Vector2D scale, Uint32 frame, Uint32 bufferFrame, VkCommandBuffer commandBuffer);
-
-VkVertexInputBindingDescription *gf3d_sprite_get_bind_description();
-
-VkVertexInputAttributeDescription *gf3d_sprite_get_attribute_descriptions(Uint32 *count);
-
-void gf3d_sprite_create_uniform_buffer(Sprite *sprite);
-
-void gf3d_sprite_create_vertex_buffer(Sprite *sprite);
-
-void gf3d_sprite_update_uniform_buffer(Sprite *sprite, uint32_t currentImage, Matrix4 spriteMat, Uint32 frame);
+VkVertexInputAttributeDescription * gf3d_sprite_get_attribute_descriptions(Uint32 *count);
 
 
 #endif
