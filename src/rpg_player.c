@@ -1,26 +1,25 @@
 
 #include "simple_logger.h"
 #include "simple_json.h"
-#include "simple_json_object.h"
-#include "simple_json_parse.h"
-#include "simple_json_value.h"
-#include "simple_json_string.h"
-#include "simple_json_list.h"
-#include "simple_json_array.h"
-#include "simple_json_error.h"
 
 #include "gf3d_camera.h"
 
+#include "rpg_cooldowns.h"
 #include "rpg_player.h"
 #include "rpg_spellbook.h"
 #include "rpg_items.h"
 #include "rpg_projectile.h"
+
 
 static Player *player = { 0 };
 Matrix4 *camera = { 0 };
 
 Uint32 timer;
 Uint32 old_time;
+
+Cooldown cd_interact;
+Cooldown cd_primary_attack;
+Cooldown cd_secondary_attack;
 
 void rpg_player_move(Entity *self);
 void rpg_player_update();
@@ -34,7 +33,9 @@ void rpg_player_init(){
 
 	player->ent = rpg_player_new();
 
-	old_time = 0;
+	cd_interact.old_time		 = 0;
+	cd_primary_attack.old_time   = 0;
+	cd_secondary_attack.old_time = 0;
 
 	// Load player json file
 	SJson *player_info = sj_load("json/player.json");
@@ -52,7 +53,6 @@ void rpg_player_init(){
 	player->ent->update = rpg_player_update;
 	player->ent->type = PLAYER;
 	player->ent->name = "Player";
-	player->ent->type = PLAYER;
 	player->ent->position = vector3d(0, 8, -10);
 	player->ent->velocity = vector3d(0, 0, 0);
 	player->ent->rotation = vector3d(0, 0, 0);
@@ -65,11 +65,9 @@ void rpg_player_init(){
 	player->ent->boxCollider.y = player->ent->position.y;
 	player->ent->boxCollider.z = player->ent->position.z;
 
-	player->interactBound.radius = 6;
+	player->interactBound.radius = 10;
 	player->interactBound.x = player->ent->position.x;
 	player->interactBound.y = player->ent->position.z;
-	
-	print_stats();
 
 	player->stats.name = sj_get_string_value(sj_object_get_value(player_info, "name"));
 
@@ -78,77 +76,44 @@ void rpg_player_init(){
 	sj_get_integer_value(sj_object_get_value(player_info, "bits"), &player->stats.bits);
 
 	sj_get_integer_value(sj_object_get_value(player_info, "life"), &player->stats.life);
-	sj_get_integer_value(sj_object_get_value(player_info, "life_max"), &player->stats.life_max);
-	sj_get_integer_value(sj_object_get_value(player_info, "life_regen"), &player->stats.life_regen);
-
-	slog("CHECKING STAT: %i", player->stats.life_regen);
-	player->stats.life_regen = sj_get_integer_value(sj_object_get_value(player_info, "life_regen"), NULL);
-	slog("CHECKING STAT: %i", player->stats.life_regen);
+	sj_get_integer_value(sj_object_get_value(player_info, "max_life"), &player->stats.life_max);
+	sj_get_integer_value(sj_object_get_value(player_info, "regen_life"), &player->stats.life_regen);
 	sj_get_integer_value(sj_object_get_value(player_info, "mana"), &player->stats.mana);
-	sj_get_integer_value(sj_object_get_value(player_info, "mana_max"), &player->stats.mana_max);
-	sj_get_integer_value(sj_object_get_value(player_info, "mana_regen"), &player->stats.mana_regen);
+	sj_get_integer_value(sj_object_get_value(player_info, "max_mana"), &player->stats.mana_max);
+	sj_get_integer_value(sj_object_get_value(player_info, "regen_mana"), &player->stats.mana_regen);
 	sj_get_integer_value(sj_object_get_value(player_info, "stamina"), &player->stats.stamina);
-	sj_get_integer_value(sj_object_get_value(player_info, "stamina_max"), &player->stats.stamina_max);
-	sj_get_integer_value(sj_object_get_value(player_info, "stamina_regen"), &player->stats.stamina_regen);
+	sj_get_integer_value(sj_object_get_value(player_info, "max_stamina"), &player->stats.stamina_max);
+	sj_get_integer_value(sj_object_get_value(player_info, "regen_stamina"), &player->stats.stamina_regen);
 
-	player->stats.carry_weight = sj_get_float_value(sj_object_get_value(player_info, "carry_weight"), NULL);
-	player->stats.carry_weight_max = sj_get_float_value(sj_object_get_value(player_info, "carry_weight_max"), NULL);
+	sj_get_float_value(sj_object_get_value(player_info, "carry_weight"), &player->stats.carry_weight);
+	sj_get_float_value(sj_object_get_value(player_info, "max_weight"), &player->stats.carry_weight_max);
 
 	sj_get_integer_value(sj_object_get_value(player_info, "strength"), &player->stats.strength);
-	sj_get_integer_value(sj_object_get_value(player_info, "strength_max"), &player->stats.strength_max);
+	sj_get_integer_value(sj_object_get_value(player_info, "max_strength"), &player->stats.strength_max);
 	sj_get_integer_value(sj_object_get_value(player_info, "health"), &player->stats.health);
-	sj_get_integer_value(sj_object_get_value(player_info, "health_max"), &player->stats.health_max);
+	sj_get_integer_value(sj_object_get_value(player_info, "max_health"), &player->stats.health_max);
 	sj_get_integer_value(sj_object_get_value(player_info, "perception"), &player->stats.perception);
-	sj_get_integer_value(sj_object_get_value(player_info, "perception_max"), &player->stats.perception_max);
+	sj_get_integer_value(sj_object_get_value(player_info, "max_perception"), &player->stats.perception_max);
 	sj_get_integer_value(sj_object_get_value(player_info, "speed"), &player->stats.speed);
-	sj_get_integer_value(sj_object_get_value(player_info, "speed_max"), &player->stats.speed_max);
+	sj_get_integer_value(sj_object_get_value(player_info, "max_speed"), &player->stats.speed_max);
 	sj_get_integer_value(sj_object_get_value(player_info, "willpower"), &player->stats.willpower);
-	sj_get_integer_value(sj_object_get_value(player_info, "willpower_max"), &player->stats.willpower_max);
+	sj_get_integer_value(sj_object_get_value(player_info, "max_willpower"), &player->stats.willpower_max);
 	sj_get_integer_value(sj_object_get_value(player_info, "dexterity"), &player->stats.dexterity);
-	sj_get_integer_value(sj_object_get_value(player_info, "dexterity_max"), &player->stats.dexterity_max);
+	sj_get_integer_value(sj_object_get_value(player_info, "max_dexterity"), &player->stats.dexterity_max);
 	sj_get_integer_value(sj_object_get_value(player_info, "intelligence"), &player->stats.intelligence);
-	sj_get_integer_value(sj_object_get_value(player_info, "intelligence_max"), &player->stats.intelligence_max);
+	sj_get_integer_value(sj_object_get_value(player_info, "max_intelligence"), &player->stats.intelligence_max);
 	sj_get_integer_value(sj_object_get_value(player_info, "luck"), &player->stats.luck);
-	sj_get_integer_value(sj_object_get_value(player_info, "luck_max"), &player->stats.luck);
+	sj_get_integer_value(sj_object_get_value(player_info, "max_luck"), &player->stats.luck_max);
 
-/*	player->stats.exp				= 0;
-	player->stats.bits				= 1000;
-
-	player->stats.life				= 100;
-	player->stats.life_max			= 100;
-	player->stats.life_regen		= 100;
-	player->stats.mana				= 100;
-	player->stats.mana_max			= 100;
-	player->stats.mana_regen		= 100;
-	player->stats.stamina			= 100;
-	player->stats.stamina_max		= 100;
-	player->stats.stamina_regen		= 100;
-
-	player->stats.carry_weight		= 65.00;	//Value is in kilograms
-
-	player->stats.strength			= 1;
-	player->stats.strength_max		= 100;
-	player->stats.health			= 1;
-	player->stats.health_max		= 100;
-	player->stats.perception		= 1;
-	player->stats.perception_max	= 100;
-	player->stats.speed				= 1;
-	player->stats.speed_max			= 100;
-	player->stats.willpower			= 1;
-	player->stats.willpower_max		= 100;
-	player->stats.dexterity			= 1;
-	player->stats.dexterity_max		= 100;
-	player->stats.intelligence		= 1;
-	player->stats.intelligence_max	= 100;
-	player->stats.luck				= 1;
-	player->stats.luck_max			= 100;
-	*/
+	sj_object_free(player_info);
+	
 	player->stats.toggleStats = false;
 	
 	player->inventory.bagSize = 30;
 	player->inventory.spellbookSize = 5;
 	player->inventory.bag = (Item *)gfc_allocate_array(sizeof(Item), player->inventory.bagSize);
 	player->inventory.spellbook = (Spell *)gfc_allocate_array(sizeof(Spell), player->inventory.spellbookSize);
+
 	
 }
 
@@ -336,8 +301,16 @@ rpg_player_input(Entity *self)
 
 	if (keys[SDL_SCANCODE_E])
 	{
-		slog("Interact");
-		player_interaction();
+		if (timer > cd_interact.old_time + 1000)
+		{
+			slog("Interact");
+			player_interaction();
+			cd_interact.old_time = timer;
+		}
+		else
+		{
+			slog("Interact cooldown");
+		}
 
 	}
 	if (keys[SDL_SCANCODE_I])
@@ -360,13 +333,13 @@ rpg_player_input(Entity *self)
 	{
 		slog("Button: %i", SDL_GetMouseState(NULL, NULL));
 		slog("\n      Time: %i\nLast Time: %i", timer, old_time);
-		if (timer > old_time + 5000)
+		if (timer > cd_secondary_attack.old_time + 5000)
 		{
 			if (player->stats.mana >= 10)
 			{
 				rpg_fireball_spawn(self);
 				player->stats.mana -= 10;
-				old_time = timer;
+				cd_secondary_attack.old_time = timer;
 			}
 			else
 			{

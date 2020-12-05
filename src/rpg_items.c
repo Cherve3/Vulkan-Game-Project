@@ -14,7 +14,7 @@ Item rpg_item_new_random(int random)
 			break;
 		case material:
 
-			return rpg_item_new_material("Wooden Log", 1);
+			return rpg_item_new_material("Wood Log", 1);
 			break;
 		case weapon:
 
@@ -35,9 +35,9 @@ Item rpg_item_new_consumable(char* name, Uint8 quantity)
 	item.quantity = quantity;
 	item.type = consumable;
 	slog("Consumable: %s Quantity: %i", name, quantity);
-	if (strcmp(name, "Health Potion"))
+	if (strcmp(name, "Health Potion") == 0)
 	{
-		item.damage = -10;
+		item.damage = 10;
 		item.name = name;
 		item.weight = 0.1;
 		item.description = "A glass filled with a red glowing liquid. It will fortify your health.";
@@ -45,9 +45,9 @@ Item rpg_item_new_consumable(char* name, Uint8 quantity)
 		item.cost = 20;
 		return item;
 	}
-	if (strcmp(name, "Mana Potion"))
+	if (strcmp(name, "Mana Potion") == 0)
 	{
-		item.damage = -10;
+		item.damage = 10;
 		item.name = name;
 		item.weight = 0.1;
 		item.description = "A glass filled with a blue glowing liquid. It will fortify your mana.";
@@ -55,9 +55,9 @@ Item rpg_item_new_consumable(char* name, Uint8 quantity)
 		item.cost = 20;
 		return item;
 	}
-	if (strcmp(name, "Stamina Potion"))
+	if (strcmp(name, "Stamina Potion") == 0)
 	{
-		item.damage = -10;
+		item.damage = 10;
 		item.name = name;
 		item.weight = 0.1;
 		item.description = "A glass filled with a green glowing liquid. It will fortify your stamina.";
@@ -65,7 +65,7 @@ Item rpg_item_new_consumable(char* name, Uint8 quantity)
 		item.cost = 20;
 		return item;
 	}
-	if (strcmp(name, "Arrow"))
+	if (strcmp(name, "Arrow") == 0)
 	{
 		item.damage = 10;
 		item.name = name;
@@ -85,7 +85,7 @@ Item rpg_item_new_material(char* name, Uint8 quantity)
 	item.armor = 0;
 	item.damage = 0;
 	slog("Material: %s Quantity: %i", name, quantity);
-	if (strcmp(name, "Wood Log"))
+	if (strcmp(name, "Wood Log") == 0)
 	{
 		item.name = name;
 		item.quantity = 1;
@@ -94,19 +94,19 @@ Item rpg_item_new_material(char* name, Uint8 quantity)
 		item.cost = 30;
 		return item;
 	}
-	if (strcmp(name, "Herb"))
+	if (strcmp(name, "Herb") == 0)
 	{
 		item.name = name;
 		item.weight = 0.1;
-		item.description = "A glass bottle filled with a blue glowing liquid. It will fortify your mana.";
+		item.description = "A small leafy plant. It may be used for something.";
 		item.cost = 20;
 		return item;
 	}
-	if (strcmp(name, "Water"))
+	if (strcmp(name, "Water") == 0)
 	{
 		item.name = name;
 		item.weight = 0.1;
-		item.description = "A glass bottle filled with water. Where did you get that?.";
+		item.description = "A glass bottle filled with water. Where did you get that?";
 		item.cost = 20;
 		return item;
 	}
@@ -119,7 +119,7 @@ Item rpg_item_new_weapon(char* name, Uint8 quantity)
 	item.type = weapon;
 	item.armor = 0;
 	slog("Weapon: %s Quantity: %i", name, quantity);
-	if (strcmp(name, "Wooden Sword"))
+	if (strcmp(name, "Wooden Sword") == 0)
 	{
 		item.damage = 5;
 		item.name = name;
@@ -128,7 +128,7 @@ Item rpg_item_new_weapon(char* name, Uint8 quantity)
 		item.cost = 100;
 		return item;
 	}
-	if (strcmp(name, "Iron Sword"))
+	if (strcmp(name, "Iron Sword") == 0)
 	{
 		item.damage = 15;
 		item.name = name;
@@ -137,7 +137,7 @@ Item rpg_item_new_weapon(char* name, Uint8 quantity)
 		item.cost = 1000;
 		return item;
 	}
-	if (strcmp(name, "Dagger"))
+	if (strcmp(name, "Dagger") == 0)
 	{
 		item.damage = 10;
 		item.name = name;
@@ -146,7 +146,7 @@ Item rpg_item_new_weapon(char* name, Uint8 quantity)
 		item.cost = 600;
 		return item;
 	}
-	if (strcmp(name, "Bow"))
+	if (strcmp(name, "Bow") == 0)
 	{
 		item.damage = 5;
 		item.name = name;
@@ -155,7 +155,7 @@ Item rpg_item_new_weapon(char* name, Uint8 quantity)
 		item.cost = 250;
 		return item;
 	}
-	if (strcmp(name, "Hammer"))
+	if (strcmp(name, "Hammer") == 0)
 	{
 		item.damage = 20;
 		item.name = name;
@@ -173,7 +173,7 @@ Item rpg_item_new_armor(char* name, Uint8 quantity)
 	item.type = armor;
 	item.damage = 0;
 	slog("Weapon: %s Quantity: %i", name, quantity);
-	if (strcmp(name, "Leather Cap"))
+	if (strcmp(name, "Leather Cap") == 0)
 	{
 		item.armor = 1;
 		item.name = name;
@@ -182,7 +182,7 @@ Item rpg_item_new_armor(char* name, Uint8 quantity)
 		item.cost = 50;
 		return item;
 	}
-	if (strcmp(name, "Leather Cuirass"))
+	if (strcmp(name, "Leather Cuirass") == 0)
 	{
 		item.armor = 15;
 		item.name = name;
@@ -191,7 +191,7 @@ Item rpg_item_new_armor(char* name, Uint8 quantity)
 		item.cost = 100;
 		return item;
 	}
-	if (strcmp(name, "Leather Greaves"))
+	if (strcmp(name, "Leather Greaves") == 0)
 	{
 		item.armor = 5;
 		item.name = name;
@@ -200,7 +200,7 @@ Item rpg_item_new_armor(char* name, Uint8 quantity)
 		item.cost = 50;
 		return item;
 	}
-	if (strcmp(name, "Leather Boots"))
+	if (strcmp(name, "Leather Boots") == 0)
 	{
 		item.armor = 5;
 		item.name = name;

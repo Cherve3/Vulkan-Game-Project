@@ -34,8 +34,6 @@ typedef struct{
 	Uint8 stamina_max;
 	Uint8 stamina_regen;
 
-	float carry_weight;		//kilograms
-
 	Uint8 strength;
 	Uint8 strength_max;
 	Uint8 health;

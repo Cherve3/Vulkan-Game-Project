@@ -65,8 +65,8 @@ void rpg_ui_draw_all(Uint32 bufferFrame, VkCommandBuffer commandbuffer)
 	if (mana_ratio != 1)
 		mana_size = mana_size * mana_ratio;
 
-	slog("mana size: %f", mana_size);
-	slog("mana ratio: %f", mana_ratio);
+//	slog("mana size: %f", mana_size);
+//	slog("mana ratio: %f", mana_ratio);
 
 	gf3d_sprite_draw(UI.hud.base, vector2d(10, 10), vector2d(1, 1), 0, bufferFrame, commandbuffer);
 	gf3d_sprite_draw(UI.hud.health, vector2d(12, 13), vector2d(1, 1), 0, bufferFrame, commandbuffer);

@@ -23,9 +23,14 @@ void rpg_chest_loot_free(Item *item)
 
 void rpg_chests_free(Chest *chest)
 {
+	int i;
 	if (!chest) return;
-	rpg_chest_loot_free(chest->loot);
-	gf3d_entity_free(chest->ent);
+	for (i = 0; i < chest->lootSize; i++)
+	{
+		rpg_chest_loot_free(&chest->loot[i]);
+	}
+	chest->lootSize = 0;
+	
 	memset(chest, 0, sizeof(Chest));
 }
 
@@ -60,6 +65,7 @@ void rpg_chests_close()
 Chest *rpg_chest_new()
 {
 	int i;
+	char* id, name;
 	for (i = 0; i < rpg_chests.chest_count; i++)
 	{
 		if (!rpg_chests.chest_list[i]._inuse)
@@ -68,11 +74,11 @@ Chest *rpg_chest_new()
 
 			rpg_chests.chest_list[i].ent = gf3d_entity_new();
 			rpg_chests.chest_list[i].ent->model = gf3d_model_load("chest");
-			rpg_chests.chest_list[i].ent->position = vector3d(-15, 2.1, 0);
+			rpg_chests.chest_list[i].ent->position = vector3d(-15, 2.4, 0);
 			rpg_chests.chest_list[i].ent->type = INTERACT;
-			rpg_chests.chest_list[i].ent->name = "Chest" ;
-			rpg_chests.chest_list[i].ent->boxCollider.width  = 3;
-			rpg_chests.chest_list[i].ent->boxCollider.height = 4;
+			rpg_chests.chest_list[i].ent->name = "Chest";
+			rpg_chests.chest_list[i].ent->boxCollider.width  = 4;
+			rpg_chests.chest_list[i].ent->boxCollider.height = 3;
 			rpg_chests.chest_list[i].ent->boxCollider.depth  = 2;
 			rpg_chests.chest_list[i].ent->interact = rpg_chest_open;
 			rpg_chests.chest_list[i].ent->boxCollider.x = rpg_chests.chest_list[i].ent->position.x;
@@ -81,7 +87,6 @@ Chest *rpg_chest_new()
 	
 			gfc_matrix_new_translation(rpg_chests.chest_list[i].ent->modelMatrix, rpg_chests.chest_list[i].ent->position);
 
-			
 			float lootSize = rand() % 10;
 			slog("LootSize: %f", lootSize);
 			rpg_chests.chest_list[i].lootSize = lootSize;
@@ -145,8 +150,10 @@ void rpg_chest_open()
 		do{
 			if (get_player()->inventory.bag[i].name == rpg_chests.chest_list[0].loot[j].name)
 			{
+				
 				slog("updating quantity");
 				get_player()->inventory.bag[i].quantity++;
+				get_player()->inventory.bag[i].weight += rpg_chests.chest_list[0].loot[j].weight;
 				rpg_chests.chest_list[0].loot[j]._inuse = 0;
 			}
 			else if (!get_player()->inventory.bag[i]._inuse)
@@ -165,7 +172,11 @@ void rpg_chest_open()
 		} while (rpg_chests.chest_list[0].loot[j]._inuse);
 		i = 0;
 	}
+	// Destroy Chest
+	rpg_chests.chest_list[0].ent->_inuse = 0;
+	gf3d_entity_free(&rpg_chests.chest_list[0].ent);
+	rpg_chest_despawn(&rpg_chests.chest_list[0]);
 	rpg_chests_free(&rpg_chests.chest_list[0]);
-	gf3d_entity_free(rpg_chests.chest_list[0].ent);
+
 
 }

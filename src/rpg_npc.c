@@ -54,8 +54,6 @@ void rpg_npc_init(int type, Vector3D position){
 		npc[count].stats.stamina_max = 100;
 		npc[count].stats.stamina_regen = 100;
 
-		npc[count].stats.carry_weight = 65.00;	//Value is in kilograms
-
 		npc[count].stats.strength = 1;
 		npc[count].stats.strength_max = 100;
 		npc[count].stats.health = 1;
@@ -93,8 +91,6 @@ void rpg_npc_init(int type, Vector3D position){
 		npc[count].stats.stamina = 100;
 		npc[count].stats.stamina_max = 100;
 		npc[count].stats.stamina_regen = 100;
-
-		npc[count].stats.carry_weight = 65.00;	//Value is in kilograms
 
 		npc[count].stats.strength = 1;
 		npc[count].stats.strength_max = 100;
@@ -134,8 +130,6 @@ void rpg_npc_init(int type, Vector3D position){
 		npc[count].stats.stamina_max = 100;
 		npc[count].stats.stamina_regen = 100;
 
-		npc[count].stats.carry_weight = 65.00;	//Value is in kilograms
-
 		npc[count].stats.strength = 1;
 		npc[count].stats.strength_max = 100;
 		npc[count].stats.health = 1;
@@ -174,8 +168,6 @@ void rpg_npc_init(int type, Vector3D position){
 		npc[count].stats.stamina_max = 100;
 		npc[count].stats.stamina_regen = 100;
 
-		npc[count].stats.carry_weight = 65.00;	//Value is in kilograms
-
 		npc[count].stats.strength = 1;
 		npc[count].stats.strength_max = 100;
 		npc[count].stats.health = 1;
@@ -213,8 +205,6 @@ void rpg_npc_init(int type, Vector3D position){
 		npc[count].stats.stamina = 100;
 		npc[count].stats.stamina_max = 100;
 		npc[count].stats.stamina_regen = 100;
-
-		npc[count].stats.carry_weight = 65.00;	//Value is in kilograms
 
 		npc[count].stats.strength = 1;
 		npc[count].stats.strength_max = 100;
