@@ -1,7 +1,51 @@
 
 #include "simple_logger.h"
+#include "simple_json.h"
 
 #include "rpg_items.h"
+
+typedef struct
+{
+	Item *item_list;
+	Uint32 item_count;
+
+}ItemManager;
+
+static ItemManager items = { 0 };
+static SJson *item_info;
+
+void rpg_item_close()
+{
+	int i;
+	if (items.item_list != NULL)
+	{
+		for (i = 0; i < items.item_count; i++)
+		{
+			gf3d_entity_free(&items.item_list[i]);
+		}
+		free(items.item_list);
+	}
+	memset(&items, 0, sizeof(ItemManager));
+	slog("Item System Closed");
+}
+
+void rpg_item_entity_init(Uint32 maxItems)
+{
+	if (items.item_list != NULL)
+	{
+		slog("WARNING: Item system already initialized");
+		return;
+	}
+	items.item_list = gfc_allocate_array(sizeof(Item), maxItems);
+	if (!items.item_list)
+	{
+		slog("failed to allocate item list");
+		return;
+	}
+	items.item_count = maxItems;
+	atexit(rpg_item_close);
+	slog("Item System Initialized");
+}
 
 //TODO: Finish item setup 
 Item rpg_item_new_random(int random)
@@ -32,84 +76,62 @@ Item rpg_item_new_random(int random)
 Item rpg_item_new_consumable(char* name, Uint8 quantity)
 {
 	Item item;
+	SJson *item_info = sj_load("json/items.json");
+
+	if (!item_info)
+	{
+		slog("Failed to load json data %s", sj_get_error());
+		return;
+	}
+
+	item_info = sj_object_get_value(item_info, name);
+
+	sj_get_integer_value(sj_object_get_value(item_info, "damage"), &item.damage);
+	sj_get_float_value(sj_object_get_value(item_info, "weight"), &item.weight);
+	sj_get_integer_value(sj_object_get_value(item_info, "cost"), &item.cost);
+
+	item.name = sj_get_string_value(sj_object_get_value(item_info, "name"));
+	item.description = sj_get_string_value(sj_object_get_value(item_info, "description"));
+
+	sj_free(item_info);
+	item_info = NULL;
+
 	item.quantity = quantity;
 	item.type = consumable;
-	slog("Consumable: %s Quantity: %i", name, quantity);
-	if (strcmp(name, "Health Potion") == 0)
-	{
-		item.damage = 10;
-		item.name = name;
-		item.weight = 0.1;
-		item.description = "A glass filled with a red glowing liquid. It will fortify your health.";
-		item.armor = 0;
-		item.cost = 20;
-		return item;
-	}
-	if (strcmp(name, "Mana Potion") == 0)
-	{
-		item.damage = 10;
-		item.name = name;
-		item.weight = 0.1;
-		item.description = "A glass filled with a blue glowing liquid. It will fortify your mana.";
-		item.armor = 0;
-		item.cost = 20;
-		return item;
-	}
-	if (strcmp(name, "Stamina Potion") == 0)
-	{
-		item.damage = 10;
-		item.name = name;
-		item.weight = 0.1;
-		item.description = "A glass filled with a green glowing liquid. It will fortify your stamina.";
-		item.armor = 0;
-		item.cost = 20;
-		return item;
-	}
-	if (strcmp(name, "Arrow") == 0)
-	{
-		item.damage = 10;
-		item.name = name;
-		item.weight = 0.1;
-		item.description = "A glass filled with a green glowing liquid. It will fortify your stamina.";
-		item.armor = 0;
-		item.cost = 5;
-		return item;
-	}
+	item.armor = 0;
+	slog("Consumable: %s Quantity: %i", item.name, item.quantity);
+
+	return item;
 }
 
 Item rpg_item_new_material(char* name, Uint8 quantity)
 {
 	Item item;
+	item_info = sj_load("json/items.json");
+
+	if (!item_info)
+	{
+		slog("Failed to load json data %s", sj_get_error());
+		return;
+	}
+	item_info = sj_object_get_value(item_info, name);
+
+	sj_get_float_value(sj_object_get_value(item_info, "weight"), &item.weight);
+	sj_get_integer_value(sj_object_get_value(item_info, "cost"), &item.cost);
+
+	item.name = sj_get_string_value(sj_object_get_value(item_info, "name"));
+	item.description = sj_get_string_value(sj_object_get_value(item_info, "description"));
+
+	sj_free(item_info);
+
 	item.quantity = quantity;
 	item.type = material;
 	item.armor = 0;
 	item.damage = 0;
 	slog("Material: %s Quantity: %i", name, quantity);
-	if (strcmp(name, "Wood Log") == 0)
-	{
-		item.name = name;
-		item.quantity = 1;
-		item.weight = 3.0;
-		item.description = "A sturdy looking wood log. It can be used for crafting.";
-		item.cost = 30;
-		return item;
-	}
-	if (strcmp(name, "Herb") == 0)
-	{
-		item.name = name;
-		item.weight = 0.1;
-		item.description = "A small leafy plant. It may be used for something.";
-		item.cost = 20;
-		return item;
-	}
-	if (strcmp(name, "Water") == 0)
-	{
-		item.name = name;
-		item.weight = 0.1;
-		item.description = "A glass bottle filled with water. Where did you get that?";
-		item.cost = 20;
-		return item;
-	}
+	slog("NAME: %s	DESCRIPTION: %s", item.name, item.description);
+
+	return item;
 }
 
 Item rpg_item_new_weapon(char* name, Uint8 quantity)
@@ -211,34 +233,69 @@ Item rpg_item_new_armor(char* name, Uint8 quantity)
 	}
 }
 
-ItemEntity *rpg_item_spawn(ItemType type, char* name, Vector3D position)
+void rpg_item_collect()
 {
-	ItemEntity *item;
+	slog("Collecting item");
+}
 
-	item->ent = gf3d_entity_new();
-	item->ent->model = gf3d_model_load(name);
-	item->ent->position = position;
+void rpg_item_create(Item item, ItemType type, char *name)
+{
 
 	switch (type)
 	{
 	case consumable:
-		item->item = rpg_item_new_consumable(name, 1);
+		item = rpg_item_new_consumable(name, 1);
 		return item;
 		break;
 	case material:
-		item->item = rpg_item_new_material(name, 1);
+		item = rpg_item_new_material(name, 1);
 
 		return item;
 		break;
 	case weapon:
-		item->item = rpg_item_new_weapon(name, 1);
+		item = rpg_item_new_weapon(name, 1);
 
 		return item;
 		break;
 	case armor:
-		item->item = rpg_item_new_armor(name, 1);
+		item = rpg_item_new_armor(name, 1);
 
 		return item;
 		break;
+	default:
+		slog("invalid item type");
+		break;
 	}
+}
+
+Item *rpg_item_new(ItemType type, char* name, Vector3D position)
+{
+	int i;
+	for (i = 0; i < items.item_count; i++)
+	{
+		if (!items.item_list[i]._inuse)
+		{
+			rpg_item_create(items.item_list[i],type,name);
+			items.item_list[i]._inuse = 1;
+
+			items.item_list[i].ent = gf3d_entity_new();
+			items.item_list[i].ent->model = gf3d_model_load("log");
+			items.item_list[i].ent->position = position;
+			gfc_matrix_scale(items.item_list[i].ent->modelMatrix, vector3d(2,2,2), items.item_list[i].ent->modelMatrix);
+			gfc_matrix_translate(items.item_list[i].ent->modelMatrix,position);
+			items.item_list[i].ent->type = ITEM;
+			items.item_list[i].ent->name = name;
+			items.item_list[i].ent->boxCollider.width = 6;
+			items.item_list[i].ent->boxCollider.height = 4;
+			items.item_list[i].ent->boxCollider.depth = 6;
+			items.item_list[i].ent->interact = rpg_item_collect;
+			items.item_list[i].ent->boxCollider.x = items.item_list[i].ent->position.x;
+			items.item_list[i].ent->boxCollider.y = items.item_list[i].ent->position.y;
+			items.item_list[i].ent->boxCollider.z = items.item_list[i].ent->position.z;
+
+			return &items.item_list[i];
+		}
+	}
+	slog("Failed to provide new item, no unused slots");
+	return NULL;
 }

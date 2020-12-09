@@ -60,6 +60,7 @@ typedef struct PStats_S
 	Uint8 luck_max;
 
 	Bool toggleStats;
+	Bool toggleMap;
 
 }pStats;
 

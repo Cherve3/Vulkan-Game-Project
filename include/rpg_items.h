@@ -21,6 +21,8 @@ typedef struct
 	char *name;
 	char *description;
 
+	Entity *ent;
+
 	Uint8 armor;
 	Uint8 damage;
 
@@ -29,13 +31,6 @@ typedef struct
 	float weight;
 
 }Item;
-
-typedef struct
-{
-	Item item;
-	Entity *ent;
-
-}ItemEntity;
 
 Item rpg_item_new_random(int random);
 
@@ -47,6 +42,6 @@ Item rpg_item_new_weapon(char* name, Uint8 quantity);
 
 Item rpg_item_new_armor(char* name, Uint8 quantity);
 
-ItemEntity *rpg_item_spawn(ItemType type, char* name, Vector3D position);
+Item *rpg_item_new(ItemType type, char* name, Vector3D position);
 
 #endif

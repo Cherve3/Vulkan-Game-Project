@@ -10,13 +10,8 @@ typedef struct
 	Entity *buildings;
 	Entity *trees;
 
-
 }World;
 
-void world_init(Vector3D position);
-
-void water_init(Vector3D position);
-
-void buildings_init(Uint32 building_count, Vector3D position);
+void rpg_world_init();
 
 #endif

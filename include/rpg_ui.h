@@ -19,9 +19,10 @@ typedef struct
 {
 	SDL_Surface *menuSurface;
 
-	SDL_Texture *menu;
-	SDL_Texture *stats;
+	Sprite *menu;
+	Sprite *stats;
 	SDL_Texture *text;
+	Sprite *map;
 
 	SDL_Color white;
 }Menu;

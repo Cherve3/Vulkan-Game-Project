@@ -1,13 +1,6 @@
 #include "simple_logger.h"
 
 #include "simple_json.h"
-#include "simple_json_array.h"
-#include "simple_json_error.h"
-#include "simple_json_list.h"
-#include "simple_json_object.h"
-#include "simple_json_parse.h"
-#include "simple_json_string.h"
-#include "simple_json_value.h"
 
 #include "rpg_goblin.h"
 #include "rpg_npc.h"
@@ -50,7 +43,7 @@ void rpg_goblin_init(int type, Vector3D position){
 	goblin[count].ent->boxCollider.y		= goblin[count].ent->position.y;
 	goblin[count].ent->boxCollider.z		= goblin[count].ent->position.z;
 
-	gfc_matrix_new_translation(goblin[count].ent->modelMatrix, goblin[count].ent->position);
+//	gfc_matrix_new_translation(goblin[count].ent->modelMatrix, goblin[count].ent->position);
 
 	switch (type)
 	{
@@ -58,51 +51,8 @@ void rpg_goblin_init(int type, Vector3D position){
 
 		goblin_info = sj_object_get_value(goblin_info, "GoblinGrunt");
 
-		if (!goblin_info)
-		{
-			slog("2Failed to load json data %s", sj_get_error());
-		}
-
-		slog("Array size: %i",goblin_info->v.array->size);
-
 		goblin[count].ent->model = gf3d_model_load("goblingrunt");
 		goblin[count].ent->think = rpg_goblin_think;
-
-		goblin[count].stats.name = sj_get_string_value(sj_object_get_value(goblin_info, "name"));
-		
-		sj_get_integer_value(sj_object_get_value(goblin_info, "level"), &goblin[count].stats.level);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "exp"), &goblin[count].stats.exp);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "bits"), &goblin[count].stats.bits);
-
-		sj_get_integer_value(sj_object_get_value(goblin_info, "life"), &goblin[count].stats.life);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "max_life"), &goblin[count].stats.life_max);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "regen_life"), &goblin[count].stats.life_regen);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "mana"), &goblin[count].stats.mana);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "max_mana"), &goblin[count].stats.mana_max);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "regen_mana"), &goblin[count].stats.mana_regen);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "stamina"), &goblin[count].stats.stamina);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "max_stamina"), &goblin[count].stats.stamina_max);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "regen_stamina"), &goblin[count].stats.stamina_regen);
-
-		sj_get_integer_value(sj_object_get_value(goblin_info, "strength"), &goblin[count].stats.strength);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "max_strength"), &goblin[count].stats.strength_max);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "health"), &goblin[count].stats.health);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "max_health"), &goblin[count].stats.health_max);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "perception"), &goblin[count].stats.perception);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "max_perception"), &goblin[count].stats.perception_max);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "speed"), &goblin[count].stats.speed);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "max_speed"), &goblin[count].stats.speed_max);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "willpower"), &goblin[count].stats.willpower);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "max_willpower"), &goblin[count].stats.willpower_max);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "dexterity"), &goblin[count].stats.dexterity);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "max_dexterity"), &goblin[count].stats.dexterity_max);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "intelligence"), &goblin[count].stats.intelligence);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "max_intelligence"), &goblin[count].stats.intelligence_max);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "luck"), &goblin[count].stats.luck);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "max_luck"), &goblin[count].stats.luck_max);
-
-		print_goblin_stats(goblin[count]);
-	
 		count++;
 		break;
 	case GoblinHeavy:							//Goblin Heavy
@@ -111,45 +61,19 @@ void rpg_goblin_init(int type, Vector3D position){
 
 		goblin[count].ent->model = gf3d_model_load("goblingrunt");
 		goblin[count].ent->think = rpg_goblin_think;
-		gfc_matrix_scale(goblin[count].ent->modelMatrix,vector3d(1.2,1.2,1.2));
 
-		goblin[count].stats.name = sj_get_string_value(sj_object_get_value(goblin_info, "name"));
+		goblin[count].ent->boxCollider.width = 2.0;
+		goblin[count].ent->boxCollider.height = 5.0;
+		goblin[count].ent->boxCollider.depth = 2.0;
 
-		sj_get_integer_value(sj_object_get_value(goblin_info, "level"), &goblin[count].stats.level);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "exp"), &goblin[count].stats.exp);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "bits"), &goblin[count].stats.bits);
-
-		sj_get_integer_value(sj_object_get_value(goblin_info, "life"), &goblin[count].stats.life);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "max_life"), &goblin[count].stats.life_max);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "regen_life"), &goblin[count].stats.life_regen);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "mana"), &goblin[count].stats.mana);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "max_mana"), &goblin[count].stats.mana_max);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "regen_mana"), &goblin[count].stats.mana_regen);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "stamina"), &goblin[count].stats.stamina);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "max_stamina"), &goblin[count].stats.stamina_max);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "regen_stamina"), &goblin[count].stats.stamina_regen);
-
-		sj_get_integer_value(sj_object_get_value(goblin_info, "strength"), &goblin[count].stats.strength);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "max_strength"), &goblin[count].stats.strength_max);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "health"), &goblin[count].stats.health);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "max_health"), &goblin[count].stats.health_max);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "perception"), &goblin[count].stats.perception);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "max_perception"), &goblin[count].stats.perception_max);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "speed"), &goblin[count].stats.speed);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "max_speed"), &goblin[count].stats.speed_max);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "willpower"), &goblin[count].stats.willpower);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "max_willpower"), &goblin[count].stats.willpower_max);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "dexterity"), &goblin[count].stats.dexterity);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "max_dexterity"), &goblin[count].stats.dexterity_max);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "intelligence"), &goblin[count].stats.intelligence);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "max_intelligence"), &goblin[count].stats.intelligence_max);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "luck"), &goblin[count].stats.luck);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "max_luck"), &goblin[count].stats.luck_max);
-
-		print_goblin_stats(goblin[count]);
-
+		gfc_matrix_slog(goblin[count].ent->modelMatrix);
+		goblin[count].ent->modelMatrix[0][0] = 2;
+		goblin[count].ent->modelMatrix[1][1] = 2;
+		goblin[count].ent->modelMatrix[2][2] = 2;
+		gfc_matrix_slog(goblin[count].ent->modelMatrix);
 		count++;
 		break;
+
 	case GoblinArcher:							//Goblin Archer
 
 		goblin_info = sj_object_get_value(goblin_info, "GoblinArcher");
@@ -158,40 +82,6 @@ void rpg_goblin_init(int type, Vector3D position){
 		goblin[count].ent->think = rpg_goblin_think;
 
 		goblin[count].stats.name = sj_get_string_value(sj_object_get_value(goblin_info, "name"));
-
-		sj_get_integer_value(sj_object_get_value(goblin_info, "level"), &goblin[count].stats.level);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "exp"), &goblin[count].stats.exp);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "bits"), &goblin[count].stats.bits);
-
-		sj_get_integer_value(sj_object_get_value(goblin_info, "life"), &goblin[count].stats.life);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "max_life"), &goblin[count].stats.life_max);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "regen_life"), &goblin[count].stats.life_regen);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "mana"), &goblin[count].stats.mana);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "max_mana"), &goblin[count].stats.mana_max);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "regen_mana"), &goblin[count].stats.mana_regen);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "stamina"), &goblin[count].stats.stamina);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "max_stamina"), &goblin[count].stats.stamina_max);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "regen_stamina"), &goblin[count].stats.stamina_regen);
-
-		sj_get_integer_value(sj_object_get_value(goblin_info, "strength"), &goblin[count].stats.strength);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "max_strength"), &goblin[count].stats.strength_max);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "health"), &goblin[count].stats.health);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "max_health"), &goblin[count].stats.health_max);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "perception"), &goblin[count].stats.perception);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "max_perception"), &goblin[count].stats.perception_max);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "speed"), &goblin[count].stats.speed);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "max_speed"), &goblin[count].stats.speed_max);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "willpower"), &goblin[count].stats.willpower);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "max_willpower"), &goblin[count].stats.willpower_max);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "dexterity"), &goblin[count].stats.dexterity);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "max_dexterity"), &goblin[count].stats.dexterity_max);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "intelligence"), &goblin[count].stats.intelligence);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "max_intelligence"), &goblin[count].stats.intelligence_max);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "luck"), &goblin[count].stats.luck);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "max_luck"), &goblin[count].stats.luck_max);
-
-		print_goblin_stats(goblin[count]);
-
 		count++;
 		break;
 
@@ -199,51 +89,55 @@ void rpg_goblin_init(int type, Vector3D position){
 
 		goblin_info = sj_object_get_value(goblin_info, "GoblinKing");
 
+		goblin[count].ent->name = "Goblin King";
+
 		goblin[count].ent->model = gf3d_model_load("goblinking");
 		goblin[count].ent->think = rpg_goblin_think;
-
-		goblin[count].stats.name = sj_get_string_value(sj_object_get_value(goblin_info, "name"));
-
-		sj_get_integer_value(sj_object_get_value(goblin_info, "level"), &goblin[count].stats.level);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "exp"), &goblin[count].stats.exp);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "bits"), &goblin[count].stats.bits);
-
-		sj_get_integer_value(sj_object_get_value(goblin_info, "life"), &goblin[count].stats.life);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "max_life"), &goblin[count].stats.life_max);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "regen_life"), &goblin[count].stats.life_regen);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "mana"), &goblin[count].stats.mana);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "max_mana"), &goblin[count].stats.mana_max);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "regen_mana"), &goblin[count].stats.mana_regen);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "stamina"), &goblin[count].stats.stamina);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "max_stamina"), &goblin[count].stats.stamina_max);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "regen_stamina"), &goblin[count].stats.stamina_regen);
-
-		sj_get_integer_value(sj_object_get_value(goblin_info, "strength"), &goblin[count].stats.strength);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "max_strength"), &goblin[count].stats.strength_max);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "health"), &goblin[count].stats.health);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "max_health"), &goblin[count].stats.health_max);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "perception"), &goblin[count].stats.perception);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "max_perception"), &goblin[count].stats.perception_max);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "speed"), &goblin[count].stats.speed);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "max_speed"), &goblin[count].stats.speed_max);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "willpower"), &goblin[count].stats.willpower);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "max_willpower"), &goblin[count].stats.willpower_max);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "dexterity"), &goblin[count].stats.dexterity);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "max_dexterity"), &goblin[count].stats.dexterity_max);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "intelligence"), &goblin[count].stats.intelligence);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "max_intelligence"), &goblin[count].stats.intelligence_max);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "luck"), &goblin[count].stats.luck);
-		sj_get_integer_value(sj_object_get_value(goblin_info, "max_luck"), &goblin[count].stats.luck_max);
 
 		goblin[count].ent->boxCollider.width	= 8.0;
 		goblin[count].ent->boxCollider.height	= 30.0;
 		goblin[count].ent->boxCollider.depth	= 8.0;
 
-		print_goblin_stats(goblin[count]);
-
 		count++;
 		break;
 	}
+
+	goblin[count].stats.name = sj_get_string_value(sj_object_get_value(goblin_info, "name"));
+
+	sj_get_integer_value(sj_object_get_value(goblin_info, "level"), &goblin[count].stats.level);
+	sj_get_integer_value(sj_object_get_value(goblin_info, "exp"), &goblin[count].stats.exp);
+	sj_get_integer_value(sj_object_get_value(goblin_info, "bits"), &goblin[count].stats.bits);
+
+	sj_get_integer_value(sj_object_get_value(goblin_info, "life"), &goblin[count].stats.life);
+	sj_get_integer_value(sj_object_get_value(goblin_info, "max_life"), &goblin[count].stats.life_max);
+	sj_get_integer_value(sj_object_get_value(goblin_info, "regen_life"), &goblin[count].stats.life_regen);
+	sj_get_integer_value(sj_object_get_value(goblin_info, "mana"), &goblin[count].stats.mana);
+	sj_get_integer_value(sj_object_get_value(goblin_info, "max_mana"), &goblin[count].stats.mana_max);
+	sj_get_integer_value(sj_object_get_value(goblin_info, "regen_mana"), &goblin[count].stats.mana_regen);
+	sj_get_integer_value(sj_object_get_value(goblin_info, "stamina"), &goblin[count].stats.stamina);
+	sj_get_integer_value(sj_object_get_value(goblin_info, "max_stamina"), &goblin[count].stats.stamina_max);
+	sj_get_integer_value(sj_object_get_value(goblin_info, "regen_stamina"), &goblin[count].stats.stamina_regen);
+
+	sj_get_integer_value(sj_object_get_value(goblin_info, "strength"), &goblin[count].stats.strength);
+	sj_get_integer_value(sj_object_get_value(goblin_info, "max_strength"), &goblin[count].stats.strength_max);
+	sj_get_integer_value(sj_object_get_value(goblin_info, "health"), &goblin[count].stats.health);
+	sj_get_integer_value(sj_object_get_value(goblin_info, "max_health"), &goblin[count].stats.health_max);
+	sj_get_integer_value(sj_object_get_value(goblin_info, "perception"), &goblin[count].stats.perception);
+	sj_get_integer_value(sj_object_get_value(goblin_info, "max_perception"), &goblin[count].stats.perception_max);
+	sj_get_integer_value(sj_object_get_value(goblin_info, "speed"), &goblin[count].stats.speed);
+	sj_get_integer_value(sj_object_get_value(goblin_info, "max_speed"), &goblin[count].stats.speed_max);
+	sj_get_integer_value(sj_object_get_value(goblin_info, "willpower"), &goblin[count].stats.willpower);
+	sj_get_integer_value(sj_object_get_value(goblin_info, "max_willpower"), &goblin[count].stats.willpower_max);
+	sj_get_integer_value(sj_object_get_value(goblin_info, "dexterity"), &goblin[count].stats.dexterity);
+	sj_get_integer_value(sj_object_get_value(goblin_info, "max_dexterity"), &goblin[count].stats.dexterity_max);
+	sj_get_integer_value(sj_object_get_value(goblin_info, "intelligence"), &goblin[count].stats.intelligence);
+	sj_get_integer_value(sj_object_get_value(goblin_info, "max_intelligence"), &goblin[count].stats.intelligence_max);
+	sj_get_integer_value(sj_object_get_value(goblin_info, "luck"), &goblin[count].stats.luck);
+	sj_get_integer_value(sj_object_get_value(goblin_info, "max_luck"), &goblin[count].stats.luck_max);
+
+	print_goblin_stats(goblin[count]);
+
+	sj_free(goblin_info);
 }
 
 Entity *rpg_goblin_new(){
@@ -253,7 +147,10 @@ Entity *rpg_goblin_new(){
 
 void rpg_goblin_think(Entity *self){
 
+
 	rpg_goblin_move(self);
+	//if (strcmp(self->name, "Goblin King") == 0)
+		//self->model = gf3d_model_load_animated("goblinking", 1, 5);
 
 }
 

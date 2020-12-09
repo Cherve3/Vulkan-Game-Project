@@ -1,0 +1,24 @@
+{
+    "World":
+    {
+        "Ground":
+        {
+            "name":"World",
+            "model":"world"
+        },
+        "Water":
+        {
+            "name":"Water",
+            "model":"water"
+        },
+        "Trees":
+        {
+
+        },
+        "Structures":
+        {
+
+        }
+
+    }
+}

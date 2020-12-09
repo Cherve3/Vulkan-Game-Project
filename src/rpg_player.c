@@ -20,6 +20,9 @@ Uint32 old_time;
 Cooldown cd_interact;
 Cooldown cd_primary_attack;
 Cooldown cd_secondary_attack;
+Cooldown cd_inventory;
+Cooldown cd_stats;
+Cooldown cd_map;
 
 void rpg_player_move(Entity *self);
 void rpg_player_update();
@@ -36,6 +39,9 @@ void rpg_player_init(){
 	cd_interact.old_time		 = 0;
 	cd_primary_attack.old_time   = 0;
 	cd_secondary_attack.old_time = 0;
+	cd_inventory.old_time		 = 0;
+	cd_stats.old_time			 = 0;
+	cd_map.old_time				 = 0;
 
 	// Load player json file
 	SJson *player_info = sj_load("json/player.json");
@@ -315,18 +321,44 @@ rpg_player_input(Entity *self)
 	}
 	if (keys[SDL_SCANCODE_I])
 	{
-		slog("Inventory");
-		print_inventory();
+		if (timer > cd_inventory.old_time + 2000)
+		{
+			slog("Inventory");
+			print_inventory();
+		}
+		else
+			slog("Inventory cooldown");
 	}
 	if (keys[SDL_SCANCODE_TAB])
 	{
-		slog("Stats");
-		if (player->stats.toggleStats == false)
-			player->stats.toggleStats = true;
-		else
-			player->stats.toggleStats = false;
+		if (timer > cd_stats.old_time + 500)
+		{
+			slog("Stats");
+			if (player->stats.toggleStats == false)
+				player->stats.toggleStats = true;
+			else
+				player->stats.toggleStats = false;
 
-		print_stats();
+			cd_stats.old_time = timer;
+			print_stats();
+		}
+		else
+			slog("Stat cooldown");
+	}
+	if (keys[SDL_SCANCODE_M])
+	{
+		if (timer > cd_map.old_time + 500)
+		{
+			slog("Map");
+			if (player->stats.toggleMap == false)
+				player->stats.toggleMap = true;
+			else
+				player->stats.toggleMap = false;
+
+			cd_map.old_time = timer;
+		}
+		else
+			slog("Map cooldown");
 	}
 
 	if (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_RIGHT))
@@ -401,13 +433,16 @@ void print_inventory()
 	int i;
 	for (i = 0; i < get_player_inventory_size(); i++)
 	{
-		slog("       Name: %s", player->inventory.bag[i].name);
-		slog("       Type: %i", player->inventory.bag[i].type);
-		slog("Description: %s", player->inventory.bag[i].description);
-		slog("      Armor: %i", player->inventory.bag[i].armor);
-		slog("     Damage: %i", player->inventory.bag[i].damage);
-		slog("   Quantity: %i", player->inventory.bag[i].quantity);
-		slog("     Weight: %f", player->inventory.bag[i].weight);
+		if (player->inventory.bag[i]._inuse)
+		{
+			slog("       Name: %s", player->inventory.bag[i].name);
+			slog("       Type: %i", player->inventory.bag[i].type);
+			slog("Description: %s", player->inventory.bag[i].description);
+			slog("      Armor: %i", player->inventory.bag[i].armor);
+			slog("     Damage: %i", player->inventory.bag[i].damage);
+			slog("   Quantity: %i", player->inventory.bag[i].quantity);
+			slog("     Weight: %f", player->inventory.bag[i].weight);
+		}
 	}
 }
 

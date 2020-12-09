@@ -100,6 +100,7 @@ Model * gf3d_model_load_animated(char * filename, Uint32 startFrame, Uint32 endF
 	for (i = 0; i < count; i++)
 	{
 		snprintf(assetname, GFCLINELEN, "models/%s_%06i.obj", filename, startFrame + i);
+		slog("%s",assetname);
 		model->mesh[i] = gf3d_mesh_load(assetname);
 	}
 
@@ -168,6 +169,30 @@ void gf3d_model_draw(Model *model,Uint32 bufferFrame, VkCommandBuffer commandBuf
     }
     gf3d_model_update_basic_model_descriptor_set(model,*descriptorSet,bufferFrame,modelMat);
     gf3d_mesh_render(model->mesh,commandBuffer,descriptorSet);
+}
+
+void gf3d_model_draw_anim(Model *model, Uint32 bufferFrame, VkCommandBuffer commandBuffer, Matrix4 modelMat, Uint32 frame)
+{
+	VkDescriptorSet *descriptorSet = NULL;
+	if (!model)
+	{
+		slog("cannot render a NULL model");
+		return;
+	}
+	if (frame >= model->frameCount)
+	{
+		slog("cannot render model frame %i, greater than frameCount", frame);
+		return;
+	}
+	descriptorSet = gf3d_pipeline_get_descriptor_set(gf3d_model.pipe, bufferFrame);
+	if (descriptorSet == NULL)
+	{
+		slog("failed to get a free descriptor Set for model rendering");
+		return;
+	}
+	gf3d_model_update_basic_model_descriptor_set(model, *descriptorSet, bufferFrame, modelMat);
+	gf3d_mesh_render(model->mesh[frame], commandBuffer, descriptorSet);
+
 }
 
 void gf3d_model_update_basic_model_descriptor_set(Model *model,VkDescriptorSet descriptorSet,Uint32 chainIndex,Matrix4 modelMat)

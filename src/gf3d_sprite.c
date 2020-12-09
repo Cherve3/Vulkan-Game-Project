@@ -253,15 +253,39 @@ void gf3d_sprite_draw(Sprite *sprite, Vector2D position, Vector2D scale, Uint32 
 		slog("failed to get a free descriptor Set for sprite rendering");
 		return;
 	}
-
-	gfc_matrix_new_scale(
-		modelMat,
-		vector3d(scale.x, scale.y, 1),
-		modelMat);
+	/*
+	gfc_matrix_scale(
+	modelMat,
+	vector3d(scale.x, scale.y, 1),
+	modelMat);
 	gfc_matrix_new_translation(
-		modelMat,
-		vector3d(position.x * 2 / (float)extent.width, position.y * 2 / (float)extent.height, 0));
+	modelMat,
+	vector3d(position.x * 2 / (float)extent.width, position.y * 2 / (float)extent.height, 0));
+	*/
+	gfc_matrix_identity(modelMat);
 
+	modelMat[0][0] = scale.x;
+	modelMat[1][1] = scale.y;
+	modelMat[2][2] = 1;
+
+	modelMat[3][0] = position.x * 2/ (float)extent.width;
+	modelMat[3][1] = position.y * 2 / (float)extent.height;
+	modelMat[3][2] = 0;
+	/*
+	if (strcmp(sprite->filename, "images/mana_bar.png") == 0)
+	{
+		slog("Extent w: %f", (float)extent.width);
+		slog("Extent h: %f", (float)extent.height);
+
+		slog("Extent pos x: %f", position.x * 2 / (float)extent.width);
+		slog("Extent pos y: %f", position.y * 2 / (float)extent.height);
+
+		slog("scale X: %f", modelMat[0][0]);
+		slog("scale Y: %f", modelMat[1][1]);
+
+		slog("position X: %f", modelMat[3][0]);
+		slog("position Y: %f", modelMat[3][1]);
+	}*/
 	gf3d_sprite_update_basic_descriptor_set(sprite, *descriptorSet, buffer_frame, modelMat, frame);
 	gf3d_sprite_render(sprite, commandBuffer, descriptorSet);
 }

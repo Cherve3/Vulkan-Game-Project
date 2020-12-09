@@ -24,14 +24,22 @@ typedef struct
 
 static UIManager UI = { 0 };
 
+float health_ratio;
+float mana_ratio;
+float stamina_ratio;
+
 void rpg_ui_init()
 {
+	UI.hud.base		= NULL;
+	UI.hud.health	= NULL;
+	UI.hud.mana		= NULL;
+	UI.hud.stamina	= NULL;
+	UI.menu.stats	= NULL;
+	UI.menu.map     = NULL;
 
-	UI.hud.base = NULL;
-	UI.hud.health = NULL;
-	UI.hud.mana = NULL;
-	UI.hud.stamina = NULL;
-
+	health_ratio	= 0;
+	mana_ratio		= 0;
+	stamina_ratio	= 0;
 
 	if (TTF_Init() < 0) {
 		SDL_GetError();
@@ -43,6 +51,28 @@ void rpg_ui_init()
 		slog("Font is NULL");
 		slog(SDL_GetError());
 	}
+	/********************************************************************/
+//	Attempting to render text
+/*	SDL_Rect *rect;
+	SDL_Color color;
+	color.a = 1;
+	color.r = 0;
+	color.g = 0;
+	color.b = 0;
+
+	rect->h = 50;
+	rect->w = 50;
+	rect->x = 50;
+	rect->y = 50;
+	SDL_Surface *text = TTF_RenderText_Blended(UI.font,"Name: ",color);
+	SDL_BlitSurface(text, rect, gf3d_vgraphics_get_surface(),NULL);
+	VkImage image;
+	
+	vkCmdBlitImage();
+
+	vkCmdBlitImage2KHR();
+	VkBlitImageInfo2KHR
+	/*********************************************************************/
 
 	UI.hud.base = gf3d_sprite_load("images/base_bars.png", -1, -1, 0);
 	if (!UI.hud.base) slog("base sprite not loaded");
@@ -56,27 +86,39 @@ void rpg_ui_init()
 	UI.hud.stamina = gf3d_sprite_load("images/stamina_bar.png", -1, -1, 0);
 	if (!UI.hud.stamina) slog("stamina sprite not loaded");
 
+	UI.menu.stats = gf3d_sprite_load("images/statmenu.png", -1, -1, 0);
+	if (!UI.menu.stats) slog("stat menu sprite not loaded");
+	
+	UI.menu.map = gf3d_sprite_load("images/map.png", -1, -1, 0);
+	if (!UI.menu.stats) slog("map menu sprite not loaded");
+}
+
+void rpg_map()
+{
+
 }
 
 void rpg_ui_draw_all(Uint32 bufferFrame, VkCommandBuffer commandbuffer)
 {
-	float mana_size = 1;
-	float mana_ratio = (float)get_player_stats().mana / (float)get_player_stats().mana_max;
-	if (mana_ratio != 1)
-		mana_size = mana_size * mana_ratio;
-
-//	slog("mana size: %f", mana_size);
-//	slog("mana ratio: %f", mana_ratio);
+	//slog("mana ratio: %f", mana_ratio);
 
 	gf3d_sprite_draw(UI.hud.base, vector2d(10, 10), vector2d(1, 1), 0, bufferFrame, commandbuffer);
 	gf3d_sprite_draw(UI.hud.health, vector2d(12, 13), vector2d(1, 1), 0, bufferFrame, commandbuffer);
 	gf3d_sprite_draw(UI.hud.mana, vector2d(12, 31), vector2d(mana_ratio, 1), 0, bufferFrame, commandbuffer);
 	gf3d_sprite_draw(UI.hud.stamina, vector2d(12, 51), vector2d(1, 1), 0, bufferFrame, commandbuffer);
+
+	if (get_player_stats().toggleStats)
+		gf3d_sprite_draw(UI.menu.stats, vector2d(250, 175), vector2d(1.5, 1.5), 0, bufferFrame, commandbuffer);
+
+	if (get_player_stats().toggleMap)
+		gf3d_sprite_draw(UI.menu.map, vector2d(0, 0), vector2d(1, 1), 0, bufferFrame, commandbuffer);
 }
 
 void rpg_ui_update()
 {
-	float mana_ratio = get_player_stats().mana / get_player_stats().mana_max;
+	health_ratio = (float)get_player_stats().health / (float)get_player_stats().health_max;
+	mana_ratio = (float)get_player_stats().mana / (float)get_player_stats().mana_max;
+	stamina_ratio = (float)get_player_stats().stamina / (float)get_player_stats().stamina_max;
 }
 
 void toggle_stats(SDL_Renderer *renderer, Bool toggle)
@@ -88,20 +130,14 @@ void toggle_stats(SDL_Renderer *renderer, Bool toggle)
 
 	SDL_Texture *statmenu;
 
-	if (keys[SDL_SCANCODE_TAB] && player->stats.toggleStats == true)
-	{
+//	if (keys[SDL_SCANCODE_TAB] && player->stats.toggleStats == true)
+//	{
 		renderer = SDL_CreateRenderer(gf3d_vgraphics_get_window(), -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
 		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
 		statmenu = IMG_LoadTexture(renderer, "images/statmenu.png");
 		SDL_Rect rect, rect2;
 
-		TTF_Font *font = TTF_OpenFont("fonts/OfenbacherSchwabCAT.ttf", 64);
-		if (!font)
-		{
-			slog("Font is NULL");
-			slog(SDL_GetError());
-		}
 		char* textName = strcat("Name: ",player->stats.name);
 
 		slog(textName);
@@ -111,7 +147,7 @@ void toggle_stats(SDL_Renderer *renderer, Bool toggle)
 		color.g = 255;
 		color.a = 255;
 
-		SDL_Surface *text = TTF_RenderText_Solid(font, textName, color);
+		SDL_Surface *text = TTF_RenderText_Solid(UI.font, textName, color);
 		SDL_Texture *tex = SDL_CreateTextureFromSurface(renderer, text);
 		if (!text)
 		{
@@ -144,69 +180,14 @@ void toggle_stats(SDL_Renderer *renderer, Bool toggle)
 		SDL_RenderCopy(renderer, tex, NULL, &rect2);
 		SDL_RenderPresent(renderer);
 		toggle = true;
-	}
-	else if (keys[SDL_SCANCODE_TAB] && player->stats.toggleStats == false)
+//	}
+/*	else if (keys[SDL_SCANCODE_TAB] && player->stats.toggleStats == false)
 	{
 		slog("Toggled stats OFF");
 		toggle = false;
 		//SDL_DestroyTexture(statmenu);
 		SDL_RenderClear(renderer);
 		SDL_DestroyRenderer(renderer);
-	}
+	}*/
 
 }
-/*
-void stats_on(SDL_Renderer *renderer)
-{
-	const Uint8 *keys = SDL_GetKeyboardState(NULL);
-
-	SDL_Rect rectMenu, rectText;
-	SDL_Texture *menu, *text;
-	if (!menu && !text)
-	{
-		menu = IMG_LoadTexture(renderer, "images/statmenu.png");
-
-		UI.menu->menuSurface = TTF_RenderText_Blended(UI.font, "Name: Player 1", UI.menu->white);
-		UI.menu->text = SDL_CreateTextureFromSurface(renderer, UI.menu->menuSurface);
-		text = IMG_LoadTexture(renderer, "images/stamina_bar.png");
-	}
-	rectMenu.x = 50;
-	rectMenu.y = 40;
-	rectMenu.h = 400;
-	rectMenu.w = 400;
-
-	rectText.x = 90;
-	rectText.y = 70;
-	rectText.h = 40;
-	rectText.w = 100;
-
-	if (keys[SDL_SCANCODE_TAB])
-	{
-		
-		slog("Toggled stats ON");
-		//SDL_FreeSurface(text);
-		SDL_RenderClear(renderer);
-
-		SDL_RenderCopy(renderer, UI.menu->stats, NULL, &rectMenu);
-		SDL_RenderCopy(renderer, UI.menu->text, NULL, &rectText);
-		SDL_RenderPresent(renderer);
-		//SDL_DestroyTexture(menu);
-		//SDL_DestroyTexture(text);
-	}
-}
-
-void stats_off(SDL_Renderer *renderer)
-{
-	const Uint8 *keys;
-
-	keys = SDL_GetKeyboardState(NULL);
-
-	if (keys[SDL_SCANCODE_TAB])
-	{
-		SDL_RenderPresent(renderer);
-		//SDL_DestroyTexture(statmenu);
-		SDL_RenderClear(renderer);
-		SDL_DestroyRenderer(renderer);
-
-	}
-}*/

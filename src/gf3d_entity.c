@@ -7,8 +7,6 @@ typedef struct
 {
 	Entity *entity_list;	/**<List of entities*/
 	Uint32 entity_count;	/**<upper limit for concurrent active entities*/
-	VkFramebuffer bufferFrame;
-	VkCommandBuffer commandBuffer;
 }EntityManager;
 
 static EntityManager gf3d_entity = { 0 };

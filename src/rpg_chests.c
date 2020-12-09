@@ -148,6 +148,7 @@ void rpg_chest_open()
 	for (j = 0; j < rpg_chests.chest_list[0].lootSize; j++)
 	{
 		do{
+			slog("NAME: %s	DESCRIPTION: %s", rpg_chests.chest_list[0].loot[j].name, rpg_chests.chest_list[0].loot[j].description);
 			if (get_player()->inventory.bag[i].name == rpg_chests.chest_list[0].loot[j].name)
 			{
 				

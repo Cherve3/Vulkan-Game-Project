@@ -19,6 +19,8 @@
 #include "gf3d_entity.h"
 #include "gf3d_sprite.h"
 
+#include "rpg_world.h"
+#include "rpg_items.h"
 #include "rpg_chests.h"
 #include "rpg_projectile.h"
 #include "rpg_goblin.h"

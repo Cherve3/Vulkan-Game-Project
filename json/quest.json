@@ -1,0 +1,40 @@
+{
+    "Quests":
+    {
+        "1":{
+            "title":"Material Run", 
+            "Description":"placeholder description", 
+            "Objective":"",
+            "reward":"",
+            "Completed":0
+        },
+        "2":{
+            "title":"Slay the Goblins", 
+            "Description":"placeholder description", 
+            "Objective":"",
+            "reward":"",
+            "Completed":0
+        },
+        "3":{
+            "title":"Protect the Town", 
+            "Description":"placeholder description", 
+            "Objective":"",
+            "reward":"",
+            "Completed":0
+        },
+        "4":{
+            "title":"Find the Goblin Camp", 
+            "Description":"placeholder description", 
+            "Objective":"",
+            "reward":"",
+            "Completed":0
+        },
+        "5":{
+            "title":"End the King...", 
+            "Description":"placeholder description", 
+            "Objective":"",
+            "reward":"",
+            "Completed":0
+        }
+    }
+}

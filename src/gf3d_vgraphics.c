@@ -765,5 +765,10 @@ VkImageView gf3d_vgraphics_create_image_view(VkImage image, VkFormat format)
     return imageView;
 }
 
+VkSurfaceKHR *gf3d_vgraphics_get_surface()
+{
+	return gf3d_vgraphics.surface;
+}
+
 /*eol@eof*/
 
