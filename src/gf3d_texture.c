@@ -197,7 +197,7 @@ void gf3d_texture_create_sampler(Texture *tex)
 	slog("created texture sampler");
 }
 
-Texture *gf3d_texture_load(char *filename)
+Texture *gf3d_texture_load(char *filename, SDL_Surface *surf)
 {
 	SDL_Surface * surface;
 	void* data;
@@ -212,10 +212,20 @@ Texture *gf3d_texture_load(char *filename)
 	tex = gf3d_texture_get_by_filename(filename);
 	if (tex)
 	{
+		slog("Filename: %s", tex->filename);
+		slog("Tex is not null");
 		tex->_refcount++;
 		return tex;
 	}
-	surface = IMG_Load(filename);
+
+	if (surf)
+	{
+		slog("Surface = surf");
+		surface = surf;
+	}
+	else
+		surface = IMG_Load(filename);
+	
 	if (!surface)
 	{
 		slog("failed to load texture file %s", filename);
@@ -224,6 +234,7 @@ Texture *gf3d_texture_load(char *filename)
 	tex = gf3d_texture_new();
 	if (!tex)
 	{
+		slog("Tex is null");
 		SDL_FreeSurface(surface);
 		return NULL;
 	}
@@ -236,6 +247,8 @@ Texture *gf3d_texture_load(char *filename)
 
 	SDL_LockSurface(surface);
 	vkMapMemory(gf3d_texture.device, stagingBufferMemory, 0, imageSize, 0, &data);
+	if (!surface->pixels)
+		slog("Pixels are null");
 	memcpy(data, surface->pixels, imageSize);
 	vkUnmapMemory(gf3d_texture.device, stagingBufferMemory);
 	SDL_UnlockSurface(surface);
@@ -281,10 +294,19 @@ Texture *gf3d_texture_load(char *filename)
 	gf3d_swapchain_transition_image_layout(tex->textureImage, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
 	gf3d_texture_copy_buffer_to_image(stagingBuffer, tex->textureImage, surface->w, surface->h);
+	
+	if (surf)
+	{
+		gf3d_swapchain_transition_image_layout(tex->textureImage, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
-	gf3d_swapchain_transition_image_layout(tex->textureImage, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+		tex->textureImageView = gf3d_vgraphics_create_image_view(tex->textureImage, VK_FORMAT_R8G8B8A8_USCALED);
 
-	tex->textureImageView = gf3d_vgraphics_create_image_view(tex->textureImage, VK_FORMAT_R8G8B8A8_UNORM);
+	}
+	else{
+		gf3d_swapchain_transition_image_layout(tex->textureImage, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
+		tex->textureImageView = gf3d_vgraphics_create_image_view(tex->textureImage, VK_FORMAT_R8G8B8A8_UNORM);
+	}
 
 	gf3d_texture_create_sampler(tex);
 

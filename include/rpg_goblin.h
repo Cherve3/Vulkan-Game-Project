@@ -19,11 +19,15 @@ typedef enum {
 }GoblinType;
 
 /**
- *	@brief initialize a goblin character
+ *	@brief initialize goblin setup
+ */
+void rpg_goblin_init();
+
+/*
  *	@param type an enum of the goblin type
  *	@param position the initial spawn position of the goblin
  */
-void rpg_goblin_init(int type, Vector3D position);
+void rpg_goblin_spawn(GoblinType type, Vector3D position);
 
 /**
 *	@brief runs gf3d_entity_new function to add an NPC to entity system
@@ -38,5 +42,9 @@ Entity *rpg_goblin_new();
 void rpg_goblin_think(Entity *self);
 
 void rpg_goblin_search(Entity *player);
+
+void print_goblin_stats(NPC goblin);
+
+NPC get_goblin(int index);
 
 #endif

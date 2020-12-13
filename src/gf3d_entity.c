@@ -93,6 +93,34 @@ void gf3d_entity_think(Entity *self)
 	self->think(self);
 }
 
+void gf3d_entity_interact(Entity *self)
+{
+	if (!self)return;
+	if (!self->think)return; // No think function
+	self->interact(self);
+}
+
+void gf3d_entity_touch(Entity *self)
+{
+	if (!self)return;
+	if (!self->think)return; // No think function
+	self->touch(self);
+}
+
+void gf3d_entity_damage(Entity *self)
+{
+	if (!self)return;
+	if (!self->think)return; // No think function
+	self->damage(self);
+}
+
+void gf3d_entity_die(Entity *self)
+{
+	if (!self)return;
+	if (!self->think)return; // No think function
+	self->die(self);
+}
+
 void gf3d_entity_think_all()
 {
 	int i;

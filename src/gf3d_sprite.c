@@ -34,10 +34,10 @@ typedef struct
 	VkDevice        device;           /**<logical vulkan device*/
 	Pipeline       *pipe;             /**<the pipeline associated with sprite rendering*/
 	VkBuffer        faceBuffer;       /**<memory handle for the face buffer (always two faces)*/
-	VkDeviceMemory  faceBufferMemory; /**<memory habdle for tge face memory*/
+	VkDeviceMemory  faceBufferMemory; /**<memory habdle for the face memory*/
 	VkVertexInputAttributeDescription   attributeDescriptions[SPRITE_ATTRIBUTE_COUNT];
 	VkVertexInputBindingDescription     bindingDescription;
-	Command                            *stagingCommandBuffer;
+
 }SpriteManager;
 
 void gf3d_sprite_update_basic_descriptor_set(Sprite *model, VkDescriptorSet descriptorSet, Uint32 chainIndex, Matrix4 modelMat, Uint32 frame);
@@ -84,7 +84,7 @@ void gf3d_sprite_manager_init(Uint32 max_sprites, Uint32 chain_length, VkDevice 
 
 	if (max_sprites == 0)
 	{
-		slog("cannot intilizat sprite manager for 0 sprites");
+		slog("cannot initialize sprite manager for 0 sprites");
 		return;
 	}
 	gf3d_sprite.chain_length = chain_length;
@@ -150,21 +150,79 @@ Sprite *gf3d_sprite_new()
 	return NULL;
 }
 
-Sprite * gf3d_sprite_load(char * filename, int frame_width, int frame_height, Uint32 frames_per_line)
+Sprite * gf3d_sprite_load(char * filename,SDL_Surface *surface, int frame_width, int frame_height, Uint32 frames_per_line)
 {
 	Sprite *sprite;
 	sprite = gf3d_sprite_get_by_filename(filename);
 	if (sprite)
 	{
+		slog("Loading sprite from file...");
 		sprite->_inuse++;
 		return sprite;
 	}
 	sprite = gf3d_sprite_new();
 	if (!sprite)
 	{
+		slog("New sprite is null");
 		return NULL;
 	}
-	sprite->texture = gf3d_texture_load(filename);
+
+	if (!surface)
+	{
+		slog("Loading File");
+		sprite->texture = gf3d_texture_load(filename, NULL);
+	}
+	else
+	{
+		slog("Loading Surface");
+		sprite->texture = gf3d_texture_load(filename, surface);
+	}
+
+	if (!sprite->texture)
+	{
+		slog("gf3d_sprite_load: failed to load texture for sprite");
+		gf3d_sprite_free(sprite);
+		return NULL;
+	}
+	if (frame_width < 0)frame_width = sprite->texture->width;
+	if (frame_height < 0)frame_height = sprite->texture->height;
+	sprite->frameWidth = frame_width;
+	sprite->frameHeight = frame_height;
+	if (frames_per_line)sprite->framesPerLine = frames_per_line;
+	else sprite->framesPerLine = 1;
+	gfc_line_cpy(sprite->filename, filename);
+	gf3d_sprite_create_vertex_buffer(sprite);
+	return sprite;
+}
+
+Sprite * gf3d_sprite_load_surface(char * filename, SDL_Surface *surface, int frame_width, int frame_height, Uint32 frames_per_line)
+{
+	Sprite *sprite;
+	sprite = gf3d_sprite_get_by_filename(filename);
+	if (sprite)
+	{
+		slog("Loading sprite from file...");
+		sprite->_inuse++;
+		return sprite;
+	}
+	sprite = gf3d_sprite_new();
+	if (!sprite)
+	{
+		slog("New sprite is null");
+		return NULL;
+	}
+
+	if (!surface)
+	{
+		slog("Loading File");
+		sprite->texture = gf3d_texture_load(filename, NULL);
+	}
+	else
+	{
+		slog("Loading Surface");
+		sprite->texture = gf3d_texture_load("", surface);
+	}
+
 	if (!sprite->texture)
 	{
 		slog("gf3d_sprite_load: failed to load texture for sprite");

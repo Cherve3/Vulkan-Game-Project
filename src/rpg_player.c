@@ -17,6 +17,8 @@ Matrix4 *camera = { 0 };
 Uint32 timer;
 Uint32 old_time;
 
+SJson *player_info = NULL;
+
 Cooldown cd_interact;
 Cooldown cd_primary_attack;
 Cooldown cd_secondary_attack;
@@ -44,7 +46,7 @@ void rpg_player_init(){
 	cd_map.old_time				 = 0;
 
 	// Load player json file
-	SJson *player_info = sj_load("json/player.json");
+	player_info = sj_load("json/player.json");
 
 	if (!player_info)
 		slog("Failed to load json data %s",sj_get_error());
@@ -75,7 +77,7 @@ void rpg_player_init(){
 	player->interactBound.x = player->ent->position.x;
 	player->interactBound.y = player->ent->position.z;
 
-	player->stats.name = sj_get_string_value(sj_object_get_value(player_info, "name"));
+	player->stats.name =sj_get_string_value(sj_object_get_value(player_info, "name"));
 
 	sj_get_integer_value(sj_object_get_value(player_info, "level"), &player->stats.level);
 	sj_get_integer_value(sj_object_get_value(player_info, "exp"), &player->stats.exp);
@@ -111,16 +113,12 @@ void rpg_player_init(){
 	sj_get_integer_value(sj_object_get_value(player_info, "luck"), &player->stats.luck);
 	sj_get_integer_value(sj_object_get_value(player_info, "max_luck"), &player->stats.luck_max);
 
-	sj_object_free(player_info);
-	
 	player->stats.toggleStats = false;
 	
 	player->inventory.bagSize = 30;
 	player->inventory.spellbookSize = 5;
 	player->inventory.bag = (Item *)gfc_allocate_array(sizeof(Item), player->inventory.bagSize);
 	player->inventory.spellbook = (Spell *)gfc_allocate_array(sizeof(Spell), player->inventory.spellbookSize);
-
-	
 }
 
 Entity *rpg_player_new(){
@@ -340,7 +338,7 @@ rpg_player_input(Entity *self)
 				player->stats.toggleStats = false;
 
 			cd_stats.old_time = timer;
-			print_stats();
+			//print_stats();
 		}
 		else
 			slog("Stat cooldown");
@@ -404,13 +402,13 @@ rpg_player_input(Entity *self)
 void player_interaction()
 {
 	int i;
-	slog("Initial interacting...");
+	slog("Check interaction...");
 	for (i = 0; i < gf3d_get_entity_list_count(); i++)
 	{
 		if (!gf3d_get_entity_list()[i]._inuse) continue;
 		if (gf3d_get_entity_list()[i].name == player->ent->name) continue;
 		slog("Interacting...");
-		if (gf3d_get_entity_list()[i].type == INTERACT)
+		if (gf3d_get_entity_list()[i].type == INTERACT || gf3d_get_entity_list()[i].type == ITEM)
 		{
 
 			float x = player->ent->position.x - gf3d_get_entity_list()[i].position.x;
@@ -448,7 +446,7 @@ void print_inventory()
 
 void print_stats()
 {
-	slog("            Name: %s", player->stats.name);
+	slog("            Name: %s", get_player()->stats.name);
 	slog("           Level: %i", player->stats.level);
 	slog("             Exp: %i", player->stats.exp);
 	slog("            Bits: %i", player->stats.bits);
@@ -482,4 +480,10 @@ void print_stats()
 	slog("Intelligence Max: %i", player->stats.intelligence_max);
 	slog("            Luck: %i", player->stats.luck);
 	slog("        Luck Max: %i", player->stats.luck_max);
+}
+
+void print_player_name()
+{
+	slog("Name: %s", player->stats.name);
+	slog("Name: %s", get_player()->stats.name);
 }

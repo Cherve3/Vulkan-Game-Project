@@ -16,8 +16,9 @@ int main(int argc,char *argv[])
 	Bool toggleStats = false;
 
 	Chest *chest = NULL;
-//	ItemEntity *log = { 0 };
 	Item *wood = NULL;
+	Item *arrow = NULL;
+	Item *potion = NULL;
 //	Model *model = NULL;
 
     for (a = 1; a < argc;a++)
@@ -51,37 +52,32 @@ int main(int argc,char *argv[])
 
 	rpg_player_init();
 
+	rpg_npc_init(ItemShop, vector3d(20, 8, -20));
+
+	rpg_goblin_init();
+	rpg_goblin_spawn(GoblinGrunt, vector3d(-10, 5, -10));
+	rpg_goblin_spawn(GoblinHeavy, vector3d(10, 5, -10));
+	rpg_goblin_spawn(GoblinArcher, vector3d(10, 5, 10));
+	rpg_goblin_spawn(GoblinKing, vector3d(-40, 25, 40));
+
 	rpg_item_entity_init(10);
+	wood = rpg_item_new(material,"Wood Log",vector3d(-5, 2, 20));
+	potion = rpg_item_new(consumable, "Health Potion", vector3d(-5, 2, 30));
+	arrow = rpg_item_new(consumable, "Arrow", vector3d(-5, 2, 50));
+
 	rpg_chests_init(10);
+	chest = rpg_chest_new();
 
 	rpg_projectile_init(10);
 
 	rpg_ui_init();
+
+
 	slog_sync();
-	chest		= rpg_chest_new();
-	wood		= rpg_item_new(material,"Wood",vector3d(-5, 2, 20));
-//	log = rpg_item_spawn(material, "log", vector3d(-5, 1, 5));
-	slog_sync();
-	rpg_goblin_init(GoblinGrunt,vector3d(-10, 5, -10));
-	rpg_goblin_init(GoblinHeavy, vector3d(10, 5, -10));
-	rpg_goblin_init(GoblinArcher, vector3d(10, 5, 10));
-	rpg_goblin_init(GoblinKing, vector3d(-40, 25, 40));
 
 //	gfc_matrix_identity(modelMat);
 //	model = gf3d_model_load_animated("goblinking", 1, 5);
 
-	rpg_npc_init(ItemShop, vector3d(20, 8, -20));
-
-	slog_sync();
-	/*
-	if (wood)
-	{
-		wood->model = gf3d_model_load("log");
-		wood->position = vector3d(-5, 1, 5);
-		wood->name = "Wood";
-		gfc_matrix_new_translation(wood->modelMatrix,wood->position);
-	}
-	*/
 	SDL_ShowCursor(0);
 	SDL_SetRelativeMouseMode(SDL_TRUE);
 

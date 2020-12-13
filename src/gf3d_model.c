@@ -105,7 +105,7 @@ Model * gf3d_model_load_animated(char * filename, Uint32 startFrame, Uint32 endF
 	}
 
 	snprintf(assetname, GFCLINELEN, "images/%s.png", filename);
-	model->texture = gf3d_texture_load(assetname);
+	model->texture = gf3d_texture_load(assetname, NULL);
 
 	return model;
 }
@@ -120,7 +120,7 @@ Model * gf3d_model_load(char * filename)
     model->mesh = gf3d_mesh_load(assetname);
 
     snprintf(assetname,GFCLINELEN,"images/%s.png",filename);
-    model->texture = gf3d_texture_load(assetname);
+    model->texture = gf3d_texture_load(assetname, NULL);
     
     return model;
 }

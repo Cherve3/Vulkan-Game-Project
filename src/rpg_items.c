@@ -3,6 +3,7 @@
 #include "simple_json.h"
 
 #include "rpg_items.h"
+#include "rpg_player.h"
 
 typedef struct
 {
@@ -12,7 +13,15 @@ typedef struct
 }ItemManager;
 
 static ItemManager items = { 0 };
-static SJson *item_info;
+
+static SJson *item_info			= NULL;
+static SJson *consumable_info	= NULL;
+static SJson *material_info		= NULL;
+static SJson *weapon_info		= NULL;
+static SJson *armor_info		= NULL;
+
+
+void print_item_manager();
 
 void rpg_item_close()
 {
@@ -36,13 +45,20 @@ void rpg_item_entity_init(Uint32 maxItems)
 		slog("WARNING: Item system already initialized");
 		return;
 	}
+
 	items.item_list = gfc_allocate_array(sizeof(Item), maxItems);
-	if (!items.item_list)
-	{
-		slog("failed to allocate item list");
-		return;
-	}
+	if (!items.item_list){slog("failed to allocate item list");return;}
+
+	item_info		= sj_load("json/items.json");
+	consumable_info = sj_object_get_value(item_info, "Consumable");
+	material_info	= sj_object_get_value(item_info, "Material");
+	armor_info		= sj_load("json/armor.json");
+	weapon_info		= sj_load("json/weapons.json");
+
+	if (!item_info || !consumable_info || !material_info || !armor_info || !weapon_info){ slog("failed to load item info"); return; }
+
 	items.item_count = maxItems;
+
 	atexit(rpg_item_close);
 	slog("Item System Initialized");
 }
@@ -69,36 +85,30 @@ Item rpg_item_new_random(int random)
 			return rpg_item_new_armor("Leather Boots", 1);
 			break;
 	}
-
-
 }
 
 Item rpg_item_new_consumable(char* name, Uint8 quantity)
 {
 	Item item;
-	SJson *item_info = sj_load("json/items.json");
-
+	SJson *info = sj_object_get_value(consumable_info, name);
 	if (!item_info)
 	{
+		slog("Consumable %s",name);
 		slog("Failed to load json data %s", sj_get_error());
 		return;
 	}
 
-	item_info = sj_object_get_value(item_info, name);
+	sj_get_integer_value(sj_object_get_value(info, "damage"), &item.damage);
+	sj_get_float_value(sj_object_get_value(info, "weight"), &item.weight);
+	sj_get_integer_value(sj_object_get_value(info, "cost"), &item.cost);
 
-	sj_get_integer_value(sj_object_get_value(item_info, "damage"), &item.damage);
-	sj_get_float_value(sj_object_get_value(item_info, "weight"), &item.weight);
-	sj_get_integer_value(sj_object_get_value(item_info, "cost"), &item.cost);
+	item.name			= sj_get_string_value(sj_object_get_value(info, "name"));
+	item.description	= sj_get_string_value(sj_object_get_value(info, "description"));
 
-	item.name = sj_get_string_value(sj_object_get_value(item_info, "name"));
-	item.description = sj_get_string_value(sj_object_get_value(item_info, "description"));
+	item.quantity	= quantity;
+	item.type		= consumable;
+	item.armor		= 0;
 
-	sj_free(item_info);
-	item_info = NULL;
-
-	item.quantity = quantity;
-	item.type = consumable;
-	item.armor = 0;
 	slog("Consumable: %s Quantity: %i", item.name, item.quantity);
 
 	return item;
@@ -107,29 +117,27 @@ Item rpg_item_new_consumable(char* name, Uint8 quantity)
 Item rpg_item_new_material(char* name, Uint8 quantity)
 {
 	Item item;
-	item_info = sj_load("json/items.json");
+	SJson *info = sj_object_get_value(material_info, name);
 
-	if (!item_info)
+	if (!info)
 	{
+		slog("Material %s", name);
 		slog("Failed to load json data %s", sj_get_error());
 		return;
 	}
-	item_info = sj_object_get_value(item_info, name);
 
-	sj_get_float_value(sj_object_get_value(item_info, "weight"), &item.weight);
-	sj_get_integer_value(sj_object_get_value(item_info, "cost"), &item.cost);
+	sj_get_float_value(sj_object_get_value(info, "weight"), &item.weight);
+	sj_get_integer_value(sj_object_get_value(info, "cost"), &item.cost);
 
-	item.name = sj_get_string_value(sj_object_get_value(item_info, "name"));
-	item.description = sj_get_string_value(sj_object_get_value(item_info, "description"));
+	item.name			= sj_get_string_value(sj_object_get_value(info, "name"));
+	item.description	= sj_get_string_value(sj_object_get_value(info, "description"));
 
-	sj_free(item_info);
+	item.quantity	= quantity;
+	item.type		= material;
+	item.armor		= 0;
+	item.damage		= 0;
 
-	item.quantity = quantity;
-	item.type = material;
-	item.armor = 0;
-	item.damage = 0;
 	slog("Material: %s Quantity: %i", name, quantity);
-	slog("NAME: %s	DESCRIPTION: %s", item.name, item.description);
 
 	return item;
 }
@@ -137,108 +145,110 @@ Item rpg_item_new_material(char* name, Uint8 quantity)
 Item rpg_item_new_weapon(char* name, Uint8 quantity)
 {
 	Item item;
+	SJson *info = sj_object_get_value(weapon_info, name);
+
+	if (!info)
+	{
+		slog("Weapon %s",name);
+		slog("Failed to load json data %s", sj_get_error());
+		return;
+	}
+
+	sj_get_integer_value(sj_object_get_value(info, "damage"), &item.damage);
+	sj_get_float_value(sj_object_get_value(info, "weight"), &item.weight);
+	sj_get_integer_value(sj_object_get_value(info, "cost"), &item.cost);
+
+	item.name = sj_get_string_value(sj_object_get_value(info, "name"));
+	item.description = sj_get_string_value(sj_object_get_value(info, "description"));
+
 	item.quantity = quantity;
 	item.type = weapon;
 	item.armor = 0;
 	slog("Weapon: %s Quantity: %i", name, quantity);
-	if (strcmp(name, "Wooden Sword") == 0)
-	{
-		item.damage = 5;
-		item.name = name;
-		item.weight = 5.0;
-		item.description = "A mid-sized sword made of a solid wood. It is not very sharp but I don't want to get hit by it.";
-		item.cost = 100;
-		return item;
-	}
-	if (strcmp(name, "Iron Sword") == 0)
-	{
-		item.damage = 15;
-		item.name = name;
-		item.weight = 10.0;
-		item.description = "A mid-sized cast iron sword. The quality is questionable but it will work.";
-		item.cost = 1000;
-		return item;
-	}
-	if (strcmp(name, "Dagger") == 0)
-	{
-		item.damage = 10;
-		item.name = name;
-		item.weight = 3.0;
-		item.description = "A small thin metal weapon. Stick 'em with the pointy end.";
-		item.cost = 600;
-		return item;
-	}
-	if (strcmp(name, "Bow") == 0)
-	{
-		item.damage = 5;
-		item.name = name;
-		item.weight = 3.0;
-		item.description = "A mid-sized sword made of a solid wood. It is not very sharp but I don't want to get hit by it.";
-		item.cost = 250;
-		return item;
-	}
-	if (strcmp(name, "Hammer") == 0)
-	{
-		item.damage = 20;
-		item.name = name;
-		item.weight = 20.0;
-		item.description = "A thick blunt metal object with a tiny handle. That's what she said...";
-		item.cost = 1000;
-		return item;
-	}
+
+	return item;
 }
 
 Item rpg_item_new_armor(char* name, Uint8 quantity)
 {
 	Item item;
+	SJson *info = sj_object_get_value(armor_info, name);
+
+	if (!info)
+	{
+		slog("Armor %s",name);
+		slog("Failed to load json data %s", sj_get_error());
+		return;
+	}
+
+	sj_get_integer_value(sj_object_get_value(info, "armor"), &item.damage);
+	sj_get_float_value(sj_object_get_value(info, "weight"), &item.weight);
+	sj_get_integer_value(sj_object_get_value(info, "cost"), &item.cost);
+
+	item.name = sj_get_string_value(sj_object_get_value(info, "name"));
+	item.description = sj_get_string_value(sj_object_get_value(info, "description"));
+
 	item.quantity = quantity;
 	item.type = armor;
 	item.damage = 0;
+
 	slog("Weapon: %s Quantity: %i", name, quantity);
-	if (strcmp(name, "Leather Cap") == 0)
-	{
-		item.armor = 1;
-		item.name = name;
-		item.weight = 1.0;
-		item.description = "A worn leather cap. It is your cap right?";
-		item.cost = 50;
-		return item;
-	}
-	if (strcmp(name, "Leather Cuirass") == 0)
-	{
-		item.armor = 15;
-		item.name = name;
-		item.weight = 15.0;
-		item.description = "A cuirass crafted from leather. It is better than nothing.";
-		item.cost = 100;
-		return item;
-	}
-	if (strcmp(name, "Leather Greaves") == 0)
-	{
-		item.armor = 5;
-		item.name = name;
-		item.weight = 5.0;
-		item.description = "A small leather covering for your legs.";
-		item.cost = 50;
-		return item;
-	}
-	if (strcmp(name, "Leather Boots") == 0)
-	{
-		item.armor = 5;
-		item.name = name;
-		item.weight = 5.0;
-		item.description = "A fairly comfy pair of leather boots. Keep your toes out of the dirt.";
-		item.cost = 50;
-		return item;
-	}
+
+	return item;
+
+}
+
+void rpg_item_free(Item *item)
+{
+	int i;
+	if (!item) return;
+	memset(item, 0, sizeof(Item));
 }
 
 void rpg_item_collect()
 {
 	slog("Collecting item");
+	int i = 0, j;
+	slog("Item Name: %s", items.item_list[0].name);
+	for (i = 0; i < get_player()->inventory.bagSize; i++)
+	{
+		if (get_player()->inventory.bag[i]._inuse)
+		{
+			slog("strcmp %i", strcmp(get_player()->inventory.bag[i].name, items.item_list[0].name));
+			if (strcmp(get_player()->inventory.bag[i].name, items.item_list[0].name) == 0)
+			{
+				slog("updating quantity");
+				get_player()->inventory.bag[i].quantity++;
+				get_player()->inventory.bag[i].weight += items.item_list[0].weight;
+				items.item_list[0]._inuse = 0;
+				items.item_list[0].ent->_inuse = 0;
+				gf3d_entity_free(&items.item_list[0].ent);
+				rpg_item_free(&items.item_list[0]);
+				return;
+			}
+		}
+	}
+	if (!items.item_list[0].ent->_inuse)
+		return;
+	
+	for (i = 0; i < get_player()->inventory.bagSize; i++)
+	{
+		if (!get_player()->inventory.bag[i]._inuse)
+		{
+			slog("adding item to inventory");
+			get_player()->inventory.bag[i] = items.item_list[0];
+			items.item_list[0]._inuse = 0;
+			items.item_list[0].ent->_inuse = 0;
+			gf3d_entity_free(&items.item_list[0].ent);
+			rpg_item_free(&items.item_list[0]);
+			return;
+		}
+	}
+	if (!items.item_list[0].ent->_inuse)
+		slog("Item could not be added to inventory");
 }
 
-void rpg_item_create(Item item, ItemType type, char *name)
+Item rpg_item_create(Item item, ItemType type, char *name)
 {
 
 	switch (type)
@@ -275,27 +285,39 @@ Item *rpg_item_new(ItemType type, char* name, Vector3D position)
 	{
 		if (!items.item_list[i]._inuse)
 		{
-			rpg_item_create(items.item_list[i],type,name);
+			items.item_list[i] = rpg_item_create(items.item_list[i], type, name);
 			items.item_list[i]._inuse = 1;
 
 			items.item_list[i].ent = gf3d_entity_new();
-			items.item_list[i].ent->model = gf3d_model_load("log");
+			items.item_list[i].ent->model = gf3d_model_load(name);
 			items.item_list[i].ent->position = position;
 			gfc_matrix_scale(items.item_list[i].ent->modelMatrix, vector3d(2,2,2), items.item_list[i].ent->modelMatrix);
 			gfc_matrix_translate(items.item_list[i].ent->modelMatrix,position);
 			items.item_list[i].ent->type = ITEM;
 			items.item_list[i].ent->name = name;
-			items.item_list[i].ent->boxCollider.width = 6;
-			items.item_list[i].ent->boxCollider.height = 4;
-			items.item_list[i].ent->boxCollider.depth = 6;
+			items.item_list[i].ent->boxCollider.width = 4;
+			items.item_list[i].ent->boxCollider.height = 2;
+			items.item_list[i].ent->boxCollider.depth = 2;
 			items.item_list[i].ent->interact = rpg_item_collect;
 			items.item_list[i].ent->boxCollider.x = items.item_list[i].ent->position.x;
 			items.item_list[i].ent->boxCollider.y = items.item_list[i].ent->position.y;
 			items.item_list[i].ent->boxCollider.z = items.item_list[i].ent->position.z;
+			
+			print_item_manager();
 
 			return &items.item_list[i];
 		}
 	}
+	
 	slog("Failed to provide new item, no unused slots");
 	return NULL;
+}
+
+void print_item_manager()
+{
+	int i;
+	for (i = 0; i < items.item_count; i++)
+	{
+		slog("Item name: %s", items.item_list[i].name);
+	}
 }

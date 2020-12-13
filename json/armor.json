@@ -1,9 +1,39 @@
 {
-    "armor":[
-        {"ItemType":3, "armor":1,  "weight": 1.0,  "cost":50,  "name":"Leather Cap",     "description":"A worn leather cap. It is your cap right?"},
-        {"ItemType":3, "armor":15, "weight": 15.0, "cost":100, "name":"Leather Cuirass", "description":"A cuirass crafted from leather. It is better than nothing."},
-        {"ItemType":3, "armor":5,  "weight": 5.0,  "cost":50,  "name":"Leather Greaves", "description":"A small leather covering for your legs. Don't take an arrow to the knee."},
-        {"ItemType":3, "armor":5,  "weight": 5.0,  "cost":50,  "name":"Leather Boots",   "description":"A fairly comfy pair of leather boots. Keep your toes out of the dirt."}
-        
-    ]
+    "Leather Cap":
+    {
+        "ItemType":         3,
+        "armor":            1,
+        "weight":           1.0,
+        "cost":             50,
+        "name":             "Leather Cap",
+        "description":      "A worn leather cap. It is your cap right?"
+    },
+    "Leather Cuirass":
+    {
+        "ItemType"          :3,
+        "armor":            15,
+        "weight":           15.0,
+        "cost":             100,
+        "name":             "Leather Cuirass",
+        "description":      "A cuirass crafted from leather. It is better than nothing."
+    },
+    "Leather Greaves":
+    {
+        "ItemType":         3,
+        "armor":            5,
+        "weight":           5.0,
+        "cost":             50,
+        "name":             "Leather Greaves",
+        "description":      "A small leather covering for your legs. Don't take an arrow to the knee."
+    },
+    "Leather Boots":
+    {
+        "ItemType":         3,
+        "armor":            5,
+        "weight":           5.0,
+        "cost":             50,
+        "name":             "Leather Boots",
+        "description":      "A fairly comfy pair of leather boots. Keep your toes out of the dirt."
+    }
+
 }

@@ -18,13 +18,14 @@ typedef struct
 typedef struct
 {
 	SDL_Surface *menuSurface;
+	SDL_Color white;
 
 	Sprite *menu;
 	Sprite *stats;
-	SDL_Texture *text;
+	Sprite **text;
 	Sprite *map;
 
-	SDL_Color white;
+	Uint8 text_sprite_count;
 }Menu;
 
 void rpg_ui_init();

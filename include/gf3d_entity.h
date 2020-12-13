@@ -79,9 +79,24 @@ void gf3d_entity_draw_all(Uint32 bufferFrame, VkCommandBuffer commandBuffer);
 void gf3d_entity_update_all();
 
 /**
- *	@brief call think function for all active entities
+ *	@brief call interact function for active entity
  */
-void gf3d_entity_think_all();
+void gf3d_entity_interact(Entity *self);
+
+/**
+*	@brief call touch function for active entity
+*/
+void gf3d_entity_touch(Entity *self);
+
+/**
+*	@brief call damage function for active entity
+*/
+void gf3d_entity_damage(Entity *self);
+
+/**
+*	@brief call die function for active entity
+*/
+void gf3d_entity_die(Entity *self);
 
 /**
  *	@brief free an entity so it can be reused by the system

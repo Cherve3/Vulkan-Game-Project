@@ -79,6 +79,7 @@ typedef struct Player_S
 	PlayerState state;
 	CircleCollider interactBound;
 }Player;
+
 /**
  *	@brief initialize a player character
  */
@@ -115,5 +116,9 @@ pStats get_player_stats();
 pInventory get_player_inventory();
 
 void player_interaction();
+
+void print_player_name();
+
+void print_stats();
 
 #endif
