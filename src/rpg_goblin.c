@@ -40,7 +40,7 @@ void rpg_goblin_init(){
 	archer_info = sj_object_get_value(goblin_info, "GoblinArcher");
 	king_info = sj_object_get_value(goblin_info, "GoblinKing");
 
-	if (!goblin_info || !grunt_info || !heavy_info || !heavy_info || !archer_info || !king_info)
+	if (!goblin_info || !grunt_info || !heavy_info || !archer_info || !king_info)
 	{
 		slog("Failed to load goblin json data %s", sj_get_error());
 		return;
@@ -56,7 +56,14 @@ void rpg_goblin_spawn(GoblinType type, Vector3D position)
 
 	goblin[count].ent						= rpg_goblin_new();
 
-	goblin[count].ent->name					= "Goblin ";
+	char name[10];
+	char int_buffer[3];
+	strcpy(name, "Goblin ");
+	_itoa(count, int_buffer, 10);
+	strcat(name, int_buffer);
+	slog("Name: %s", name);
+
+	goblin[count].ent->name					= name;
 	goblin[count].ent->type					= MONSTER;
 
 	goblin[count].ent->position				= position;

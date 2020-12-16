@@ -13,6 +13,7 @@ void rpg_world_init()
 		world.ground->model = gf3d_model_load("world");
 		world.ground->name = "World";
 		world.ground->position = vector3d(0, 0, 0);
+		world.ground->type = WORLD;
 		gfc_matrix_new_translation(world.ground->modelMatrix, world.ground->position);
 		world.ground->boxCollider.depth = 1000.0;
 		world.ground->boxCollider.height = 0;
@@ -43,6 +44,7 @@ int water_init(Vector3D position)
 		world.water->model = gf3d_model_load("water");
 		world.water->position = position;
 		world.water->name = "Water";
+		world.water->type = WORLD;
 		gfc_matrix_new_translation(world.water->modelMatrix, world.water->position);
 		return 1;
 	}

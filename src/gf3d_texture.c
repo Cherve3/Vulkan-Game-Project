@@ -220,7 +220,7 @@ Texture *gf3d_texture_load(char *filename, SDL_Surface *surf)
 
 	if (surf)
 	{
-		slog("Surface = surf");
+		//slog("Surface = surf");
 		surface = surf;
 	}
 	else
@@ -266,7 +266,8 @@ Texture *gf3d_texture_load(char *filename, SDL_Surface *surf)
 	imageInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
 	imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 	imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
-	imageInfo.flags = 0; // Optional
+	imageInfo.flags = VK_IMAGE_CREATE_MUTABLE_FORMAT_BIT; // Optional 
+	/*Note: Added flag for text render issue VK_IMAGE_FORMAT_R8G8B8A8_USCALED*/
 
 	if (vkCreateImage(gf3d_texture.device, &imageInfo, NULL, &tex->textureImage) != VK_SUCCESS)
 	{

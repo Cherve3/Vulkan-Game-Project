@@ -3,6 +3,7 @@
 
 #include <SDL.h>            
 #include <SDL_vulkan.h>
+#include <SDL_image.h>
 
 #include "simple_logger.h"
 #include "simple_json.h"

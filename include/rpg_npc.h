@@ -12,8 +12,9 @@
 typedef enum {
 	ItemShop,
 	WeaponShop,
+	ArmorShop,
 	SpellShop,
-	General,
+	Generic,
 	Questgiver
 }NPCType;
 
@@ -67,9 +68,16 @@ typedef struct NPC_S
 	npcInventory inventory;
 }NPC;
 /**
-*	@brief initialize an NPC character
+*	@brief initialize an NPC setup
 */
-void rpg_npc_init(int type, Vector3D position);
+void rpg_npc_init();
+
+/*
+ *	@brief Spawn a new NPC character
+ *	@param type an enum of the goblin type
+ *	@param position the initial spawn position of the goblin
+ */
+void rpg_npc_spawn(NPCType type, Vector3D position);
 
 /**
 *	@brief runs gf3d_entity_new function to add an NPC to entity system

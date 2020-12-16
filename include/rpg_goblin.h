@@ -24,6 +24,7 @@ typedef enum {
 void rpg_goblin_init();
 
 /*
+ *  @brief Spawn a new Goblin character
  *	@param type an enum of the goblin type
  *	@param position the initial spawn position of the goblin
  */

@@ -1,0 +1,36 @@
+{
+    "ItemShop":
+    {
+        "1":"Welcome to the item shop! Need some potions? You probably need potions."
+    },
+    "WeaponShop":
+    {
+        "1":"Welcome to the weapon shop! If you need a weapon I'm your dwarf. You won't last long without a weapon"
+    },
+    "ArmorShop":
+    {
+        "1":"Welcome to the armor shop! Looks like you need some armor. Always wear protection."
+    },
+    "SpellShop":
+    {
+        "1":"Welcome to the spell shop! One does not simply buy and cast spells."
+    },
+    "Generic":
+    {
+        "1":"Visit the shops in town they have everything you could ever need.",
+        "2":"I hear some strange noises coming from the forest you should stay away from there...",
+        "3":"Help the goblins are attacking! Ahhhh!",
+        "4":"You protected the city? Thank you on behalf of everyone we are greteful.",
+        "5":"You are going to find the goblins? It would be foolish to not prepare first. Good luck.",
+        "6":"You defeated the Goblin King... Wow your life will never be the same after this."
+    },
+    "Quest":
+    {
+        "1":"Hey stranger! I am the Questgiver. You should do some quests. Don't worry, i'll go easy on ya for now.",
+        "2":"Stranger you are back! Here take this. A towns person said they spotted some goblins outside of town go slay them.",
+        "3":"You're alive! ... I mean of course you are. While you were gone goblins attacked the town help defend.",
+        "4":"Thank you for helping the town owes you one. I think you are ready for a spell... here. Oh ... I hope you don't have any plans because I over heard a few of the townsfolk. They mentioned a rumor about a goblin camp. Go check it out please. ... Oh take this just in case.",
+        "5":"You are back! You found it! I was hoping for better news we will have to take care of it. Wait ... what?! A large goblin?! I fear that the king may be back. What will we do if all the goblins have been united? What you will fight?! You will be killed ... are you insane? ... There is no changing your mind then, you will need this.",
+        "6":"I cannot believe it you made it back in one piece. The town owes you a greater debt then can be paid. Here this is all I could do. I'll have to find a more difficult quest for you soon."
+    }
+}

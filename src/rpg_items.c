@@ -17,20 +17,29 @@ static ItemManager items = { 0 };
 static SJson *item_info			= NULL;
 static SJson *consumable_info	= NULL;
 static SJson *material_info		= NULL;
+static SJson *weapons			= NULL;
+static SJson *armors			= NULL;
 static SJson *weapon_info		= NULL;
 static SJson *armor_info		= NULL;
-
 
 void print_item_manager();
 
 void rpg_item_close()
 {
 	int i;
+
+	sj_free(item_info);
+	sj_free(consumable_info);
+	sj_free(material_info);
+	sj_free(weapons);
+	sj_free(armors);
+	sj_free(weapon_info);
+	sj_free(armor_info);
 	if (items.item_list != NULL)
 	{
 		for (i = 0; i < items.item_count; i++)
 		{
-			gf3d_entity_free(&items.item_list[i]);
+			gf3d_entity_free(&items.item_list[i].ent);
 		}
 		free(items.item_list);
 	}
@@ -52,10 +61,16 @@ void rpg_item_entity_init(Uint32 maxItems)
 	item_info		= sj_load("json/items.json");
 	consumable_info = sj_object_get_value(item_info, "Consumable");
 	material_info	= sj_object_get_value(item_info, "Material");
-	armor_info		= sj_load("json/armor.json");
-	weapon_info		= sj_load("json/weapons.json");
+	armors			= sj_load("json/armor.json");
+	armor_info = sj_object_get_value(armors, "Armor");
+	weapons			= sj_load("json/weapons.json");
+	weapon_info = sj_object_get_value(weapons, "Weapons");
 
-	if (!item_info || !consumable_info || !material_info || !armor_info || !weapon_info){ slog("failed to load item info"); return; }
+	if (!item_info){ slog("failed to load item info"); return; }
+	if (!consumable_info){ slog("failed to load consumable info"); return; }
+	if (!material_info){ slog("failed to load material info"); return; }
+	if (!armor_info){ slog("failed to load armor info"); return; }
+	if(!weapon_info){ slog("failed to load weapon info"); return; }
 
 	items.item_count = maxItems;
 
@@ -63,7 +78,7 @@ void rpg_item_entity_init(Uint32 maxItems)
 	slog("Item System Initialized");
 }
 
-//TODO: Finish item setup 
+//TODO: randomize each type of item
 Item rpg_item_new_random(int random)
 {
 	switch ( random )
@@ -91,7 +106,8 @@ Item rpg_item_new_consumable(char* name, Uint8 quantity)
 {
 	Item item;
 	SJson *info = sj_object_get_value(consumable_info, name);
-	if (!item_info)
+
+	if (!info)
 	{
 		slog("Consumable %s",name);
 		slog("Failed to load json data %s", sj_get_error());
@@ -150,7 +166,7 @@ Item rpg_item_new_weapon(char* name, Uint8 quantity)
 	if (!info)
 	{
 		slog("Weapon %s",name);
-		slog("Failed to load json data %s", sj_get_error());
+		slog("Failed to load weapon json data %s", sj_get_error());
 		return;
 	}
 
@@ -177,7 +193,7 @@ Item rpg_item_new_armor(char* name, Uint8 quantity)
 	if (!info)
 	{
 		slog("Armor %s",name);
-		slog("Failed to load json data %s", sj_get_error());
+		slog("Failed to load armor json data %s", sj_get_error());
 		return;
 	}
 
@@ -205,46 +221,55 @@ void rpg_item_free(Item *item)
 	memset(item, 0, sizeof(Item));
 }
 
-void rpg_item_collect()
+void rpg_item_collect(Entity *self)
 {
+	Item *item = (Item*)(self->data);
+	slog("Item data: %s", item->name);
 	slog("Collecting item");
 	int i = 0, j;
-	slog("Item Name: %s", items.item_list[0].name);
+	slog("Item Name: %s", self->name);
 	for (i = 0; i < get_player()->inventory.bagSize; i++)
 	{
 		if (get_player()->inventory.bag[i]._inuse)
 		{
-			slog("strcmp %i", strcmp(get_player()->inventory.bag[i].name, items.item_list[0].name));
-			if (strcmp(get_player()->inventory.bag[i].name, items.item_list[0].name) == 0)
+			slog("strcmp %i", strcmp(get_player()->inventory.bag[i].name, self->name));
+			slog("Player inventory: %s Item: %s", get_player()->inventory.bag[i].name, self->name);
+			if (strcmp(get_player()->inventory.bag[i].name,self->name) == 0)
 			{
 				slog("updating quantity");
 				get_player()->inventory.bag[i].quantity++;
-				get_player()->inventory.bag[i].weight += items.item_list[0].weight;
-				items.item_list[0]._inuse = 0;
-				items.item_list[0].ent->_inuse = 0;
-				gf3d_entity_free(&items.item_list[0].ent);
-				rpg_item_free(&items.item_list[0]);
+				get_player()->inventory.bag[i].weight +=  item->weight;
+				item->_inuse = 0;
+				self->_inuse = 0;
+//				gf3d_entity_free(&self);
+				rpg_item_free(item);
 				return;
 			}
 		}
 	}
-	if (!items.item_list[0].ent->_inuse)
-		return;
 	
 	for (i = 0; i < get_player()->inventory.bagSize; i++)
 	{
 		if (!get_player()->inventory.bag[i]._inuse)
 		{
 			slog("adding item to inventory");
-			get_player()->inventory.bag[i] = items.item_list[0];
-			items.item_list[0]._inuse = 0;
-			items.item_list[0].ent->_inuse = 0;
-			gf3d_entity_free(&items.item_list[0].ent);
-			rpg_item_free(&items.item_list[0]);
+			get_player()->inventory.bag[i].armor = item->armor;
+			get_player()->inventory.bag[i].cost = item->cost;
+			get_player()->inventory.bag[i].damage = item->damage;
+			get_player()->inventory.bag[i].description = item->description;
+			get_player()->inventory.bag[i].name = item->name;
+			get_player()->inventory.bag[i].quantity = item->quantity;
+			get_player()->inventory.bag[i].type = item->type;
+			get_player()->inventory.bag[i].weight = item->weight;
+			get_player()->inventory.bag[i]._inuse = 1;
+			item->_inuse = 0;
+			self->_inuse = 0;
+
+			rpg_item_free(item);
 			return;
 		}
 	}
-	if (!items.item_list[0].ent->_inuse)
+	if (!self->_inuse)
 		slog("Item could not be added to inventory");
 }
 
@@ -295,7 +320,7 @@ Item *rpg_item_new(ItemType type, char* name, Vector3D position)
 			gfc_matrix_translate(items.item_list[i].ent->modelMatrix,position);
 			items.item_list[i].ent->type = ITEM;
 			items.item_list[i].ent->name = name;
-			items.item_list[i].ent->boxCollider.width = 4;
+			items.item_list[i].ent->boxCollider.width = 2;
 			items.item_list[i].ent->boxCollider.height = 2;
 			items.item_list[i].ent->boxCollider.depth = 2;
 			items.item_list[i].ent->interact = rpg_item_collect;
@@ -303,7 +328,9 @@ Item *rpg_item_new(ItemType type, char* name, Vector3D position)
 			items.item_list[i].ent->boxCollider.y = items.item_list[i].ent->position.y;
 			items.item_list[i].ent->boxCollider.z = items.item_list[i].ent->position.z;
 			
-			print_item_manager();
+			items.item_list[i].ent->data = (void*)&items.item_list[i];
+
+			//print_item_manager();
 
 			return &items.item_list[i];
 		}

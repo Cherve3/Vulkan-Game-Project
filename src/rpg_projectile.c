@@ -64,10 +64,11 @@ void rpg_fireball_spawn(Entity *player)
 
 			rpg_projectiles.projectile_list[i].ent = gf3d_entity_new();
 			rpg_projectiles.projectile_list[i].ent->model = gf3d_model_load("fireball");
-			
+			rpg_projectiles.projectile_list[i].ent->parent = player;
+
 			rpg_projectiles.projectile_list[i].ent->position = 
-				vector3d(player->position.x, player->position.y +2, player->position.z -2);
-			
+				vector3d(player->position.x, player->position.y +2, player->position.z);
+
 			rpg_projectiles.projectile_list[i].ent->name = "Fireball";
 			rpg_projectiles.projectile_list[i].ent->think = rpg_fireball_think;
 			rpg_projectiles.projectile_list[i].ent->update = rpg_fireball_update;
@@ -97,8 +98,11 @@ void rpg_fireball_despawn()
 
 void rpg_fireball_think(Entity *self)
 {
+	float x = -self->parent->forward.x;
+	float z = -self->parent->forward.y;
+	slog("X: %f Z: %f", x, z);
 	if (!self)return;
-	self->velocity = vector3d(0,0,-1);
+		self->velocity = vector3d(x, 0, z);
 
 }
 

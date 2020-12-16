@@ -26,13 +26,15 @@ typedef struct Entity_S
 {
 	Uint8		_inuse;		/**<flag to make sure entities are not re-assigned while active*/
 	char *		name;
-	struct Entity   *parent;
+	struct Entity_S   *parent;
 	EntityType	type;
 
 	Vector3D	position;
 	Vector3D	rotation;
 	Vector3D	direction;
 	Vector3D	velocity;
+	float		rotate;
+	Vector2D	forward;
 
 	Model		*model;
 	Matrix4		modelMatrix;
@@ -41,9 +43,12 @@ typedef struct Entity_S
 	void		(*update)	(struct Entity_S *self);
 	void		(*think)	(struct Entity_S *self);
 	void		(*interact) (struct Entity_S *self);
-	void		(*touch)	(struct Entity_S *self);
+	void		(*touch)	(struct Entity_S *self, struct Entity_S *other);
 	void		(*damage)	(struct Entity_S *self);
 	void		(*die)		(struct Entity_S *self);
+
+	void *data;		// Expecting typedef Struct of entity (ex. Item, Goblin, etc.)
+
 }Entity;
 
 /**

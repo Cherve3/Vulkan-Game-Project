@@ -24,22 +24,26 @@ typedef struct
 	Sprite *stats;
 	Sprite **text;
 	Sprite *map;
+	Sprite *map_point;
+	Vector2D point_position;
 
-	Uint8 text_sprite_count;
+	Uint8 text_count;
 }Menu;
+
+typedef struct
+{
+	Sprite *menu;
+	Sprite **text;
+
+	Uint8 text_count;
+
+}ShopUI;
 
 void rpg_ui_init();
 
 void rpg_ui_draw_all(Uint32 bufferFrame, VkCommandBuffer commandBuffer);
 
 void rpg_ui_update();
-
-void toggle_stats(SDL_Renderer *renderer);
-
-void stats_on(SDL_Renderer *renderer);
-
-void stats_off(SDL_Renderer *renderer);
-
 
 
 #endif

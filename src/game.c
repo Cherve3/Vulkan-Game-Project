@@ -3,6 +3,7 @@
 int main(int argc,char *argv[])
 {
     int done = 0;
+	int start = 0;
     int a;
 	Uint32 old_time, time;
 	float frame = 0;
@@ -11,8 +12,19 @@ int main(int argc,char *argv[])
     Uint8 validate = 1;
 	Matrix4 modelMat;
     const Uint8 * keys;
+	int x, y;
     Uint32 bufferFrame = 0;
     VkCommandBuffer commandBuffer;
+
+	SDL_Event event;
+	SDL_Renderer *renderer	= NULL;
+	SDL_Texture *menu		= NULL;
+	SDL_Texture *loading	= NULL;
+	SDL_Texture *load_icon  = NULL;
+	SDL_Rect start_rect;
+	SDL_Rect quit_rect;
+	SDL_Rect load_rect;
+
 	Bool toggleStats = false;
 
 	Chest *chest = NULL;
@@ -40,38 +52,171 @@ int main(int argc,char *argv[])
         validate                //validation
     );
 	slog_sync();
+	slog("initializing menu");
+	// Main Menu
+	renderer = SDL_CreateRenderer(gf3d_vgraphics_get_window(), -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
+	if (!renderer){ slog("Renderer not created."); SDL_Quit(); exit(0); }
 
+	menu = IMG_LoadTexture(renderer, "images/mainmenu.png");
+	if (!menu){ slog("Main menu texture not created."); SDL_Quit(); exit(0); }
+
+	SDL_RenderClear(renderer);
+	SDL_RenderCopy(renderer,menu,NULL,NULL);
+
+	VkExtent2D extent = gf3d_vgraphics_get_view_extent();
+	keys = SDL_GetKeyboardState(NULL);
+
+	slog("initializing menu");
+	start_rect.h = 80;
+	start_rect.w = 150;
+	start_rect.x = 250;//100 * 2 / (float)extent.width;
+	start_rect.y = 230;// 70 * 2 / (float)extent.height;
+
+	quit_rect.h = 80;
+	quit_rect.w = 150;
+	quit_rect.x = 250;//100 * 2 / (float)extent.width;
+	quit_rect.y = 350;//100 * 2 / (float)extent.height;
+	
+	slog("Main Menu loaded");
+	while (!start)
+	{
+		SDL_RenderPresent(renderer);
+		if (SDL_PollEvent(&event))
+		{
+			if (event.type == SDL_MOUSEMOTION)
+			{
+				x = event.motion.x;
+				y = event.motion.y;
+
+				if ((x > start_rect.x) && (x < start_rect.x + start_rect.w) &&
+					(y > start_rect.y) && (y < start_rect.y + start_rect.h))
+				{
+					slog("Hovering over start");
+				}
+
+				if ((x > quit_rect.x) && (x < quit_rect.x + quit_rect.w) &&
+					(y > quit_rect.y) && (y < quit_rect.y + quit_rect.h))
+				{
+					slog("Hovering over Quit");
+				}
+			}
+			if (event.type == SDL_MOUSEBUTTONDOWN)
+			{
+				x = event.button.x;
+				y = event.button.y;
+
+				if (event.button.button == SDL_BUTTON_LEFT)
+				{
+					if ((x > start_rect.x) && (x < start_rect.x + start_rect.w) &&
+						(y > start_rect.y) && (y < start_rect.y + start_rect.h))
+					{
+						slog("Pressed Start button");
+						start = 1;
+
+						loading = IMG_LoadTexture(renderer, "images/loading.png");
+						if (!loading){ slog("Loading texture not created."); SDL_Quit(); exit(0); }
+
+						load_icon = IMG_LoadTexture(renderer, "images/load_icon.png");
+
+						load_rect.h = 150;
+						load_rect.w = 150;
+						load_rect.x = (extent.width - load_rect.w) / 2;
+						load_rect.y = (extent.width - load_rect.h) / 2;
+
+						SDL_RenderClear(renderer);
+						
+						SDL_RenderCopy(renderer, loading, NULL, NULL);
+
+
+						SDL_RenderCopyEx(renderer, load_icon, NULL, &load_rect, 1, NULL, SDL_FLIP_NONE);
+						SDL_RenderPresent(renderer);
+
+
+					}
+
+					if ((x > quit_rect.x) && (x < quit_rect.x + quit_rect.w) &&
+						(y > quit_rect.y) && (y < quit_rect.y + quit_rect.h))
+					{
+						slog("Pressed Quit button");
+						SDL_DestroyRenderer(renderer);
+						SDL_DestroyTexture(menu);
+						done = 1;
+						SDL_Quit();
+						return 0;
+					}
+				}
+			}
+		}
+//		bufferFrame = gf3d_vgraphics_render_begin();
+//		gf3d_pipeline_reset_frame(gf3d_vgraphics_get_graphics_model_pipeline(), bufferFrame);
+
+//		commandBuffer = gf3d_command_rendering_begin(bufferFrame, gf3d_vgraphics_get_graphics_model_pipeline());
+//		gf3d_vgraphics_render_end(bufferFrame);
+	}
     // main game loop
     slog("gf3d main loop begin");
 
 	gf3d_camera_init();
 
+	SDL_RenderCopyEx(renderer, load_icon, NULL, &load_rect, 36, NULL, SDL_FLIP_NONE);
+	SDL_RenderPresent(renderer);
+
 	gf3d_entity_init(1024);
+
+	SDL_RenderCopyEx(renderer, load_icon, NULL, &load_rect, 72, NULL, SDL_FLIP_NONE);
+	SDL_RenderPresent(renderer);
 
 	rpg_world_init();
 
+	SDL_RenderCopyEx(renderer, load_icon, NULL, &load_rect, 108, NULL, SDL_FLIP_NONE);
+	SDL_RenderPresent(renderer);
+
 	rpg_player_init();
 
-	rpg_npc_init(ItemShop, vector3d(20, 8, -20));
+	SDL_RenderCopyEx(renderer, load_icon, NULL, &load_rect, 144, NULL, SDL_FLIP_NONE);
+	SDL_RenderPresent(renderer);
+
+	rpg_npc_init();
+	rpg_npc_spawn(ItemShop, vector3d(20, 8, -20));
+	rpg_npc_spawn(WeaponShop, vector3d(90, 5, -40));
+	rpg_npc_spawn(ArmorShop, vector3d(90, 5.5, -60));
+	rpg_npc_spawn(SpellShop, vector3d(60, 9.3, -20));
+	rpg_npc_spawn(Generic, vector3d(100, 8.3, -80));
+	rpg_npc_spawn(Questgiver, vector3d(90, 8.3, -20));
+
+	SDL_RenderCopyEx(renderer, load_icon, NULL, &load_rect, 216, NULL, SDL_FLIP_NONE);
+	SDL_RenderPresent(renderer);
 
 	rpg_goblin_init();
-	rpg_goblin_spawn(GoblinGrunt, vector3d(-10, 5, -10));
-	rpg_goblin_spawn(GoblinHeavy, vector3d(10, 5, -10));
-	rpg_goblin_spawn(GoblinArcher, vector3d(10, 5, 10));
-	rpg_goblin_spawn(GoblinKing, vector3d(-40, 25, 40));
+	rpg_goblin_spawn(GoblinGrunt, vector3d(-40, 5, -10));
+	rpg_goblin_spawn(GoblinHeavy, vector3d(-30, 5, -10));
+	rpg_goblin_spawn(GoblinArcher, vector3d(-20, 5, -10));
+	rpg_goblin_spawn(GoblinKing, vector3d(-60, 25, 50));
+
+
+	SDL_RenderCopyEx(renderer, load_icon, NULL, &load_rect, 252, NULL, SDL_FLIP_NONE);
+	SDL_RenderPresent(renderer);
 
 	rpg_item_entity_init(10);
 	wood = rpg_item_new(material,"Wood Log",vector3d(-5, 2, 20));
 	potion = rpg_item_new(consumable, "Health Potion", vector3d(-5, 2, 30));
 	arrow = rpg_item_new(consumable, "Arrow", vector3d(-5, 2, 50));
 
+	SDL_RenderCopyEx(renderer, load_icon, NULL, &load_rect, 288, NULL, SDL_FLIP_NONE);
+	SDL_RenderPresent(renderer);
+
 	rpg_chests_init(10);
 	chest = rpg_chest_new();
+
+	SDL_RenderCopyEx(renderer, load_icon, NULL, &load_rect, 324, NULL, SDL_FLIP_NONE);
+	SDL_RenderPresent(renderer);
 
 	rpg_projectile_init(10);
 
 	rpg_ui_init();
 
+	SDL_RenderCopyEx(renderer, load_icon, NULL, &load_rect, 360, NULL, SDL_FLIP_NONE);
+	SDL_RenderPresent(renderer);
 
 	slog_sync();
 
@@ -81,10 +226,13 @@ int main(int argc,char *argv[])
 	SDL_ShowCursor(0);
 	SDL_SetRelativeMouseMode(SDL_TRUE);
 
+	SDL_DestroyTexture(menu);
+	SDL_DestroyTexture(loading);
+	SDL_DestroyRenderer(renderer);
 	//Game Loop
 	slog("Game Loop Begin");
 	while (!done)
-	{
+	{		
 		currentTime = SDL_GetTicks();
 		if (currentTime > lastTime + 1000) {
 			//slog("\ncurrent time: %i\n", currentTime);

@@ -10,6 +10,9 @@
 
 static Camera camera;
 
+static float camera_height = 10;
+static float camera_distance = 10;
+
 void gf3d_camera_init()
 {
 	camera.proj = gf3d_vgraphics_get_ubo_proj();
@@ -28,11 +31,76 @@ void gf3d_camera_init()
 		
 }
 
-void camera_update(Vector3D rotation, Vector3D playerPosition, Matrix4 playerMat, const int x_rel, const int y_rel)
+void gf3d_camera_update(Vector3D pos, Vector3D rotate)
 {
+	float s = SDL_sinf(rotate.z - GFC_PI);
+	float c = SDL_cosf(rotate.z - GFC_PI);
+	Vector2D cpos;
+	gfc_matrix_identity(camera.view);
+
+	cpos.x = ((-20) * c) - ((-20) * s);
+	cpos.y = ((-20) * s) + ((-20) * c);
+
+
+	if (camera_height > 0 && rotate.y > 0)
+	{
+		camera_height -= rotate.y;
+	}
+	else if (camera_height < 15 && rotate.y < 0)
+	{
+		camera_height -= rotate.y;
+	}
+
+//	slog("Camera height %f", camera_height);
+//	slog("cpos.x = %f  cpos.y = %f", cpos.x, cpos.y);
+//	slog("rotate.y + %f", rotate.y);
+
+	gf3d_camera_look_at(
+		vector3d(cpos.x + pos.x, cpos.y + pos.y, pos.z + camera_height),
+		pos,
+		vector3d(0, 1, 0));
+
+}
+void camera_update(Vector2D forward, Vector3D position, Vector3D rotate, const int x_rel, const int y_rel)
+{	//Take 1
 	//gfc_matrix_new_translation(camera.view, camera.position);
 	//gfc_matrix_rotate(camera.view, camera.view, -x_rel*GFC_DEGTORAD, camera.up);
-	
+
+	camera.yaw += x_rel;
+	camera.pitch += y_rel;
+
+	if (camera.pitch > 89.0f)
+		camera.pitch = 89.0f;
+	if (camera.pitch < -60.0f)
+		camera.pitch = -60.0f;
+
+	if (camera.yaw >= 360.0f)
+		camera.yaw = 0;
+	if (camera.yaw <= -360.0f)
+		camera.yaw = 0;
+
+	rotate.z += camera.yaw * GFC_DEGTORAD;
+
+	//gfc_matrix_rotate(gf3d_get_camera(), gf3d_get_camera(), -camera.yaw*GFC_DEGTORAD, vector3d(0, 1, 0));
+	forward.x = (0 * SDL_cosf(rotate.z)) - (1 * SDL_sinf(rotate.z));
+	forward.y = (0 * SDL_sinf(rotate.z)) + (1 * SDL_cosf(rotate.z));
+
+	float s = SDL_sinf(rotate.z - GFC_PI);
+	float c = SDL_cosf(rotate.z - GFC_PI);
+
+	Vector2D cpos;
+	gfc_matrix_identity(camera.view);
+
+	cpos.x = ((-20) * c) - ((-20) * s);
+	cpos.y = ((-20) * s) + ((-20) * c);
+
+	gf3d_camera_look_at(
+		vector3d(cpos.x + position.x, cpos.y + position.y, position.z + camera_height),
+		position,
+		vector3d(0, 1, 0));
+
+
+	/*Take 2
 	Vector3D negate;
 	vector3d_negate(negate, camera.position);
 
@@ -60,7 +128,7 @@ void camera_update(Vector3D rotation, Vector3D playerPosition, Matrix4 playerMat
 	camera.position.z = -playerPosition.z - 20;
 	gfc_matrix_translate(camera.view,camera.position);
 
-	
+	*/
 
 	/*
 	SDL_Event event;

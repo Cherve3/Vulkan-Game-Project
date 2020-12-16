@@ -24,7 +24,8 @@ typedef struct
 
 void gf3d_camera_init();
 
-void camera_update(Vector3D rotation, Vector3D playerPosition, Matrix4 playerMat);
+void camera_update(Vector2D forward, Vector3D Position, Vector3D rotation, const int x_rel, const int y_rel);
+//void camera_update(Vector3D rotation, Vector3D playerPosition, Matrix4 playerMat);
 
 Matrix4 *gf3d_get_camera();
 
@@ -64,5 +65,7 @@ void gf3d_camera_set_position(Vector3D position);
 * @param move the ammount to move the camera
 */
 void gf3d_camera_move(Vector3D move);
+
+void gf3d_camera_update(Vector3D pos, Vector3D rotate);
 
 #endif

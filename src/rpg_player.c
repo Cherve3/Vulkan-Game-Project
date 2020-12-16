@@ -233,7 +233,7 @@ void rpg_player_move(Entity *self){
 	SDL_GetRelativeMouseState(&x_rel, &y_rel);
 
 	float angle = x_rel*GFC_DEGTORAD;
-
+	
 	//Player input
 	if (keys[SDL_SCANCODE_W])
 	{
@@ -288,12 +288,27 @@ void rpg_player_move(Entity *self){
 	else
 		player->state.crouched = false;
 
-	gfc_matrix_rotate(self->modelMatrix, self->modelMatrix, angle,vector_up());
+	
 	
 	//Move model to position
 	gfc_matrix_new_translation(self->modelMatrix,self->position);
-	
-	camera_update(self->rotation, self->position, self->modelMatrix, x_rel, y_rel);
+	gfc_matrix_rotate(self->modelMatrix, self->modelMatrix, -self->rotate, vector_up());
+
+	self->rotate += x_rel * GFC_DEGTORAD;
+
+	player->ent->forward.x = (0 * SDL_cosf(self->rotate)) - (1 * SDL_sinf(self->rotate));
+	player->ent->forward.y = (0 * SDL_sinf(self->rotate)) + (1 * SDL_cosf(self->rotate));
+/*	Vector3D move = vector3d(self->velocity.x, 0, self->velocity.z);
+
+	vector3d_normalize(&move);
+
+	gfc_matrix_rotate(self->modelMatrix, self->modelMatrix, -self->rotate, vector_up());
+	gfc_matrix_rotate(gf3d_get_camera(), gf3d_get_camera(), -x_rel*GFC_DEGTORAD, vector3d(0, 1, 0));
+
+
+	gf3d_camera_update(self->position, vector3d(0,x_rel,self->rotate));
+	*/
+	camera_update(self->forward, self->position, vector3d(0, x_rel, self->rotate), x_rel, y_rel);
 	
 }
 
@@ -408,7 +423,7 @@ void player_interaction()
 		if (!gf3d_get_entity_list()[i]._inuse) continue;
 		if (gf3d_get_entity_list()[i].name == player->ent->name) continue;
 		slog("Interacting...");
-		if (gf3d_get_entity_list()[i].type == INTERACT || gf3d_get_entity_list()[i].type == ITEM)
+		if (gf3d_get_entity_list()[i].type == INTERACT || gf3d_get_entity_list()[i].type == ITEM || gf3d_get_entity_list()[i].type == NONPLAYER)
 		{
 
 			float x = player->ent->position.x - gf3d_get_entity_list()[i].position.x;
@@ -420,7 +435,7 @@ void player_interaction()
 			if (result < player->interactBound.radius)
 			{
 				slog("Interacting with %s",gf3d_get_entity_list()[i].name);
-				gf3d_get_entity_list()[i].interact(&gf3d_get_entity_list()[i]);
+				gf3d_get_entity_list()[i].interact(&gf3d_get_entity_list()[i], NULL);
 			}
 		}
 	}

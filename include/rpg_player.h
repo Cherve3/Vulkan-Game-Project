@@ -61,6 +61,7 @@ typedef struct PStats_S
 
 	Bool toggleStats;
 	Bool toggleMap;
+	Bool toggleShop;
 
 }pStats;
 
