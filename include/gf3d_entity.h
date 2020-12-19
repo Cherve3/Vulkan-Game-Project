@@ -40,6 +40,8 @@ typedef struct Entity_S
 	Matrix4		modelMatrix;
 	BoxCollider boxCollider;
 
+	Bool		animated;
+
 	void		(*update)	(struct Entity_S *self);
 	void		(*think)	(struct Entity_S *self);
 	void		(*interact) (struct Entity_S *self);

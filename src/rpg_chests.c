@@ -4,6 +4,7 @@
 #include "rpg_chests.h"
 #include "rpg_items.h"
 #include "rpg_player.h"
+#include "rpg_levelup.h"
 
 typedef struct
 {
@@ -151,8 +152,10 @@ void rpg_chest_open()
 			slog("NAME: %s	DESCRIPTION: %s", rpg_chests.chest_list[0].loot[j].name, rpg_chests.chest_list[0].loot[j].description);
 			if (get_player()->inventory.bag[i].name == rpg_chests.chest_list[0].loot[j].name)
 			{
-				
 				slog("updating quantity");
+				stat_counter("itemscollected");
+				get_player()->stats.carry_weight += rpg_chests.chest_list[0].loot[j].weight;
+
 				get_player()->inventory.bag[i].quantity++;
 				get_player()->inventory.bag[i].weight += rpg_chests.chest_list[0].loot[j].weight;
 				rpg_chests.chest_list[0].loot[j]._inuse = 0;
@@ -160,6 +163,9 @@ void rpg_chest_open()
 			else if (!get_player()->inventory.bag[i]._inuse)
 			{
 				slog("adding item to inventory");
+				stat_counter("itemscollected");
+				get_player()->stats.carry_weight += rpg_chests.chest_list[0].loot[j].weight;
+
 				get_player()->inventory.bag[i] = rpg_chests.chest_list[0].loot[j];
 				rpg_chests.chest_list[0].loot[j]._inuse = 0;
 				

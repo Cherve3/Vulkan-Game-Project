@@ -4,6 +4,7 @@
 
 #include "rpg_items.h"
 #include "rpg_player.h"
+#include "rpg_levelup.h"
 
 typedef struct
 {
@@ -237,6 +238,9 @@ void rpg_item_collect(Entity *self)
 			if (strcmp(get_player()->inventory.bag[i].name,self->name) == 0)
 			{
 				slog("updating quantity");
+				stat_counter("itemscollected");
+				get_player()->stats.carry_weight += item->weight;
+
 				get_player()->inventory.bag[i].quantity++;
 				get_player()->inventory.bag[i].weight +=  item->weight;
 				item->_inuse = 0;
@@ -253,6 +257,9 @@ void rpg_item_collect(Entity *self)
 		if (!get_player()->inventory.bag[i]._inuse)
 		{
 			slog("adding item to inventory");
+			stat_counter("itemscollected");
+			get_player()->stats.carry_weight += item->weight;
+
 			get_player()->inventory.bag[i].armor = item->armor;
 			get_player()->inventory.bag[i].cost = item->cost;
 			get_player()->inventory.bag[i].damage = item->damage;

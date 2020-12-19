@@ -31,7 +31,7 @@ int main(int argc,char *argv[])
 	Item *wood = NULL;
 	Item *arrow = NULL;
 	Item *potion = NULL;
-//	Model *model = NULL;
+	Model *model = NULL;
 
     for (a = 1; a < argc;a++)
     {
@@ -127,10 +127,8 @@ int main(int argc,char *argv[])
 						
 						SDL_RenderCopy(renderer, loading, NULL, NULL);
 
-
 						SDL_RenderCopyEx(renderer, load_icon, NULL, &load_rect, 1, NULL, SDL_FLIP_NONE);
 						SDL_RenderPresent(renderer);
-
 
 					}
 
@@ -147,12 +145,8 @@ int main(int argc,char *argv[])
 				}
 			}
 		}
-//		bufferFrame = gf3d_vgraphics_render_begin();
-//		gf3d_pipeline_reset_frame(gf3d_vgraphics_get_graphics_model_pipeline(), bufferFrame);
-
-//		commandBuffer = gf3d_command_rendering_begin(bufferFrame, gf3d_vgraphics_get_graphics_model_pipeline());
-//		gf3d_vgraphics_render_end(bufferFrame);
 	}
+
     // main game loop
     slog("gf3d main loop begin");
 
@@ -183,6 +177,8 @@ int main(int argc,char *argv[])
 	rpg_npc_spawn(SpellShop, vector3d(60, 9.3, -20));
 	rpg_npc_spawn(Generic, vector3d(100, 8.3, -80));
 	rpg_npc_spawn(Questgiver, vector3d(90, 8.3, -20));
+
+	print_npc_stats(rpg_get_npc()[0]);
 
 	SDL_RenderCopyEx(renderer, load_icon, NULL, &load_rect, 216, NULL, SDL_FLIP_NONE);
 	SDL_RenderPresent(renderer);
@@ -221,7 +217,7 @@ int main(int argc,char *argv[])
 	slog_sync();
 
 //	gfc_matrix_identity(modelMat);
-//	model = gf3d_model_load_animated("goblinking", 1, 5);
+//	get_player()->ent->model = gf3d_model_load_animated("player", 1,19);
 
 	SDL_ShowCursor(0);
 	SDL_SetRelativeMouseMode(SDL_TRUE);
@@ -244,8 +240,8 @@ int main(int argc,char *argv[])
 		time = SDL_GetTicks();
 		deltaTime = ((float)(time - old_time) / 1000);
 
-		frame = frame + 0.5;
-		if (frame >= 24)frame = 0;
+		frame = frame + 0.4;
+		if (frame >= 19)frame = 1;
 
 		SDL_PumpEvents();   // update SDL's internal event structures
 		keys = SDL_GetKeyboardState(NULL); // get the keyboard state for this frame
@@ -263,7 +259,7 @@ int main(int argc,char *argv[])
 
 		//Model Buffer
 		commandBuffer = gf3d_command_rendering_begin(bufferFrame, gf3d_vgraphics_get_graphics_model_pipeline());
-//			gf3d_model_draw_anim(model, bufferFrame, commandBuffer, modelMat, (Uint32)frame);
+//		gf3d_model_draw_anim(get_player_entity()->model, bufferFrame, commandBuffer, modelMat, frame);
 			gf3d_entity_draw_all(bufferFrame, commandBuffer);
 			
 		gf3d_command_rendering_end(commandBuffer);

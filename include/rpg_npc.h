@@ -91,4 +91,20 @@ Entity *rpg_npc_new();
  */
 void rpg_npc_think(Entity *self);
 
+Bool rpg_get_itemshop_toggle();
+
+Bool rpg_get_weaponshop_toggle();
+
+Bool rpg_get_armorshop_toggle();
+
+Bool rpg_get_spellshop_toggle();
+
+Bool rpg_get_generic_toggle();
+
+Bool rpg_get_quest_toggle();
+
+NPC *rpg_get_npc();
+
+void print_npc_stats(NPC npc);
+
 #endif

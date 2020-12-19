@@ -1,0 +1,38 @@
+{
+    "Levelup":
+    {
+        "level2":10,
+        "level3":100,
+        "level4":500,
+        "level5":1000
+    },
+
+    "StatCounters":
+    {
+        "total":            0,
+
+        "strength":         10,
+        "attacks":          0,
+
+        "health":           10,
+        "damagetaken":      0,
+
+        "perception":       10,
+        "npcconvo":         0,
+
+        "speed":            10,
+        "rundistance":      0,
+
+        "willpower":        10,
+        "magiccast":        0,
+
+        "dexterity":        10,
+        "jumpamount":       0,
+
+        "intelligence":     10,
+        "items collected":  0,
+        
+        "luck":             10,
+        "random":           0
+    }
+}

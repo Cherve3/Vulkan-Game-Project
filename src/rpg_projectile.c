@@ -1,3 +1,5 @@
+#include <math.h>
+
 #include "simple_logger.h"
 
 #include "rpg_projectile.h"
@@ -9,6 +11,8 @@ typedef struct
 }ProjectileManager;
 
 ProjectileManager rpg_projectiles = { 0 };
+
+void rpg_fireball_despawn(Entity *self, Entity *other);
 
 void rpg_projectiles_free(Projectile *proj)
 {
@@ -69,14 +73,17 @@ void rpg_fireball_spawn(Entity *player)
 			rpg_projectiles.projectile_list[i].ent->position = 
 				vector3d(player->position.x, player->position.y +2, player->position.z);
 
+			rpg_projectiles.projectile_list[i].ent->data = (void*)&rpg_projectiles.projectile_list[i];
 			rpg_projectiles.projectile_list[i].ent->name = "Fireball";
 			rpg_projectiles.projectile_list[i].ent->think = rpg_fireball_think;
 			rpg_projectiles.projectile_list[i].ent->update = rpg_fireball_update;
-			
+			rpg_projectiles.projectile_list[i].ent->touch = rpg_fireball_despawn;
+
+
 			rpg_projectiles.projectile_list[i].collider.x = rpg_projectiles.projectile_list[i].ent->position.x;
 			rpg_projectiles.projectile_list[i].collider.y = rpg_projectiles.projectile_list[i].ent->position.y;
 			rpg_projectiles.projectile_list[i].collider.z = rpg_projectiles.projectile_list[i].ent->position.z;
-			rpg_projectiles.projectile_list[i].collider.radius = 5;
+			rpg_projectiles.projectile_list[i].collider.radius = 10;
 			
 			
 			gfc_matrix_new_translation(
@@ -91,25 +98,52 @@ void rpg_fireball_spawn(Entity *player)
 	
 }
 
-void rpg_fireball_despawn()
+void rpg_fireball_despawn(Entity *self)
 {
+	if (!self) return;
+	self->_inuse = 0;
+	memset(self, 0, sizeof(Projectile));
+}
 
+Bool rpg_projectile_check_collision(Entity *self)
+{
+	int i = 0;
+	Projectile *pro = (Projectile*)self->data;
+	if (!self) return false;
+
+	for (i = 0; i < gf3d_get_entity_list_count(); i++)
+	{
+		if (gf3d_get_entity_list()[i].type == NONPLAYER || gf3d_get_entity_list()[i].type == MONSTER)
+		{
+			if (( (self->position.x + pro->collider.x) - (gf3d_get_entity_list()[i].position.x + gf3d_get_entity_list()[i].boxCollider.x) <= pro->collider.radius + gf3d_get_entity_list()[i].boxCollider.x) &&
+				( (self->position.y + pro->collider.y) - (gf3d_get_entity_list()[i].position.y + gf3d_get_entity_list()[i].boxCollider.y) <= pro->collider.radius + gf3d_get_entity_list()[i].boxCollider.y) &&
+				( (self->position.z + pro->collider.z) - (gf3d_get_entity_list()[i].position.z + gf3d_get_entity_list()[i].boxCollider.z) <= pro->collider.radius + gf3d_get_entity_list()[i].boxCollider.z))
+			{
+				slog("Collided with monster or npc");
+				return true;
+			}
+		}
+	}
+	return false;
 }
 
 void rpg_fireball_think(Entity *self)
 {
 	float x = -self->parent->forward.x;
 	float z = -self->parent->forward.y;
-	slog("X: %f Z: %f", x, z);
+	//slog("X: %f Z: %f", x, z);
 	if (!self)return;
-		self->velocity = vector3d(x, 0, z);
+	if (rpg_projectile_check_collision(self)){
+		rpg_fireball_despawn(self);
+	}
+	self->velocity = vector3d(x, 0, z);
 
 }
 
 void rpg_fireball_update(Entity *self)
 {
 	if (!self)return;
-	vector3d_scale(self->velocity, self->velocity, 0.2);
+	vector3d_scale(self->velocity, self->velocity, 0.4);
 	vector3d_add(self->position, self->position, self->velocity);
 	gfc_matrix_new_translation(self->modelMatrix,self->position);
 	

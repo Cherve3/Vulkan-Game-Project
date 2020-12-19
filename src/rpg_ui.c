@@ -120,7 +120,33 @@ void rpg_ui_draw_all(Uint32 bufferFrame, VkCommandBuffer commandbuffer)
 	if (get_player_stats().toggleShop)
 	{
 		slog("Toggling Store");
+		if (rpg_get_itemshop_toggle())
+		{
+			slog("Drawing sprite store");
+			gf3d_sprite_draw(UI.shop.menu, vector2d(400, 175), vector2d(1, 1), 0, bufferFrame, commandbuffer);
+		}
+		else if (rpg_get_weaponshop_toggle())
+		{
+			gf3d_sprite_draw(UI.shop.menu, vector2d(400, 175), vector2d(1, 1), 0, bufferFrame, commandbuffer);
+		}
+		else if (rpg_get_armorshop_toggle())
+		{
+			gf3d_sprite_draw(UI.shop.menu, vector2d(400, 175), vector2d(1, 1), 0, bufferFrame, commandbuffer);
+		}
+		else if (rpg_get_spellshop_toggle())
+		{
+			gf3d_sprite_draw(UI.shop.menu, vector2d(400, 175), vector2d(1, 1), 0, bufferFrame, commandbuffer);
+		}
+		else if (rpg_get_generic_toggle())
+		{
+			gf3d_sprite_draw(UI.shop.menu, vector2d(400, 175), vector2d(1, 1), 0, bufferFrame, commandbuffer);
+		}
+		else if (rpg_get_quest_toggle())
+		{
+			gf3d_sprite_draw(UI.shop.menu, vector2d(400, 175), vector2d(1, 1), 0, bufferFrame, commandbuffer);
+		}
 	}
+
 }
 
 void rpg_ui_update()
@@ -141,6 +167,10 @@ void rpg_ui_update()
 Sprite *rpg_ui_text(char* name, char* text)
 {
 	TTF_Font *font = TTF_OpenFont("fonts/OfenbacherSchwabCAT.ttf", 32);
+	if (!font)
+	{
+		slog("Font null");
+	}
 	SDL_Color color;
 	color.a = 1;
 	color.r = 255;
@@ -148,8 +178,15 @@ Sprite *rpg_ui_text(char* name, char* text)
 	color.b = 255;
 
 	SDL_Surface	*surface = TTF_RenderText_Blended(font, text, color);
+	if (!surface)
+	{
+		slog("Surface null");
+	}
 	Sprite *sprite = gf3d_sprite_load(name, surface, -1, -1, 0);
-	SDL_FreeSurface(surface);
+	if (!sprite)
+		slog("Sprite null");
+
+//	SDL_FreeSurface(surface);
 	TTF_CloseFont(font);
 	return sprite;
 }
@@ -260,14 +297,14 @@ void setup_hud()
 	//	slog("Buffer : %s", buffer);
 	
 	UI.menu.text[9] = rpg_ui_text("HealthText", buffer);
-	/*
+
 	strcpy(buffer, "Perception: ");
 	_itoa(get_player()->stats.perception, int_buffer, 10);
 	strcat(buffer, int_buffer);
-	//	slog("Buffer : %s", buffer);
+		slog("Buffer : %s", buffer);
 
 	UI.menu.text[10] = rpg_ui_text("PerceptionText", buffer);
-	
+
 	strcpy(buffer, "Speed: ");
 	_itoa(get_player()->stats.speed, int_buffer, 10);
 	strcat(buffer, int_buffer);
@@ -301,7 +338,7 @@ void setup_hud()
 	strcat(buffer, int_buffer);
 	//	slog("Buffer : %s", buffer);
 
-	UI.menu.text[15] = rpg_ui_text("LuckText", buffer);*/
+	UI.menu.text[15] = rpg_ui_text("LuckText", buffer);
 }
 
 void setup_npc_ui()

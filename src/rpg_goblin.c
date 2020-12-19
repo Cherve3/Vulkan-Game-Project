@@ -83,6 +83,7 @@ void rpg_goblin_spawn(GoblinType type, Vector3D position)
 
 		goblin_info = sj_object_get_value(goblin_info, "GoblinGrunt");
 
+		goblin[count].ent->name = "Goblin Grunt";
 		goblin[count].ent->model = gf3d_model_load("goblingrunt");
 		goblin[count].ent->think = rpg_goblin_think;
 
@@ -94,6 +95,7 @@ void rpg_goblin_spawn(GoblinType type, Vector3D position)
 
 		goblin_info = sj_object_get_value(heavy_info, "GoblinHeavy");
 
+		goblin[count].ent->name = "Goblin Heavy";
 		goblin[count].ent->model = gf3d_model_load("goblingrunt");
 		goblin[count].ent->think = rpg_goblin_think;
 
@@ -114,6 +116,7 @@ void rpg_goblin_spawn(GoblinType type, Vector3D position)
 
 		goblin_info = sj_object_get_value(archer_info, "GoblinArcher");
 
+		goblin[count].ent->name = "Goblin Archer";
 		goblin[count].ent->model = gf3d_model_load("goblinarcher");
 		goblin[count].ent->think = rpg_goblin_think;
 
@@ -138,6 +141,7 @@ void rpg_goblin_spawn(GoblinType type, Vector3D position)
 		goblin[count].ent->boxCollider.depth	= 8.0;
 
 		set_goblin_stats(king_info);
+		goblin[count].ent->data = (void*)&goblin[count];
 
 		count++;
 		break;
@@ -155,6 +159,7 @@ void rpg_goblin_think(Entity *self){
 
 
 	rpg_goblin_move(self);
+	gf3d_entity_collision_test(self);
 	//if (strcmp(self->name, "Goblin King") == 0)
 		//self->model = gf3d_model_load_animated("goblinking", 1, 5);
 

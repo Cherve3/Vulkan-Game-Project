@@ -9,6 +9,7 @@
 #include "rpg_spellbook.h"
 #include "rpg_items.h"
 #include "rpg_projectile.h"
+#include "rpg_levelup.h"
 
 
 static Player *player = { 0 };
@@ -19,12 +20,19 @@ Uint32 old_time;
 
 SJson *player_info = NULL;
 
+time_t t;
+
 Cooldown cd_interact;
+Cooldown cd_jump;
 Cooldown cd_primary_attack;
 Cooldown cd_secondary_attack;
 Cooldown cd_inventory;
 Cooldown cd_stats;
 Cooldown cd_map;
+
+float total_movement;
+float old_x_pos;
+float old_z_pos;
 
 void rpg_player_move(Entity *self);
 void rpg_player_update();
@@ -39,24 +47,27 @@ void rpg_player_init(){
 	player->ent = rpg_player_new();
 
 	cd_interact.old_time		 = 0;
+	cd_jump.old_time			 = 0;
 	cd_primary_attack.old_time   = 0;
 	cd_secondary_attack.old_time = 0;
 	cd_inventory.old_time		 = 0;
 	cd_stats.old_time			 = 0;
 	cd_map.old_time				 = 0;
 
+	total_movement = 0;
 	// Load player json file
 	player_info = sj_load("json/player.json");
 
 	if (!player_info)
-		slog("Failed to load json data %s",sj_get_error());
+		slog("Failed to load player json data %s",sj_get_error());
 	
 	player_info = sj_object_get_value(player_info, "Player");
 
 	/**
 	 * Player Stats
 	 */
-	player->ent->model = gf3d_model_load("player");
+	player->ent->model = gf3d_model_load("player");// gf3d_model_load_animated("player",1,20);
+	player->ent->animated = true;
 	player->ent->think = rpg_player_think;
 	player->ent->update = rpg_player_update;
 	player->ent->type = PLAYER;
@@ -114,11 +125,15 @@ void rpg_player_init(){
 	sj_get_integer_value(sj_object_get_value(player_info, "max_luck"), &player->stats.luck_max);
 
 	player->stats.toggleStats = false;
+	player->stats.toggleShop  = false;
+	player->stats.toggleMap   = false;
 	
 	player->inventory.bagSize = 30;
 	player->inventory.spellbookSize = 5;
 	player->inventory.bag = (Item *)gfc_allocate_array(sizeof(Item), player->inventory.bagSize);
 	player->inventory.spellbook = (Spell *)gfc_allocate_array(sizeof(Spell), player->inventory.spellbookSize);
+
+	srand((unsigned)time(&t));
 }
 
 Entity *rpg_player_new(){
@@ -156,6 +171,7 @@ void rpg_player_bag_free(Item *bag)
 
 void rpg_player_update(Entity *self)
 {
+	
 	if (vector3d_magnitude(self->velocity) > 0.001)
 	{
 		self->velocity.y += GRAVITY;
@@ -166,6 +182,18 @@ void rpg_player_update(Entity *self)
 			self->position.y += self->velocity.y;
 
 		self->position.z += self->velocity.z;
+
+		total_movement += (float)(abs(self->position.x)+ abs(self->position.z)) - ((float)(abs(old_x_pos) + abs(old_z_pos)));
+		old_x_pos = self->position.x;
+		old_z_pos = self->position.z;
+//		slog("Old x: %f old z: %f", old_x_pos, old_z_pos);
+//		slog("total movement: %f", total_movement * 0.1);
+		if (total_movement * 0.1 >= 10)
+		{
+			slog("run distance +1");
+			total_movement = 0;
+			stat_counter("rundistance");
+		}
 		//vector3d_add(self->position, self->position, self->velocity);
 	}
 	else
@@ -185,6 +213,11 @@ void rpg_player_update(Entity *self)
 
 void rpg_player_think(Entity *self){
 	
+	int random_luck = rand() % 100;
+	slog("random luck: %i", random_luck);
+	if (random_luck == 1)
+		stat_counter("random");
+
 	gf3d_entity_collision_test(self);
 
 	rpg_player_move(self);
@@ -270,6 +303,8 @@ void rpg_player_move(Entity *self){
 			self->velocity.y = 15;
 		else
 			self->velocity.y = 11;
+
+		stat_counter("jumpamount");
 	}
 	
 	if (player->state.inAir)
@@ -353,7 +388,7 @@ rpg_player_input(Entity *self)
 				player->stats.toggleStats = false;
 
 			cd_stats.old_time = timer;
-			//print_stats();
+			print_stats();
 		}
 		else
 			slog("Stat cooldown");
@@ -385,6 +420,7 @@ rpg_player_input(Entity *self)
 				rpg_fireball_spawn(self);
 				player->stats.mana -= 10;
 				cd_secondary_attack.old_time = timer;
+				stat_counter("magiccast");
 			}
 			else
 			{
@@ -422,19 +458,33 @@ void player_interaction()
 	{
 		if (!gf3d_get_entity_list()[i]._inuse) continue;
 		if (gf3d_get_entity_list()[i].name == player->ent->name) continue;
-		slog("Interacting...");
+//		slog("Interacting...");
 		if (gf3d_get_entity_list()[i].type == INTERACT || gf3d_get_entity_list()[i].type == ITEM || gf3d_get_entity_list()[i].type == NONPLAYER)
 		{
-
+			
 			float x = player->ent->position.x - gf3d_get_entity_list()[i].position.x;
 			float y = player->ent->position.z - gf3d_get_entity_list()[i].position.z;
 			
 			float result = sqrt( (x * x) + (y * y));
 			slog("checking distance...");
-			slog("Result: %f", result);
+//			slog("Result: %f", result);
 			if (result < player->interactBound.radius)
 			{
 				slog("Interacting with %s",gf3d_get_entity_list()[i].name);
+				if (gf3d_get_entity_list()[i].type == NONPLAYER)
+				{
+					if (player->stats.toggleShop == false)
+					{
+						slog("toggleshop true");
+						player->stats.toggleShop = true;
+					}
+					else
+					{
+						stat_counter("npcconvo");
+						slog("toggleshop false");
+						player->stats.toggleShop = false;
+					}
+				}
 				gf3d_get_entity_list()[i].interact(&gf3d_get_entity_list()[i], NULL);
 			}
 		}

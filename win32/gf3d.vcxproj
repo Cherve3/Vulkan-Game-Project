@@ -125,6 +125,7 @@
     <ClInclude Include="..\include\rpg_goblin.h" />
     <ClInclude Include="..\include\rpg_input.h" />
     <ClInclude Include="..\include\rpg_items.h" />
+    <ClInclude Include="..\include\rpg_levelup.h" />
     <ClInclude Include="..\include\rpg_npc.h" />
     <ClInclude Include="..\include\rpg_player.h" />
     <ClInclude Include="..\include\rpg_projectile.h" />
@@ -166,6 +167,7 @@
     <ClCompile Include="..\src\gf3d_validation.c" />
     <ClCompile Include="..\src\gf3d_vgraphics.c" />
     <ClCompile Include="..\src\gf3d_vqueues.c" />
+    <ClCompile Include="..\src\levelup.c" />
     <ClCompile Include="..\src\rpg_chests.c" />
     <ClCompile Include="..\src\rpg_goblin.c" />
     <ClCompile Include="..\src\rpg_input.c" />

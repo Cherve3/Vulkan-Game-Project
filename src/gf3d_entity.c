@@ -134,7 +134,9 @@ void gf3d_entity_think_all()
 void gf3d_entity_draw(Entity *self, Uint32 bufferFrame, VkCommandBuffer commandBuffer)
 {
 	if (!self) return;
+
 	gf3d_model_draw(self->model, bufferFrame, commandBuffer, self->modelMatrix);
+
 }
 
 void gf3d_entity_draw_all(Uint32 bufferFrame, VkCommandBuffer commandBuffer)
@@ -196,6 +198,7 @@ void gf3d_entity_collision_test(Entity *self){
 
 				self->position.z += (gf3d_entity.entity_list[i].boxCollider.z - gf3d_entity.entity_list[i].boxCollider.depth) - (self->boxCollider.z + self->boxCollider.depth);
 			}
+			gf3d_entity_touch(self, &gf3d_entity.entity_list[i]);
 		}
 	}
 }

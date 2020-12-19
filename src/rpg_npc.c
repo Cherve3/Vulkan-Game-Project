@@ -7,13 +7,6 @@
 static NPC *npc = NULL;
 static int count = 0;
 
-Bool toggleItemShop		= false;
-Bool toggleWeaponShop	= false;
-Bool toggleArmorShop	= false;
-Bool toggleSpellShop	= false;
-Bool toggleGeneric		= false;
-Bool toggleQuest		= false;
-
 static SJson *npc_info			= NULL;
 static SJson *itemshop_info		= NULL;
 static SJson *weaponshop_info	= NULL;
@@ -21,6 +14,13 @@ static SJson *armorshop_info	= NULL;
 static SJson *spellshop_info	= NULL;
 static SJson *generic_info		= NULL;
 static SJson *questgiver_info	= NULL;
+
+Bool toggleItemShop		= false;
+Bool toggleWeaponShop	= false;
+Bool toggleArmorShop	= false;
+Bool toggleSpellShop	= false;
+Bool toggleGeneric		= false;
+Bool toggleQuest		= false;
 
 void rpg_npc_move(Entity *self);
 void set_npc_stats(SJson *info);
@@ -97,8 +97,7 @@ void rpg_npc_spawn(NPCType type, Vector3D position)
 	{
 	case ItemShop:
 
-		itemshop_info = sj_object_get_value(npc_info, "ItemShop");
-
+		npc[count].ent->name = "Item Shop";
 		npc[count].ent->model = gf3d_model_load("itemshop");
 		npc[count].ent->think = rpg_npc_think;
 
@@ -107,8 +106,7 @@ void rpg_npc_spawn(NPCType type, Vector3D position)
 		break;
 	case WeaponShop:
 
-		weaponshop_info = sj_object_get_value(npc_info, "WeaponShop");
-
+		npc[count].ent->name = "Weapon Shop";
 		npc[count].ent->model = gf3d_model_load("weaponshop");
 		npc[count].ent->think = rpg_npc_think;
 
@@ -121,8 +119,7 @@ void rpg_npc_spawn(NPCType type, Vector3D position)
 		break;
 	case ArmorShop:
 
-		armorshop_info = sj_object_get_value(npc_info, "ArmorShop");
-
+		npc[count].ent->name = "Armor Shop";
 		npc[count].ent->model = gf3d_model_load("armorshop");
 		npc[count].ent->think = rpg_npc_think;
 
@@ -135,8 +132,7 @@ void rpg_npc_spawn(NPCType type, Vector3D position)
 		break;
 	case SpellShop:
 
-		spellshop_info = sj_object_get_value(npc_info, "SpellShop");
-
+		npc[count].ent->name = "Spell Shop";
 		npc[count].ent->model = gf3d_model_load("spellshop");
 		npc[count].ent->think = rpg_npc_think;
 
@@ -145,8 +141,7 @@ void rpg_npc_spawn(NPCType type, Vector3D position)
 		break;
 	case Generic:
 
-		generic_info = sj_object_get_value(npc_info, "Generic");
-
+		npc[count].ent->name = "Generic";
 		npc[count].ent->model = gf3d_model_load("generic1");
 		npc[count].ent->think = rpg_npc_think;
 
@@ -155,16 +150,17 @@ void rpg_npc_spawn(NPCType type, Vector3D position)
 		break;
 	case Questgiver:
 
-		questgiver_info = sj_object_get_value(npc_info, "Questgiver");
-
+		npc[count].ent->name = "Quest Giver";
 		npc[count].ent->model = gf3d_model_load("questgiver");
 		npc[count].ent->think = rpg_npc_think;
 
 		set_npc_stats(questgiver_info);
+		
 
 		count++;
 		break;
 	}
+	//npc[count].ent->data = (void*)npc[count];
 //	print_npc_stats(npc[count]);
 }
 
@@ -188,6 +184,7 @@ void rpg_npc_move(Entity *self){
 
 void rpg_npc_interact(Entity *self)
 {
+
 	slog("Interacting with %s", self->name);
 	if (strcmp(self->name, "Item Shop") == 0 && toggleItemShop == false)
 	{
@@ -213,6 +210,41 @@ void rpg_npc_interact(Entity *self)
 	{
 		toggleQuest = true;
 	}
+}
+
+Bool rpg_get_itemshop_toggle()
+{
+	return toggleItemShop;
+}
+
+Bool rpg_get_weaponshop_toggle()
+{
+	return toggleWeaponShop;
+}
+
+Bool rpg_get_armorshop_toggle()
+{
+	return toggleArmorShop;
+}
+
+Bool rpg_get_spellshop_toggle()
+{
+	return toggleSpellShop;
+}
+
+Bool rpg_get_generic_toggle()
+{
+	return toggleGeneric;
+}
+
+Bool rpg_get_quest_toggle()
+{
+	return toggleQuest;
+}
+
+NPC *rpg_get_npc()
+{
+	return npc;
 }
 
 void set_npc_stats(SJson *info)

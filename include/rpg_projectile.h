@@ -46,8 +46,6 @@ void rpg_projectile_init();
 
 void rpg_fireball_spawn(Entity *player);
 
-void rpg_despawn();
-
 void rpg_fireball_think(Entity *self);
 
 void rpg_fireball_update(Entity *self);
