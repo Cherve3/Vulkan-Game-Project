@@ -262,7 +262,7 @@ int main(int argc,char *argv[])
 
 		//Model Buffer
 		commandBuffer = gf3d_command_rendering_begin(bufferFrame, gf3d_vgraphics_get_graphics_model_pipeline());
-//		gf3d_model_draw_anim(get_player_entity()->model, bufferFrame, commandBuffer, modelMat, frame);
+//		gf3d_model_draw_anim(get_player_entity()->model, bufferFrame, commandBuffer, get_player_entity()->modelMatrix, frame);
 			gf3d_entity_draw_all(bufferFrame, commandBuffer);
 			
 		gf3d_command_rendering_end(commandBuffer);

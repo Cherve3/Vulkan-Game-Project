@@ -19,7 +19,8 @@ typedef struct
 	float yaw;
 	float pitch;
 	float speed;
-	float rotate;
+
+	int zoom;
 }Camera;
 
 void gf3d_camera_init();

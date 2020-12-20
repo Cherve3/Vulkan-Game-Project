@@ -7,7 +7,7 @@ typedef struct
 {
 	Entity *ground;
 	Entity *water;
-	Entity *buildings;
+	Entity **buildings;
 	Entity *trees;
 
 }World;

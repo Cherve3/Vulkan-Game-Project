@@ -24,6 +24,7 @@ void gf3d_camera_init()
 	camera.rotation = vector3d(0, 0, 0);
 	camera.offset = vector3d(0, -10, -5);
 	camera.speed = 0.5;
+	camera.zoom = 12;
 
 	vector3d_normalize(&camera.forward);
 	vector3d_normalize(&camera.up);
@@ -50,30 +51,7 @@ void camera_update(Vector3D position, Vector3D rotate, const int x_rel, const in
 //	rotate.z += camera.yaw * GFC_DEGTORAD;
 
 //	gfc_matrix_rotate(gf3d_get_camera(), gf3d_get_camera(), -camera.yaw*GFC_DEGTORAD, vector3d(0, 1, 0));
-
-	camera.rotate += x_rel*GFC_DEGTORAD;
-
-	float s = SDL_sinf(camera.rotate - 2.35619);
-	float c = SDL_cosf(camera.rotate - 2.35619);
-
-	Vector2D cpos;
-	cpos.x = ((-20) * c) - ((-20) * s);
-	cpos.y = ((-20) * s) + ((-20) * c);
 	
-	gfc_matrix_view(
-		camera.view,
-		vector3d(cpos.x + position.x, 20 + position.y, cpos.y + position.z),
-		vector3d(position.x,position.y,position.z),
-		vector3d(0, 1, 0));
-	/*
-	gf3d_camera_look_at(
-		vector3d(cpos.x + position.x, cpos.y + position.y, position.z + camera_height),
-		position,
-		vector3d(0, 1, 0));
-		*/
-
-
-	/*
 	SDL_Event event;
 	while (SDL_PollEvent(&event))
 	{
@@ -81,14 +59,38 @@ void camera_update(Vector3D position, Vector3D rotate, const int x_rel, const in
 		{
 			if (event.wheel.y > 0) // scroll up
 			{
-				gf3d_camera_move(vector3d(0, 0, event.wheel.y));
+				camera.zoom += event.wheel.y;
+				if (camera.zoom == 0)
+					camera.zoom = 1;
+
 			}
 			else if (event.wheel.y < 0) // scroll down
 			{
-				gf3d_camera_move(vector3d(0, 0, event.wheel.y));
+				camera.zoom += event.wheel.y;
+				if (camera.zoom == 0)
+					camera.zoom = -1;
 			}
 		}
-	}*/
+	}
+
+	camera.yaw += x_rel*GFC_DEGTORAD;
+	camera.pitch += y_rel *GFC_DEGTORAD;
+
+	float s = SDL_sinf(camera.yaw - 2.35619);
+	float c = SDL_cosf(camera.yaw - 2.35619);
+
+	Vector2D cpos;
+	cpos.x = ((-camera.zoom) * c) - ((-camera.zoom) * s);
+	cpos.y = ((-camera.zoom) * s) + ((-camera.zoom) * c);
+	
+	gfc_matrix_view(
+		camera.view,
+		vector3d(cpos.x + position.x, 15 + position.y, cpos.y + position.z),
+		vector3d(position.x,position.y,position.z),
+		vector3d(0, 1, 0));
+
+
+
 }
 
 Matrix4 *gf3d_get_camera()

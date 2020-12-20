@@ -10,6 +10,6 @@ typedef struct
 	float maxDistance;
 }Raycast;
 
-Bool raycast(Vector3D origin, Vector3D direction, float maxDistance);
+Raycast *raycast(Vector3D origin, Vector3D direction, float maxDistance);
 
 #endif

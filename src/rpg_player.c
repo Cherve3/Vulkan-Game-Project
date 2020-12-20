@@ -73,7 +73,7 @@ void rpg_player_init(){
 	/**
 	 * Player Stats
 	 */
-	player->ent->model = gf3d_model_load("player");// gf3d_model_load_animated("player",1,20);
+	player->ent->model = gf3d_model_load("player");// gf3d_model_load_animated("player",1,20);//
 	player->ent->animated = true;
 	player->ent->think = rpg_player_think;
 	player->ent->update = rpg_player_update;
@@ -257,7 +257,6 @@ void rpg_player_think(Entity *self){
 		}
 	}
 
-
 	gf3d_entity_collision_test(self);
 
 	rpg_player_move(self);
@@ -301,40 +300,71 @@ void rpg_player_move(Entity *self){
 	const int x_rel, y_rel;
 
 	keys = SDL_GetKeyboardState(NULL);
-
-	SDL_GetMouseState(&x, &y);
 	SDL_GetRelativeMouseState(&x_rel, &y_rel);
 
-	float angle = x_rel*GFC_DEGTORAD;
-	
+	//Move model to position
+	gfc_matrix_new_translation(self->modelMatrix, self->position);
+	gfc_matrix_rotate(self->modelMatrix, self->modelMatrix, -self->rotate, vector_up());
+
+	self->rotate += x_rel * GFC_DEGTORAD;
+
+	player->ent->forward.x = -(1 * SDL_sinf(self->rotate));
+	player->ent->forward.y = (1 * SDL_cosf(self->rotate));
+
+	double forward = atan2(player->ent->forward.y, player->ent->forward.y);
+
 	//Player input
 	if (keys[SDL_SCANCODE_W])
 	{
 		if (player->state.crouched)
-			self->velocity.z -= 0.5;
+		{
+			self->velocity.z -= player->ent->forward.y * 0.5;
+			self->velocity.x -= player->ent->forward.x * 0.5;
+		}
 		else
-			self->velocity.z -= 1;
+		{
+			self->velocity.z -= player->ent->forward.y;
+			self->velocity.x -= player->ent->forward.x;
+		}
 	}
 	if (keys[SDL_SCANCODE_A])
 	{
 		if (player->state.crouched)
-			self->velocity.x -= 0.5;
+		{
+			self->velocity.x -= player->ent->forward.y * 0.5;
+			self->velocity.z -= -player->ent->forward.x * 0.5;
+		}
 		else
-			self->velocity.x -= 1;
+		{
+			self->velocity.x -=  player->ent->forward.y;
+			self->velocity.z -= -player->ent->forward.x;
+		}
 	}
 	if (keys[SDL_SCANCODE_S])
 	{
 		if (player->state.crouched)
-			self->velocity.z += 0.5;
+		{
+			self->velocity.z -= -player->ent->forward.y * 0.5;
+			self->velocity.x -= -player->ent->forward.x * 0.5;
+		}
 		else
-			self->velocity.z += 1;
+		{
+			self->velocity.z -= -player->ent->forward.y;
+			self->velocity.x -= -player->ent->forward.x;
+		}
 	}
 	if (keys[SDL_SCANCODE_D])
 	{
 		if (player->state.crouched)
-			self->velocity.x += 0.5;
+		{
+			self->velocity.x += player->ent->forward.y * 0.5;
+			self->velocity.z += -player->ent->forward.x * 0.5;
+		}
 		else
-			self->velocity.x += 1;
+		{
+			self->velocity.x +=  player->ent->forward.y;
+			self->velocity.z += -player->ent->forward.x;
+		}
 	}
 	if (keys[SDL_SCANCODE_SPACE])
 	{
@@ -368,34 +398,14 @@ void rpg_player_move(Entity *self){
 		player->state.onGround = true;
 		player->state.inAir = false;
 	}
+
 	//Toggle Crouch state
 	if (keys[SDL_SCANCODE_LSHIFT])
 		player->state.crouched = true;
 	else
 		player->state.crouched = false;
 
-	
-	
-	//Move model to position
-	gfc_matrix_new_translation(self->modelMatrix,self->position);
-	gfc_matrix_rotate(self->modelMatrix, self->modelMatrix, -self->rotate, vector_up());
-
-	self->rotate += x_rel * GFC_DEGTORAD;
-
-	player->ent->forward.x = (0 * SDL_cosf(self->rotate)) - (1 * SDL_sinf(self->rotate));
-	player->ent->forward.y = (0 * SDL_sinf(self->rotate)) + (1 * SDL_cosf(self->rotate));
-/*	Vector3D move = vector3d(self->velocity.x, 0, self->velocity.z);
-
-	vector3d_normalize(&move);
-
-	gfc_matrix_rotate(self->modelMatrix, self->modelMatrix, -self->rotate, vector_up());
-	gfc_matrix_rotate(gf3d_get_camera(), gf3d_get_camera(), -x_rel*GFC_DEGTORAD, vector3d(0, 1, 0));
-
-
-	gf3d_camera_update(self->position, vector3d(0,x_rel,self->rotate));
-	*/
 	camera_update(self->position, vector3d(0, x_rel, self->rotate), x_rel, y_rel);
-	
 }
 
 rpg_player_input(Entity *self)

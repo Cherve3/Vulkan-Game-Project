@@ -1,24 +1,31 @@
 {
-    "World":
+    "Ground":
     {
-        "Ground":
-        {
-            "name":"World",
-            "model":"world"
-        },
-        "Water":
-        {
-            "name":"Water",
-            "model":"water"
-        },
-        "Trees":
-        {
+        "name":"World",
+        "model":"world",
+        "type":6,
+        "position":[0,0,0]
+    },
+    "Water":
+    {
+        "name":"Water",
+        "model":"water",
+        "type":6,
+        "position":[0,-4,0]
+    },
+    "Trees":
+    {
 
-        },
-        "Structures":
+    },
+    "Buildings":
+    {
+        "house1":
         {
+            "name":"House 0",
+            "model":"house1",
+            "type":7,
+            "position":[100, 26, 100]
 
         }
-
     }
 }
