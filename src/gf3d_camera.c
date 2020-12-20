@@ -27,48 +27,16 @@ void gf3d_camera_init()
 
 	vector3d_normalize(&camera.forward);
 	vector3d_normalize(&camera.up);
-
-		
 }
 
-void gf3d_camera_update(Vector3D pos, Vector3D rotate)
-{
-	float s = SDL_sinf(rotate.z - GFC_PI);
-	float c = SDL_cosf(rotate.z - GFC_PI);
-	Vector2D cpos;
-	gfc_matrix_identity(camera.view);
-
-	cpos.x = ((-20) * c) - ((-20) * s);
-	cpos.y = ((-20) * s) + ((-20) * c);
-
-
-	if (camera_height > 0 && rotate.y > 0)
-	{
-		camera_height -= rotate.y;
-	}
-	else if (camera_height < 15 && rotate.y < 0)
-	{
-		camera_height -= rotate.y;
-	}
-
-//	slog("Camera height %f", camera_height);
-//	slog("cpos.x = %f  cpos.y = %f", cpos.x, cpos.y);
-//	slog("rotate.y + %f", rotate.y);
-
-	gf3d_camera_look_at(
-		vector3d(cpos.x + pos.x, cpos.y + pos.y, pos.z + camera_height),
-		pos,
-		vector3d(0, 1, 0));
-
-}
-void camera_update(Vector2D forward, Vector3D position, Vector3D rotate, const int x_rel, const int y_rel)
+void camera_update(Vector3D position, Vector3D rotate, const int x_rel, const int y_rel)
 {	//Take 1
 	//gfc_matrix_new_translation(camera.view, camera.position);
 	//gfc_matrix_rotate(camera.view, camera.view, -x_rel*GFC_DEGTORAD, camera.up);
 
-	camera.yaw += x_rel;
-	camera.pitch += y_rel;
-
+//	camera.yaw += x_rel;
+//	camera.pitch += y_rel;
+	/*
 	if (camera.pitch > 89.0f)
 		camera.pitch = 89.0f;
 	if (camera.pitch < -60.0f)
@@ -78,57 +46,32 @@ void camera_update(Vector2D forward, Vector3D position, Vector3D rotate, const i
 		camera.yaw = 0;
 	if (camera.yaw <= -360.0f)
 		camera.yaw = 0;
+*/
+//	rotate.z += camera.yaw * GFC_DEGTORAD;
 
-	rotate.z += camera.yaw * GFC_DEGTORAD;
+//	gfc_matrix_rotate(gf3d_get_camera(), gf3d_get_camera(), -camera.yaw*GFC_DEGTORAD, vector3d(0, 1, 0));
 
-	//gfc_matrix_rotate(gf3d_get_camera(), gf3d_get_camera(), -camera.yaw*GFC_DEGTORAD, vector3d(0, 1, 0));
-	forward.x = (0 * SDL_cosf(rotate.z)) - (1 * SDL_sinf(rotate.z));
-	forward.y = (0 * SDL_sinf(rotate.z)) + (1 * SDL_cosf(rotate.z));
+	camera.rotate += x_rel*GFC_DEGTORAD;
 
-	float s = SDL_sinf(rotate.z - GFC_PI);
-	float c = SDL_cosf(rotate.z - GFC_PI);
+	float s = SDL_sinf(camera.rotate - 2.35619);
+	float c = SDL_cosf(camera.rotate - 2.35619);
 
 	Vector2D cpos;
-	gfc_matrix_identity(camera.view);
-
 	cpos.x = ((-20) * c) - ((-20) * s);
 	cpos.y = ((-20) * s) + ((-20) * c);
-
+	
+	gfc_matrix_view(
+		camera.view,
+		vector3d(cpos.x + position.x, 20 + position.y, cpos.y + position.z),
+		vector3d(position.x,position.y,position.z),
+		vector3d(0, 1, 0));
+	/*
 	gf3d_camera_look_at(
 		vector3d(cpos.x + position.x, cpos.y + position.y, position.z + camera_height),
 		position,
 		vector3d(0, 1, 0));
+		*/
 
-
-	/*Take 2
-	Vector3D negate;
-	vector3d_negate(negate, camera.position);
-
-	camera.yaw += x_rel;
-	camera.pitch += y_rel;
-	
-	if (camera.pitch > 89.0f)
-		camera.pitch = 89.0f;
-	if (camera.pitch < -60.0f)
-		camera.pitch = -60.0f;
-		
-	if (camera.yaw >= 360.0f)
-		camera.yaw = 0;
-	if (camera.yaw <= -360.0f)
-		camera.yaw = 0;
-	//slog("\nYAW: %f\nPitch: %f", camera.yaw, camera.pitch);
-	
-	gfc_matrix_new_translation(camera.view, vector3d(0,-8,0));
-	//gf3d_camera_look_at(camera.position,playerPosition,camera.up);
-	gfc_matrix_rotate(camera.view, camera.view, camera.pitch*GFC_DEGTORAD, vector_right());
-	gfc_matrix_rotate(camera.view, camera.view, camera.yaw*GFC_DEGTORAD, camera.up);
-	
-	camera.position.x = -playerPosition.x;
-	camera.position.y = -playerPosition.y - 10;
-	camera.position.z = -playerPosition.z - 20;
-	gfc_matrix_translate(camera.view,camera.position);
-
-	*/
 
 	/*
 	SDL_Event event;

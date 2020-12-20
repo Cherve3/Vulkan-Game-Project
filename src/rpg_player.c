@@ -1,3 +1,4 @@
+#include <math.h>
 
 #include "simple_logger.h"
 #include "simple_json.h"
@@ -29,6 +30,9 @@ Cooldown cd_secondary_attack;
 Cooldown cd_inventory;
 Cooldown cd_stats;
 Cooldown cd_map;
+Cooldown cd_health_regen;
+Cooldown cd_mana_regen;
+Cooldown cd_stamina_regen;
 
 float total_movement;
 float old_x_pos;
@@ -53,6 +57,9 @@ void rpg_player_init(){
 	cd_inventory.old_time		 = 0;
 	cd_stats.old_time			 = 0;
 	cd_map.old_time				 = 0;
+	cd_health_regen.old_time	 = 0;
+	cd_mana_regen.old_time		 = 0;
+	cd_stamina_regen.old_time	 = 0;
 
 	total_movement = 0;
 	// Load player json file
@@ -179,22 +186,16 @@ void rpg_player_update(Entity *self)
 		self->position.x += self->velocity.x;
 
 		if (player->state.onGround = true);
-			self->position.y += self->velocity.y;
+		self->position.y += self->velocity.y;
 
 		self->position.z += self->velocity.z;
 
-		total_movement += (float)(abs(self->position.x)+ abs(self->position.z)) - ((float)(abs(old_x_pos) + abs(old_z_pos)));
-		old_x_pos = self->position.x;
-		old_z_pos = self->position.z;
-//		slog("Old x: %f old z: %f", old_x_pos, old_z_pos);
-//		slog("total movement: %f", total_movement * 0.1);
+		total_movement += (float)(fabs(self->velocity.x) + fabs(self->velocity.z));
 		if (total_movement * 0.1 >= 10)
 		{
-			slog("run distance +1");
 			total_movement = 0;
 			stat_counter("rundistance");
 		}
-		//vector3d_add(self->position, self->position, self->velocity);
 	}
 	else
 	{
@@ -213,10 +214,49 @@ void rpg_player_update(Entity *self)
 
 void rpg_player_think(Entity *self){
 	
-	int random_luck = rand() % 100;
-	slog("random luck: %i", random_luck);
+	int random_luck = rand() % 1000;
 	if (random_luck == 1)
 		stat_counter("random");
+
+	if (player->stats.health != player->stats.health_max)
+	{
+		if (timer > cd_health_regen.old_time + 5000)
+		{
+			cd_health_regen.old_time = timer;
+			player->stats.life += player->stats.life_regen;
+			if (player->stats.life > player->stats.life_max)
+			{
+				player->stats.life = player->stats.life_max;
+			}
+		}
+	}
+
+	if (player->stats.mana != player->stats.mana_max)
+	{
+		if (timer > cd_mana_regen.old_time + 5000)
+		{
+			cd_mana_regen.old_time = timer;
+			player->stats.mana += player->stats.mana_regen;
+			if (player->stats.mana > player->stats.mana_max)
+			{
+				player->stats.mana = player->stats.mana_max;
+			}
+		}
+	}
+
+	if (player->stats.stamina != player->stats.stamina_max)
+	{
+		if (timer > cd_stamina_regen.old_time + 5000)
+		{
+			cd_stamina_regen.old_time = timer;
+			player->stats.stamina += player->stats.stamina_regen;
+			if (player->stats.stamina > player->stats.stamina_max)
+			{
+				player->stats.stamina = player->stats.stamina_max;
+			}
+		}
+	}
+
 
 	gf3d_entity_collision_test(self);
 
@@ -298,13 +338,24 @@ void rpg_player_move(Entity *self){
 	}
 	if (keys[SDL_SCANCODE_SPACE])
 	{
-		player->state.inAir = true;
-		if (player->state.crouched)
-			self->velocity.y = 15;
-		else
-			self->velocity.y = 11;
-
-		stat_counter("jumpamount");
+		if (timer > cd_jump.old_time + 1000)
+		{
+			player->state.inAir = true;
+			if (player->state.crouched)
+			{
+				self->velocity.y = 70;
+				player->stats.stamina -= 10;
+			}
+			
+			else
+			{
+				self->velocity.y = 60;
+				player->stats.stamina -= 5;
+			}
+				
+			cd_jump.old_time = timer;
+			stat_counter("jumpamount");
+		}
 	}
 	
 	if (player->state.inAir)
@@ -343,7 +394,7 @@ void rpg_player_move(Entity *self){
 
 	gf3d_camera_update(self->position, vector3d(0,x_rel,self->rotate));
 	*/
-	camera_update(self->forward, self->position, vector3d(0, x_rel, self->rotate), x_rel, y_rel);
+	camera_update(self->position, vector3d(0, x_rel, self->rotate), x_rel, y_rel);
 	
 }
 
@@ -409,11 +460,16 @@ rpg_player_input(Entity *self)
 			slog("Map cooldown");
 	}
 
+	if (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_LEFT))
+	{
+		slog("Pressed mouse left");
+	}
+
 	if (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_RIGHT))
 	{
 		slog("Button: %i", SDL_GetMouseState(NULL, NULL));
 		slog("\n      Time: %i\nLast Time: %i", timer, old_time);
-		if (timer > cd_secondary_attack.old_time + 5000)
+		if (timer > cd_secondary_attack.old_time + 3000)
 		{
 			if (player->stats.mana >= 10)
 			{

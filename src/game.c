@@ -31,6 +31,8 @@ int main(int argc,char *argv[])
 	Item *wood = NULL;
 	Item *arrow = NULL;
 	Item *potion = NULL;
+	Item *woodsword = NULL;
+
 	Model *model = NULL;
 
     for (a = 1; a < argc;a++)
@@ -197,6 +199,7 @@ int main(int argc,char *argv[])
 	wood = rpg_item_new(material,"Wood Log",vector3d(-5, 2, 20));
 	potion = rpg_item_new(consumable, "Health Potion", vector3d(-5, 2, 30));
 	arrow = rpg_item_new(consumable, "Arrow", vector3d(-5, 2, 50));
+	woodsword = rpg_item_new(weapon, "Wooden Sword", vector3d(-5, 2, 70));
 
 	SDL_RenderCopyEx(renderer, load_icon, NULL, &load_rect, 288, NULL, SDL_FLIP_NONE);
 	SDL_RenderPresent(renderer);
