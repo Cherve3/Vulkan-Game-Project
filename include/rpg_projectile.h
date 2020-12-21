@@ -6,6 +6,7 @@
 #include "gf3d_entity.h"
 
 #include "rpg_collision.h"
+#include "rpg_cooldowns.h"
 
 typedef enum{
 	Wind,
@@ -30,8 +31,8 @@ typedef struct
 	Element element;
 	ProjectileType type;
 	SphereCollider collider;
+	Cooldown cd_lifetime;
 	int damage;
-	float cooldown;
 	Entity *ent;
 	Entity *owner;
 }Projectile;

@@ -20,7 +20,8 @@ typedef enum{
 	NONPLAYER,
 	MONSTER,
 	WORLD,
-	STRUCTURE
+	STRUCTURE,
+	PROJECTILE
 }EntityType;
 
 typedef struct Entity_S

@@ -34,6 +34,7 @@ typedef struct
 {
 	Sprite *menu;
 	Sprite **text;
+	Sprite *textbox;
 
 	Uint8 text_count;
 

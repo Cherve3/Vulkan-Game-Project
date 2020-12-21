@@ -4,6 +4,7 @@
 
 #include "rpg_goblin.h"
 #include "rpg_npc.h"
+#include "rpg_projectile.h"
 
 static NPC *goblin = NULL;
 static int count = 0;
@@ -71,7 +72,7 @@ void rpg_goblin_spawn(GoblinType type, Vector3D position)
 	goblin[count].ent->rotation				= vector3d(0, 0, 0);
 
 	goblin[count].ent->boxCollider.width	= 2.0;
-	goblin[count].ent->boxCollider.height	= 5.0;
+	goblin[count].ent->boxCollider.height	= 10.0;
 	goblin[count].ent->boxCollider.depth	= 2.0;
 	goblin[count].ent->boxCollider.x		= goblin[count].ent->position.x;
 	goblin[count].ent->boxCollider.y		= goblin[count].ent->position.y;
@@ -100,7 +101,7 @@ void rpg_goblin_spawn(GoblinType type, Vector3D position)
 		goblin[count].ent->think = rpg_goblin_think;
 
 		goblin[count].ent->boxCollider.width = 2.0;
-		goblin[count].ent->boxCollider.height = 5.0;
+		goblin[count].ent->boxCollider.height = 6.0;
 		goblin[count].ent->boxCollider.depth = 2.0;
 
 		goblin[count].ent->modelMatrix[0][0] = 2;
@@ -137,7 +138,7 @@ void rpg_goblin_spawn(GoblinType type, Vector3D position)
 		goblin[count].ent->think = rpg_goblin_think;
 
 		goblin[count].ent->boxCollider.width	= 8.0;
-		goblin[count].ent->boxCollider.height	= 30.0;
+		goblin[count].ent->boxCollider.height	= 28.0;
 		goblin[count].ent->boxCollider.depth	= 8.0;
 
 		set_goblin_stats(king_info);
@@ -155,8 +156,27 @@ Entity *rpg_goblin_new(){
 	return gf3d_entity_new();
 }
 
-void rpg_goblin_think(Entity *self){
+void rpg_goblin_touch(Entity *self, Entity *other)
+{
+	Projectile *pro = NULL;
+	NPC *goblin = NULL;
 
+	if (!self || !other) return;
+	goblin = self->data;
+	slog("Goblin hit");
+	if (other->type == PROJECTILE)
+	{
+		pro = (Projectile*)other->data;
+		slog("Goblin health is %i", goblin->stats.health);
+		goblin->stats.health -= pro->damage;
+		slog("Goblin health is %i", goblin->stats.health);
+	}
+	if (goblin->stats.health <= 0)
+		self->_inuse = 0;
+	
+}
+
+void rpg_goblin_think(Entity *self){
 
 	rpg_goblin_move(self);
 	gf3d_entity_collision_test(self);

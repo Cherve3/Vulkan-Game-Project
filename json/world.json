@@ -1,21 +1,17 @@
 {
     "Ground":
     {
-        "name":"World",
+        "name":"world",
         "model":"world",
         "type":6,
-        "position":[0,0,0]
+        "position":[0.0,0.0,0.0]
     },
     "Water":
     {
         "name":"Water",
         "model":"water",
         "type":6,
-        "position":[0,-4,0]
-    },
-    "Trees":
-    {
-
+        "position":[0.0,-4.0,0.0]
     },
     "Buildings":
     {
@@ -24,8 +20,57 @@
             "name":"House 0",
             "model":"house1",
             "type":7,
-            "position":[100, 26, 100]
+            "position":[100.0, 26.0, 100.0]
 
+        },
+        "house2":
+        {
+            "name":"House 1",
+            "model":"house2",
+            "type":7,
+            "position":[-100.0, 22.0, 100.0]
+
+        },
+        "house3":
+        {
+            "name":"House 2",
+            "model":"house3",
+            "type":7,
+            "position":[-50.0, 22.0, 150.0]
+
+        },
+        "house4":
+        {
+            "name":"House 3",
+            "model":"house4",
+            "type":7,
+            "position":[20.0, 29.0, 170.0]
+
+        },
+        "well":
+        {
+            "name":"Well",
+            "model":"well",
+            "type":7,
+            "position":[20.0, 20.0, 150.0]
+    
+        },
+        "goblinbase":
+        {
+            "name":"Goblin Base",
+            "model":"goblinbase",
+            "type":7,
+            "position":[-400.0, 0.0, -500.0]
+        }
+    },
+    "Trees":
+    {
+        "tree1":
+        {
+            "name":"Tree",
+            "model":"tree1",
+            "type":7,
+            "position":[-400.0, 0.0, -400.0]
         }
     }
 }

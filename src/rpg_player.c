@@ -43,38 +43,46 @@ void rpg_player_update();
 void print_inventory();
 void print_stats();
 
-void rpg_player_init(){
+void rpg_player_init(char* model){
 	camera = gf3d_get_camera();
 
-	player = (Player *)gfc_allocate_array(sizeof(Player),1);
+	player = (Player *)gfc_allocate_array(sizeof(Player), 1);
 
 	player->ent = rpg_player_new();
 
-	cd_interact.old_time		 = 0;
-	cd_jump.old_time			 = 0;
-	cd_primary_attack.old_time   = 0;
+	cd_interact.old_time = 0;
+	cd_jump.old_time = 0;
+	cd_primary_attack.old_time = 0;
 	cd_secondary_attack.old_time = 0;
-	cd_inventory.old_time		 = 0;
-	cd_stats.old_time			 = 0;
-	cd_map.old_time				 = 0;
-	cd_health_regen.old_time	 = 0;
-	cd_mana_regen.old_time		 = 0;
-	cd_stamina_regen.old_time	 = 0;
+	cd_inventory.old_time = 0;
+	cd_stats.old_time = 0;
+	cd_map.old_time = 0;
+	cd_health_regen.old_time = 0;
+	cd_mana_regen.old_time = 0;
+	cd_stamina_regen.old_time = 0;
 
 	total_movement = 0;
 	// Load player json file
 	player_info = sj_load("json/player.json");
 
 	if (!player_info)
-		slog("Failed to load player json data %s",sj_get_error());
-	
+		slog("Failed to load player json data %s", sj_get_error());
+
 	player_info = sj_object_get_value(player_info, "Player");
 
 	/**
 	 * Player Stats
 	 */
-	player->ent->model = gf3d_model_load("player");// gf3d_model_load_animated("player",1,20);//
-	player->ent->animated = true;
+	if (strcmp(model, "Player") == 0)
+	{
+		player->ent->model = gf3d_model_load_animated("player", 1, 20);//gf3d_model_load("player"); //
+		player->ent->animated = true;
+	}
+	else
+	{
+		player->ent->model = gf3d_model_load("player2");
+		player->ent->animated = false;
+	}
 	player->ent->think = rpg_player_think;
 	player->ent->update = rpg_player_update;
 	player->ent->type = PLAYER;
@@ -182,7 +190,7 @@ void rpg_player_update(Entity *self)
 	if (vector3d_magnitude(self->velocity) > 0.001)
 	{
 		self->velocity.y += GRAVITY;
-		vector3d_scale(self->velocity, self->velocity, 0.3);
+		vector3d_scale(self->velocity, self->velocity, 0.4);
 		self->position.x += self->velocity.x;
 
 		if (player->state.onGround = true);
@@ -472,7 +480,7 @@ rpg_player_input(Entity *self)
 
 	if (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_LEFT))
 	{
-		slog("Pressed mouse left");
+		//slog("Pressed mouse left");
 	}
 
 	if (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_RIGHT))
@@ -498,22 +506,6 @@ rpg_player_input(Entity *self)
 			slog("fireball cool down");
 		}
 	}
-
-	SDL_Event event;
-	while (SDL_PollEvent(&event))
-	{
-		if (event.type == SDL_MOUSEWHEEL)
-		{
-			if (event.wheel.y > 0) // scroll up
-			{
-				gf3d_camera_move(vector_forward());
-			}
-			else if (event.wheel.y < 0) // scroll down
-			{
-				gf3d_camera_move(vector_backward());
-			}
-		}
-	}
 }
 
 void player_interaction()
@@ -532,8 +524,7 @@ void player_interaction()
 			float y = player->ent->position.z - gf3d_get_entity_list()[i].position.z;
 			
 			float result = sqrt( (x * x) + (y * y));
-			slog("checking distance...");
-//			slog("Result: %f", result);
+			//slog("checking distance...");
 			if (result < player->interactBound.radius)
 			{
 				slog("Interacting with %s",gf3d_get_entity_list()[i].name);

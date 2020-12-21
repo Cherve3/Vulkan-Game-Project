@@ -29,6 +29,7 @@
 #include "rpg_npc.h"
 #include "rpg_ui.h"
 #include "rpg_input.h"
+#include "rpg_quest.h"
 
 #define GRAVITY -9.8
 

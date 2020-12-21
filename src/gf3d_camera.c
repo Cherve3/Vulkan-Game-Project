@@ -24,7 +24,7 @@ void gf3d_camera_init()
 	camera.rotation = vector3d(0, 0, 0);
 	camera.offset = vector3d(0, -10, -5);
 	camera.speed = 0.5;
-	camera.zoom = 12;
+	camera.zoom = 20;
 
 	vector3d_normalize(&camera.forward);
 	vector3d_normalize(&camera.up);
@@ -72,6 +72,11 @@ void camera_update(Vector3D position, Vector3D rotate, const int x_rel, const in
 			}
 		}
 	}
+
+	if (camera.zoom > 20)
+		camera.zoom = 20;
+	if (camera.zoom < -20)
+		camera.zoom = -20;
 
 	camera.yaw += x_rel*GFC_DEGTORAD;
 	camera.pitch += y_rel *GFC_DEGTORAD;

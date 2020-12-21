@@ -3,6 +3,7 @@
 #include "simple_json.h"
 
 #include "rpg_npc.h"
+#include "rpg_quest.h"
 
 static NPC *npc = NULL;
 static int count = 0;
@@ -150,13 +151,12 @@ void rpg_npc_spawn(NPCType type, Vector3D position)
 		break;
 	case Questgiver:
 
-		npc[count].ent->name = "Quest Giver";
+		npc[count].ent->name = "Questgiver";
 		npc[count].ent->model = gf3d_model_load("questgiver");
 		npc[count].ent->think = rpg_npc_think;
 
 		set_npc_stats(questgiver_info);
 		
-
 		count++;
 		break;
 	}
@@ -190,26 +190,45 @@ void rpg_npc_interact(Entity *self)
 	{
 		toggleItemShop = true;
 	}
-	else if (strcmp(self->name, "Weapon Shop") == 0 && toggleWeaponShop == false)
+	else
+		toggleItemShop = false;
+	
+	if (strcmp(self->name, "Weapon Shop") == 0 && toggleWeaponShop == false)
 	{
 		toggleWeaponShop = true;
 	}
-	else if (strcmp(self->name, "Armor Shop") == 0 && toggleArmorShop == false)
+	else
+		toggleWeaponShop = false;
+
+	if (strcmp(self->name, "Armor Shop") == 0 && toggleArmorShop == false)
 	{
 		toggleArmorShop = true;
 	}
-	else if (strcmp(self->name, "Spell Shop") == 0 && toggleSpellShop == false)
+	else
+		toggleArmorShop = false;
+
+	if (strcmp(self->name, "Spell Shop") == 0 && toggleSpellShop == false)
 	{
 		toggleSpellShop = true;
 	}
-	else if (strcmp(self->name, "Generic") == 0 && toggleGeneric == false)
+	else
+		toggleSpellShop = false;
+
+	if (strcmp(self->name, "Generic") == 0 && toggleGeneric == false)
 	{
 		toggleGeneric = true;
 	}
-	else if (strcmp(self->name, "Questgiver") == 0 && toggleQuest == false)
+	else
+		toggleGeneric = false;
+
+	if (strcmp(self->name, "Questgiver") == 0 && toggleQuest == false)
 	{
 		toggleQuest = true;
+		if (rpg_get_current_quest() == 0)
+			rpg_start_quest(1);
 	}
+	else
+		toggleQuest = false;
 }
 
 Bool rpg_get_itemshop_toggle()
@@ -282,7 +301,7 @@ void set_npc_stats(SJson *info)
 	sj_get_integer_value(sj_object_get_value(info, "luck"), &npc[count].stats.luck);
 	sj_get_integer_value(sj_object_get_value(info, "max_luck"), &npc[count].stats.luck_max);
 
-	print_npc_stats(npc[count]);
+	//print_npc_stats(npc[count]);
 }
 
 void print_npc_stats(NPC npc)

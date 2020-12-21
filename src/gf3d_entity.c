@@ -134,7 +134,7 @@ void gf3d_entity_think_all()
 void gf3d_entity_draw(Entity *self, Uint32 bufferFrame, VkCommandBuffer commandBuffer)
 {
 	if (!self) return;
-
+	if (self->animated)return;
 	gf3d_model_draw(self->model, bufferFrame, commandBuffer, self->modelMatrix);
 
 }
@@ -168,12 +168,12 @@ void gf3d_entity_collision_test(Entity *self){
 		{
 			//Check X
 			if ( (self->boxCollider.x - self->boxCollider.width) <= (gf3d_entity.entity_list[i].boxCollider.x + gf3d_entity.entity_list[i].boxCollider.width) &&
-			   ( (self->boxCollider.x - self->boxCollider.width) >= (gf3d_entity.entity_list[i].boxCollider.x - gf3d_entity.entity_list[i].boxCollider.width)) && gf3d_entity.entity_list[i].name != "World")
+				((self->boxCollider.x - self->boxCollider.width) >= (gf3d_entity.entity_list[i].boxCollider.x - gf3d_entity.entity_list[i].boxCollider.width)) && gf3d_entity.entity_list[i].type != WORLD)
 			{
 				self->position.x += (gf3d_entity.entity_list[i].boxCollider.x + gf3d_entity.entity_list[i].boxCollider.width) - (self->boxCollider.x - self->boxCollider.width);
 			}
 			else if ( (self->boxCollider.x + self->boxCollider.width) <= (gf3d_entity.entity_list[i].boxCollider.x + gf3d_entity.entity_list[i].boxCollider.width) &&
-				( (self->boxCollider.x + self->boxCollider.width) >= (gf3d_entity.entity_list[i].boxCollider.x - gf3d_entity.entity_list[i].boxCollider.width)) && gf3d_entity.entity_list[i].name != "World")
+				((self->boxCollider.x + self->boxCollider.width) >= (gf3d_entity.entity_list[i].boxCollider.x - gf3d_entity.entity_list[i].boxCollider.width)) && gf3d_entity.entity_list[i].type != WORLD)
 			{
 
 				self->position.x += (gf3d_entity.entity_list[i].boxCollider.x - gf3d_entity.entity_list[i].boxCollider.width) - (self->boxCollider.x + self->boxCollider.width);
@@ -188,12 +188,12 @@ void gf3d_entity_collision_test(Entity *self){
 
 			//Check Z
 			if ((self->boxCollider.z - self->boxCollider.depth) <= (gf3d_entity.entity_list[i].boxCollider.z + gf3d_entity.entity_list[i].boxCollider.depth) &&
-				((self->boxCollider.z - self->boxCollider.depth) >= (gf3d_entity.entity_list[i].boxCollider.z - gf3d_entity.entity_list[i].boxCollider.depth)) && gf3d_entity.entity_list[i].name != "World")
+				((self->boxCollider.z - self->boxCollider.depth) >= (gf3d_entity.entity_list[i].boxCollider.z - gf3d_entity.entity_list[i].boxCollider.depth)) && gf3d_entity.entity_list[i].type != WORLD)
 			{
 				self->position.z += (gf3d_entity.entity_list[i].boxCollider.z + gf3d_entity.entity_list[i].boxCollider.depth) - (self->boxCollider.z - self->boxCollider.depth);
 			}
 			else if ((self->boxCollider.z + self->boxCollider.depth) <= (gf3d_entity.entity_list[i].boxCollider.z + gf3d_entity.entity_list[i].boxCollider.depth) &&
-				((self->boxCollider.z + self->boxCollider.depth) >= (gf3d_entity.entity_list[i].boxCollider.z - gf3d_entity.entity_list[i].boxCollider.depth)) && gf3d_entity.entity_list[i].name != "World")
+				((self->boxCollider.z + self->boxCollider.depth) >= (gf3d_entity.entity_list[i].boxCollider.z - gf3d_entity.entity_list[i].boxCollider.depth)) && gf3d_entity.entity_list[i].type != WORLD)
 			{
 
 				self->position.z += (gf3d_entity.entity_list[i].boxCollider.z - gf3d_entity.entity_list[i].boxCollider.depth) - (self->boxCollider.z + self->boxCollider.depth);
