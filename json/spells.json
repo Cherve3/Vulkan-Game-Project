@@ -1,0 +1,9 @@
+{
+    "spells":[
+        {"SpellType":3, "cost":10, "name":"Fire", "description":"A ball of flame to hurl at your opponent."},
+        {"SpellType":0, "cost":10, "name":"Heal", "description":"Heal yourself for 20 health."},
+        {"SpellType":3, "cost":10, "name":"Thunder", "description":"A thunderbolt to throw at your opponent."},
+        {"SpellType":1, "cost":10, "name":"Shield", "description":" Cast a Protective barrier on yourself and withstand 20 damage."}
+        
+    ]
+}

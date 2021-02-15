@@ -143,7 +143,7 @@ void gf3d_swapchain_create(VkDevice device,VkSurfaceKHR surface)
     
     slog("minimum images needed for swap chain: %i",gf3d_swapchain.capabilities.minImageCount);
     slog("Maximum images needed for swap chain: %i",gf3d_swapchain.capabilities.maxImageCount);
-    gf3d_swapchain.swapChainCount = gf3d_swapchain.capabilities.minImageCount + 1;
+    gf3d_swapchain.swapChainCount = gf3d_swapchain.capabilities.minImageCount + 1028;
     if (gf3d_swapchain.capabilities.maxImageCount)gf3d_swapchain.swapChainCount = MIN(gf3d_swapchain.swapChainCount,gf3d_swapchain.capabilities.maxImageCount);
     slog("using %i images for the swap chain",gf3d_swapchain.swapChainCount);
     
@@ -230,12 +230,14 @@ int gf3d_swapchain_get_presentation_mode()
 {
     int i;
     int chosen = -1;
-    for (i = 0; i < gf3d_swapchain.formatCount; i++)
+    for (i = 0; i < gf3d_swapchain.presentModeCount; i++)
     {
         if (gf3d_swapchain.presentModes[i] == VK_PRESENT_MODE_MAILBOX_KHR)
             return i;
         chosen = i;
+		
     }
+
     return chosen;
 }
 

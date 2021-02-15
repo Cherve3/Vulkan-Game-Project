@@ -66,6 +66,7 @@ void gf3d_vqueues_init(VkPhysicalDevice device,VkSurfaceKHR surface)
     slog("discoverd %i queue family properties",gf3d_vqueues.queue_family_count);
     for (i = 0; i < gf3d_vqueues.queue_family_count; i++)
     {
+		
         slog("Queue family %i:",i);
         slog("queue flag bits %i",gf3d_vqueues.queue_properties[i].queueFlags);
         slog("queue count %i",gf3d_vqueues.queue_properties[i].queueCount);

@@ -1,0 +1,16 @@
+# Blender MTL File: 'None'
+# Material Count: 1
+
+newmtl warrok_MAT
+Ns 179.999996
+Ka 0.500000 0.500000 0.500000
+Kd 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Bump C:\\home\\app\\mixamo-mini\\tmp\\skins_8c54eb3e-7e4a-4efa-8e65-8f69690444de.fbm\\bear_normal.png
+map_Kd C:\\home\\app\\mixamo-mini\\tmp\\skins_8c54eb3e-7e4a-4efa-8e65-8f69690444de.fbm\\bear_diffuse.png
+map_Ks C:\\home\\app\\mixamo-mini\\tmp\\skins_8c54eb3e-7e4a-4efa-8e65-8f69690444de.fbm\\bear_specular.png
+map_d C:\\home\\app\\mixamo-mini\\tmp\\skins_8c54eb3e-7e4a-4efa-8e65-8f69690444de.fbm\\bear_alpha.png

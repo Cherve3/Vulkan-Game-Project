@@ -1,0 +1,36 @@
+{
+    "Player":
+    {
+        "name":                 "Player 1",
+        "level":                1,
+        "exp":                  0,
+        "bits":                 1000,
+        "life":                 100,
+        "max_life":             100,
+        "regen_life":           10,
+        "mana":                 100,
+        "max_mana":             100,
+        "regen_mana":           10,
+        "stamina":              100,
+        "max_stamina":          100,
+        "regen_stamina":        10,
+        "carry_weight":         0.0,
+        "max_weight":           65.0,
+        "strength":             1,
+        "max_strength":         100,
+        "health":               1,
+        "max_health":           100,
+        "perception":           1,
+        "max_perception":       100,
+        "speed":                1,
+        "max_speed":            100,
+        "willpower":            1,
+        "max_willpower":        100,
+        "dexterity":            1,
+        "max_dexterity":        100,
+        "intelligence":         1,
+        "max_intelligence":     100,
+        "luck":                 1,
+        "max_luck":             100
+    }
+}

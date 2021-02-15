@@ -18,10 +18,11 @@ typedef struct
 }vValidation;
 
 static vValidation gf3d_validation = {0};
+static VkValidationFlagsEXT gf3d_validation_flags = { 0 };
 
 void gf3d_validation_query_layer_properties()
 {
-    int i;
+	int i;
     vkEnumerateInstanceLayerProperties(&gf3d_validation.layerCount, NULL);
     slog("discovered %i validation layers",gf3d_validation.layerCount);
     
@@ -37,6 +38,7 @@ void gf3d_validation_query_layer_properties()
         slog("Validation layer available: %s",gf3d_validation.availableLayers[i].layerName);
     }
 }
+
 
 void gf3d_validation_close()
 {
@@ -80,6 +82,11 @@ Uint32 gf3d_validation_get_validation_layer_count()
 VkLayerProperties *gf3d_validation_get_validation_layer_data()
 {
     return gf3d_validation.availableLayers;
+}
+
+VkValidationFlagsEXT gf3d_validation_disable_validations()
+{
+	return gf3d_validation_flags;
 }
 
 const char* const* gf3d_validation_get_validation_layer_names()

@@ -1,0 +1,15 @@
+# Blender MTL File: 'weaponshop.blend'
+# Material Count: 1
+
+newmtl Guard_02
+Ns 56.806129
+Ka 0.500000 0.500000 0.500000
+Kd 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Bump C:\\home\\app\\mixamo-mini\\tmp\\skins_ea87a86c-7a76-4bc0-b498-ebf3a3b98f7e.fbm\\Guard_02__normal.png
+map_Kd C:\\Git\\Vulkan-Game-Project\\images\\weaponshop.png
+map_Ks C:\\home\\app\\mixamo-mini\\tmp\\skins_ea87a86c-7a76-4bc0-b498-ebf3a3b98f7e.fbm\\Guard_02__specular.png

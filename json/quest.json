@@ -1,0 +1,38 @@
+{
+    "1":{
+        "title":"Wood you like a quest?",
+        "description":"Questgiver is looking for a few materials.",
+        "objective":"Find and return 5 Wood Logs",
+        "reward":[10, 200, "Wooden Sword"],
+        "completed":0
+    },
+    "2":{
+        "title":"Thinning the Numbers",
+        "description":"There has been a goblin sighting. They can overrun the town if their numbers keep growing.",
+        "objective":"Slay 5 Goblins",
+        "reward":[100, 1000,"Leather Cap", "Leather Cuirass","Leather Greaves","Leather Boots"],
+        "completed":0
+    },
+    "3":{
+        "title":"Ambush",
+        "description":"It was an ambush! You were drawn from town to leave the town defenseless.",
+        "objective":"Protect the Town",
+        "reward":[200, 2000, "Fireball"],
+        "completed":0
+    },
+    "4":{
+        "title":"Find the Goblin Camp",
+        "description":"There is a rumor that the goblin camp has been discovered. Search for the camp and report back to Questgiver.",
+        "objective":"Find the Goblin Camp",
+        "reward":[300, 3000,"Iron Sword"],
+        "completed":0
+    },
+    "5":{
+        "title":"Return of the King!?",
+        "description":"You found the goblin camp. All the goblins have been rallied under one banner by the Goblin King.",
+        "objective":"Slay the Goblin King",
+        "reward":[1000, 10000],
+        "completed":0
+    }
+
+}

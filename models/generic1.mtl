@@ -1,0 +1,52 @@
+# Blender MTL File: 'generic1.blend'
+# Material Count: 4
+
+newmtl Akai_MAT
+Ns 45.000011
+Ka 1.000000 1.000000 1.000000
+Kd 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Bump C:\\home\\app\\mixamo-mini\\tmp\\skins_54ca0688-1315-4b73-a861-3276fbdb2aa5.fbm\\Erika_Archer_Clothes_normal.png
+map_Kd C:\\Git\\Vulkan-Game-Project\\images\\generic1.png
+
+newmtl Body_MAT
+Ns 56.806129
+Ka 0.500000 0.500000 0.500000
+Kd 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Bump C:\\home\\app\\mixamo-mini\\tmp\\skins_54ca0688-1315-4b73-a861-3276fbdb2aa5.fbm\\FemaleFitA_StdNM.png
+map_Kd C:\\home\\app\\mixamo-mini\\tmp\\skins_54ca0688-1315-4b73-a861-3276fbdb2aa5.fbm\\FemaleFitA_Body_diffuse.png
+map_d C:\\home\\app\\mixamo-mini\\tmp\\skins_54ca0688-1315-4b73-a861-3276fbdb2aa5.fbm\\FemaleFitA_Body_diffuse.png
+
+newmtl EyeSpec_MAT
+Ns 462.769233
+Ka 0.500000 0.500000 0.500000
+Kd 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Bump C:\\home\\app\\mixamo-mini\\tmp\\skins_54ca0688-1315-4b73-a861-3276fbdb2aa5.fbm\\FemaleFitA_StdNM.png
+map_Kd C:\\home\\app\\mixamo-mini\\tmp\\skins_54ca0688-1315-4b73-a861-3276fbdb2aa5.fbm\\FemaleFitA_Body_diffuse.png
+map_d C:\\home\\app\\mixamo-mini\\tmp\\skins_54ca0688-1315-4b73-a861-3276fbdb2aa5.fbm\\FemaleFitA_Body_diffuse.png
+
+newmtl Lashes_MAT
+Ns 179.999996
+Ka 1.000000 1.000000 1.000000
+Kd 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Kd C:\\home\\app\\mixamo-mini\\tmp\\skins_54ca0688-1315-4b73-a861-3276fbdb2aa5.fbm\\FemaleFitA_Body_diffuse.png
+map_d C:\\home\\app\\mixamo-mini\\tmp\\skins_54ca0688-1315-4b73-a861-3276fbdb2aa5.fbm\\FemaleFitA_Body_diffuse.png

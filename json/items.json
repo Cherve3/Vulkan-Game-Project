@@ -1,0 +1,68 @@
+{
+    "Consumable":
+    {
+        "Health Potion":
+        {
+            "ItemType":     0,
+            "damage":       10,
+            "cost":         20,
+            "weight":       0.10,
+            "name":         "Health Potion", 
+            "description":  "A glass bottle filled with a red glowing liquid. It will fortify your health."
+        },
+        "Mana Potion":
+        {
+            "ItemType":     0,
+            "damage":       10,
+            "cost":         20,
+            "weight":       0.10,
+            "name":         "Mana Potion",   
+            "description":  "A glass bottle filled with a blue glowing liquid. It will fortify your mana."
+        },
+        "Stamina Potion":
+        {
+            "ItemType":     0,
+            "damage":       10,
+            "cost":         20,
+            "weight":       0.10,
+            "name":         "Stamina Potion",
+            "description":  "A glass bottle filled with a green glowing liquid. It will fortify your stamina."
+        },
+        "Arrow":
+        {
+            "ItemType":     0,
+            "damage":       10,
+            "cost":         5,
+            "weight":       0.10,
+            "name":         "Arrow",
+            "description":  "A long thin stick with a pointed tip and feather on either side."
+        }
+    },
+    "Material":
+    {
+        "Wood Log":
+        {
+            "ItemType":     1,
+            "weight":       3.0,
+            "cost":         30,
+            "name":         "Wood Log",
+            "description":  "A sturdy looking wood log. It can be used for crafting."
+        },
+        "Herb":
+        {
+            "ItemType":     1,
+            "weight":       0.10,
+            "cost":         10,
+            "name":         "Herb",
+            "description":  "A small herbal plant. It may be used for something."
+        },
+        "Water":
+        {
+            "ItemType":     1,
+            "weight":       0.10,
+            "cost":         10,
+            "name":         "Water",
+            "description":  "A glass bottle filled with water. Where did you get that?"
+        }
+    }
+}

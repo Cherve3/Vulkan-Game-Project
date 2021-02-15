@@ -42,16 +42,30 @@ void gf3d_vgraphics_copy_buffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDevice
 
 uint32_t gf3d_vgraphics_find_memory_type(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
-void gf3d_vgraphics_rotate_camera(float degrees);
+void gf3d_vgraphics_rotate_z(float degrees);
+void gf3d_vgraphics_rotate_x(float degrees);
+void gf3d_vgraphics_rotate_y(float degrees);
 
 VkBuffer gf3d_vgraphics_get_uniform_buffer_by_index(Uint32 index);
+
 UniformBufferObject gf3d_vgraphics_get_uniform_buffer_object();
 
-Pipeline *gf3d_vgraphics_get_graphics_pipeline();
+Matrix4 *gf3d_vgraphics_get_ubo_view();
+
+Matrix4 *gf3d_vgraphics_get_ubo_model();
+
+Matrix4 *gf3d_vgraphics_get_ubo_proj();
+
+SDL_Window *gf3d_vgraphics_get_window();
+
+Pipeline *gf3d_vgraphics_get_graphics_model_pipeline();
+
+Pipeline *gf3d_vgraphics_get_graphics_overlay_pipeline();
 
 Command *gf3d_vgraphics_get_graphics_command_pool();
 
 VkImageView gf3d_vgraphics_create_image_view(VkImage image, VkFormat format);
 
+VkSurfaceKHR *gf3d_vgraphics_get_surface();
 
 #endif
