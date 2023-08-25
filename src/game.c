@@ -49,7 +49,7 @@ int main(int argc,char *argv[])
         }
     }
 
-    init_logger("gf3d.log");    
+    init_logger("gf3d.log", true);    
     slog("gf3d begin");
     gf3d_vgraphics_init(
         "gf3d",                 //program name
