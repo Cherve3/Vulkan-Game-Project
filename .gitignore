@@ -4,7 +4,6 @@
 # Object files
 *.o
 *.ko
-*.obj
 *.elf
 
 # Linker output
@@ -53,3 +52,7 @@ dkms.conf
 makefile.dep
 gf3d
 *.log
+
+# Unnecessary Project Files
+win32/Release/
+win32/Debug/
