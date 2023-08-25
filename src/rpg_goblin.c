@@ -189,7 +189,7 @@ void rpg_goblin_move(Entity *self){
 
 	self->velocity = vector3d(gfc_crandom()*0.8, 0, gfc_crandom()*0.8);
 	vector3d_add(self->position,self->position, self->velocity);
-	gfc_matrix_new_translation(self->modelMatrix,self->position);
+	gfc_matrix_make_translation(self->modelMatrix,self->position);
 	self->boxCollider.x = self->position.x;
 	self->boxCollider.y = self->position.y;
 	self->boxCollider.z = self->position.z;

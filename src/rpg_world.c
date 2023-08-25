@@ -57,7 +57,7 @@ void rpg_world_init()
 		
 		sj_get_integer_value(sj_object_get_value(ground_info, "type"), &world.ground->type);
 
-		gfc_matrix_new_translation(world.ground->modelMatrix, world.ground->position);
+		gfc_matrix_make_translation(world.ground->modelMatrix, world.ground->position);
 		world.ground->boxCollider.depth = 1000.0;
 		world.ground->boxCollider.height = 0;
 		world.ground->boxCollider.width = 1000.0;
@@ -104,7 +104,7 @@ int water_init()
 		sj_get_float_value(sj_array_get_nth(sj_object_get_value(water_info, "position"), 2), &world.water->position.z);
 
 		sj_get_integer_value(sj_object_get_value(water_info, "type"), &world.water->type);
-		gfc_matrix_new_translation(world.water->modelMatrix, world.water->position);
+		gfc_matrix_make_translation(world.water->modelMatrix, world.water->position);
 		return 1;
 	}
 
@@ -131,7 +131,7 @@ int buildings_init(Uint32 building_count)
 		world.buildings[0]->boxCollider.width = 26;
 		world.buildings[0]->boxCollider.height = 26;
 		world.buildings[0]->boxCollider.depth = 26;
-		gfc_matrix_new_translation(world.buildings[0]->modelMatrix, world.buildings[0]->position);
+		gfc_matrix_make_translation(world.buildings[0]->modelMatrix, world.buildings[0]->position);
 	}
 
 	world.buildings[1] = gf3d_entity_new();
@@ -150,7 +150,7 @@ int buildings_init(Uint32 building_count)
 		world.buildings[1]->boxCollider.width = 25;
 		world.buildings[1]->boxCollider.height = 25;
 		world.buildings[1]->boxCollider.depth = 25;
-		gfc_matrix_new_translation(world.buildings[1]->modelMatrix, world.buildings[1]->position);
+		gfc_matrix_make_translation(world.buildings[1]->modelMatrix, world.buildings[1]->position);
 	}
 
 	world.buildings[2] = gf3d_entity_new();
@@ -169,7 +169,7 @@ int buildings_init(Uint32 building_count)
 		world.buildings[2]->boxCollider.width = 25;
 		world.buildings[2]->boxCollider.height = 25;
 		world.buildings[2]->boxCollider.depth = 25;
-		gfc_matrix_new_translation(world.buildings[2]->modelMatrix, world.buildings[2]->position);
+		gfc_matrix_make_translation(world.buildings[2]->modelMatrix, world.buildings[2]->position);
 	}
 
 	world.buildings[3] = gf3d_entity_new();
@@ -188,7 +188,7 @@ int buildings_init(Uint32 building_count)
 		world.buildings[3]->boxCollider.width = 25;
 		world.buildings[3]->boxCollider.height = 25;
 		world.buildings[3]->boxCollider.depth = 25;
-		gfc_matrix_new_translation(world.buildings[3]->modelMatrix, world.buildings[3]->position);
+		gfc_matrix_make_translation(world.buildings[3]->modelMatrix, world.buildings[3]->position);
 	}
 	/*
 	world.buildings[4] = gf3d_entity_new();
@@ -224,7 +224,7 @@ int buildings_init(Uint32 building_count)
 		world.buildings[5]->boxCollider.y = world.buildings[5]->position.y;
 		world.buildings[5]->boxCollider.z = world.buildings[5]->position.z;
 
-		gfc_matrix_new_translation(world.buildings[5]->modelMatrix, world.buildings[5]->position);
+		gfc_matrix_make_translation(world.buildings[5]->modelMatrix, world.buildings[5]->position);
 		return 1;
 	}
 	return 0;
@@ -250,7 +250,7 @@ int trees_init(Uint32 tree_count)
 		world.trees[0]->boxCollider.width = 3;
 		world.trees[0]->boxCollider.height = 3;
 		world.trees[5]->boxCollider.depth = 3;
-		gfc_matrix_new_translation(world.trees[0]->modelMatrix, world.trees[0]->position);
+		gfc_matrix_make_translation(world.trees[0]->modelMatrix, world.trees[0]->position);
 		return 1;
 	}
 	return 0;

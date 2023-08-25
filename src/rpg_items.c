@@ -2,6 +2,8 @@
 #include "simple_logger.h"
 #include "simple_json.h"
 
+#include "gfc_matrix.h"
+
 #include "rpg_items.h"
 #include "rpg_player.h"
 #include "rpg_levelup.h"

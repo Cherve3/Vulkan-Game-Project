@@ -311,8 +311,8 @@ void rpg_player_move(Entity *self){
 	SDL_GetRelativeMouseState(&x_rel, &y_rel);
 
 	//Move model to position
-	gfc_matrix_new_translation(self->modelMatrix, self->position);
-	gfc_matrix_rotate(self->modelMatrix, self->modelMatrix, -self->rotate, vector_up());
+	gfc_matrix_make_translation(self->modelMatrix, self->position);
+	gfc_matrix_rotate(self->modelMatrix, self->modelMatrix, -self->rotate, vector3d(0, 0, 1));
 
 	self->rotate += x_rel * GFC_DEGTORAD;
 

@@ -92,7 +92,7 @@ void rpg_npc_spawn(NPCType type, Vector3D position)
 	npc[count].ent->boxCollider.y = npc[count].ent->position.y;
 	npc[count].ent->boxCollider.z = npc[count].ent->position.z;
 
-	gfc_matrix_new_translation(npc[count].ent->modelMatrix, npc[count].ent->position);
+	gfc_matrix_make_translation(npc[count].ent->modelMatrix, npc[count].ent->position);
 
 	switch (type)
 	{

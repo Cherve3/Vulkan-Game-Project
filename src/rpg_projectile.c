@@ -91,7 +91,7 @@ void rpg_fireball_spawn(Entity *player)
 			timer = SDL_GetTicks();
 			rpg_projectiles.projectile_list[i].cd_lifetime.old_time = timer;
 
-			gfc_matrix_new_translation(
+			gfc_matrix_make_translation(
 				rpg_projectiles.projectile_list[i].ent->modelMatrix, 
 				rpg_projectiles.projectile_list[i].ent->position);
 
@@ -162,6 +162,6 @@ void rpg_fireball_update(Entity *self)
 	if (!self)return;
 	vector3d_scale(self->velocity, self->velocity, 0.7);
 	vector3d_add(self->position, self->position, self->velocity);
-	gfc_matrix_new_translation(self->modelMatrix,self->position);
+	gfc_matrix_make_translation(self->modelMatrix,self->position);
 	
 }

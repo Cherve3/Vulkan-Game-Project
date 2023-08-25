@@ -310,8 +310,8 @@ int main(int argc,char *argv[])
 
 //	model = gf3d_model_load_animated("player", 1, 20);
 	dino = gf3d_model_load_animated("dino_anim", 5, 29);
-	gfc_matrix_new_translation(modelMat,vector3d(5,4,5));
-	gfc_matrix_new_translation(modelMat2, vector3d(0, 8, 10));
+	gfc_matrix_make_translation(modelMat,vector3d(5,4,5));
+	gfc_matrix_make_translation(modelMat2, vector3d(0, 8, 10));
 	
 	//	get_player()->ent->model = gf3d_model_load_animated("player", 1,19);
 

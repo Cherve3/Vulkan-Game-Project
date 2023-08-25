@@ -27,7 +27,7 @@
 #include "gf3d_sprite.h"
 
 
-typedef struct
+typedef struct vGraphics
 {
     SDL_Window                 *main_window;
 
@@ -65,7 +65,7 @@ typedef struct
     Pipeline                   *modelPipe;
 	Pipeline				   *spritePipe;
     
-    Command                 *   graphicsCommandPool;
+    Command                    *graphicsCommandPool;
 
     UniformBufferObject         ubo;
 }vGraphics;
@@ -114,7 +114,7 @@ void gf3d_vgraphics_init(
 		gf3d_vgraphics.ubo.view, 
 		vector3d(0, -10, 5), 
 		vector3d(0, 0, 0), 
-		vector_up()
+        vector3d(0, 0, 1)
 		);
 
     gfc_matrix_perspective(
@@ -160,6 +160,75 @@ void gf3d_vgraphics_init(
     gf3d_vgraphics_semaphores_create();
 }
 
+void get_instance_extensions()
+{
+    SDL_Vulkan_GetInstanceExtensions(
+        gf3d_vgraphics.main_window, 
+        &(gf3d_vgraphics.sdl_extension_count), 
+        NULL);
+
+    if (gf3d_vgraphics.sdl_extension_count > 0)
+    {
+        gf3d_vgraphics.sdl_extension_names = gfc_allocate_array(sizeof(const char*), gf3d_vgraphics.sdl_extension_count);
+
+        SDL_Vulkan_GetInstanceExtensions(
+            gf3d_vgraphics.main_window, 
+            &(gf3d_vgraphics.sdl_extension_count), 
+            gf3d_vgraphics.sdl_extension_names);
+
+        for (Uint32 i = 0; i < gf3d_vgraphics.sdl_extension_count; i++)
+        {
+            slog("SDL Vulkan extensions support: %s", gf3d_vgraphics.sdl_extension_names[i]);
+            gf3d_extensions_enable(
+                ET_Instance, 
+                gf3d_vgraphics.sdl_extension_names[i]);
+        }
+    }
+    else
+    {
+        slog("SDL / Vulkan not supported");
+        gf3d_vgraphics_close();
+        exit(0);
+        return;
+    }
+}
+
+void create_instance(char* windowName)
+{
+    gf3d_vgraphics.vk_app_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+    gf3d_vgraphics.vk_app_info.pNext = NULL;
+    gf3d_vgraphics.vk_app_info.pApplicationName = windowName;
+    gf3d_vgraphics.vk_app_info.applicationVersion = 0;
+    gf3d_vgraphics.vk_app_info.pEngineName = windowName;
+    gf3d_vgraphics.vk_app_info.engineVersion = 0;
+    gf3d_vgraphics.vk_app_info.apiVersion = VK_API_VERSION_1_3;
+
+    gf3d_vgraphics.vk_instance_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+    gf3d_vgraphics.vk_instance_info.pNext = NULL;
+    gf3d_vgraphics.vk_instance_info.pApplicationInfo = &gf3d_vgraphics.vk_app_info;
+}
+
+void enable_validation(Bool enableValidation)
+{
+    Uint32 enabledExtensionCount = 0;
+
+    if (enableValidation)
+    {
+        gf3d_vgraphics.enableValidationLayers = true;
+        gf3d_validation_init();
+        gf3d_vgraphics.vk_instance_info.enabledLayerCount = gf3d_validation_get_validation_layer_count();
+        gf3d_vgraphics.vk_instance_info.ppEnabledLayerNames = gf3d_validation_get_validation_layer_names();
+        gf3d_extensions_enable(ET_Instance, "VK_EXT_debug_utils");
+    }
+    else
+    {
+        //setup instance info
+        gf3d_vgraphics.vk_instance_info.enabledLayerCount = 0;
+        gf3d_vgraphics.vk_instance_info.ppEnabledLayerNames = NULL;
+    }
+    gf3d_vgraphics.vk_instance_info.ppEnabledExtensionNames = gf3d_extensions_get_instance_enabled_names(&enabledExtensionCount);
+    gf3d_vgraphics.vk_instance_info.enabledExtensionCount = enabledExtensionCount;
+}
 
 void gf3d_vgraphics_setup(
     char *windowName,
@@ -171,8 +240,6 @@ void gf3d_vgraphics_setup(
 )
 {
     Uint32 flags = SDL_WINDOW_VULKAN;
-    Uint32 i;
-    Uint32 enabledExtensionCount = 0;
     VkDeviceCreateInfo createInfo = {0};
     
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
@@ -210,65 +277,24 @@ void gf3d_vgraphics_setup(
     // instance extension configuration
     gf3d_extensions_instance_init();
 	slog_sync();
-    // get the extensions that are needed for rendering to an SDL Window
-    SDL_Vulkan_GetInstanceExtensions(gf3d_vgraphics.main_window, &(gf3d_vgraphics.sdl_extension_count), NULL);
-    if (gf3d_vgraphics.sdl_extension_count > 0)
-    {
-        gf3d_vgraphics.sdl_extension_names = gfc_allocate_array(sizeof(const char *),gf3d_vgraphics.sdl_extension_count);
-        
-        SDL_Vulkan_GetInstanceExtensions(gf3d_vgraphics.main_window, &(gf3d_vgraphics.sdl_extension_count), gf3d_vgraphics.sdl_extension_names);
-        for (i = 0; i < gf3d_vgraphics.sdl_extension_count;i++)
-        {
-            slog("SDL Vulkan extensions support: %s",gf3d_vgraphics.sdl_extension_names[i]);
-            gf3d_extensions_enable(ET_Instance, gf3d_vgraphics.sdl_extension_names[i]);
-        }
-    }
-    else
-    {
-        slog("SDL / Vulkan not supported");
-        gf3d_vgraphics_close();
-        exit(0);
-        return;
-    }
+ 
+    get_instance_extensions();
+    
 	slog_sync();
-    // setup app info
-    gf3d_vgraphics.vk_app_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-    gf3d_vgraphics.vk_app_info.pNext = NULL;
-    gf3d_vgraphics.vk_app_info.pApplicationName = windowName;
-    gf3d_vgraphics.vk_app_info.applicationVersion = 0;
-    gf3d_vgraphics.vk_app_info.pEngineName = windowName;
-    gf3d_vgraphics.vk_app_info.engineVersion = 0;
-    gf3d_vgraphics.vk_app_info.apiVersion = VK_API_VERSION_1_2;
     
-    gf3d_vgraphics.vk_instance_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-	gf3d_vgraphics.vk_instance_info.pNext = NULL;
-    gf3d_vgraphics.vk_instance_info.pApplicationInfo = &gf3d_vgraphics.vk_app_info;
-    
-    if (enableValidation)
-    {
-        gf3d_vgraphics.enableValidationLayers = true;
-        gf3d_validation_init();
-        gf3d_vgraphics.vk_instance_info.enabledLayerCount = gf3d_validation_get_validation_layer_count();
-        gf3d_vgraphics.vk_instance_info.ppEnabledLayerNames = gf3d_validation_get_validation_layer_names();
-        gf3d_extensions_enable(ET_Instance,"VK_EXT_debug_utils");
-    }
-    else
-    {
-        //setup instance info
-        gf3d_vgraphics.vk_instance_info.enabledLayerCount = 0;
-        gf3d_vgraphics.vk_instance_info.ppEnabledLayerNames = NULL;
-    }
-    gf3d_vgraphics.vk_instance_info.ppEnabledExtensionNames = gf3d_extensions_get_instance_enabled_names(&enabledExtensionCount);
-    gf3d_vgraphics.vk_instance_info.enabledExtensionCount = enabledExtensionCount;
+    create_instance(windowName);
+    enable_validation(enableValidation);
+
 
 	slog_sync();
 
     // create instance
-    vkCreateInstance(&gf3d_vgraphics.vk_instance_info, NULL, &gf3d_vgraphics.vk_instance);
+    VkResult result = vkCreateInstance(&gf3d_vgraphics.vk_instance_info, NULL, &gf3d_vgraphics.vk_instance);
 
     if (!gf3d_vgraphics.vk_instance)
     {
         slog("failed to create a vulkan instance");
+        slog("Result = %d", result);
         gf3d_vgraphics_close();
         return;
     }
@@ -319,6 +345,7 @@ void gf3d_vgraphics_setup(
     {
         slog("failed to create logical device");
         gf3d_vgraphics_close();
+        slog_sync();
         return;
     }
     gf3d_vgraphics.logicalDeviceCreated = true;

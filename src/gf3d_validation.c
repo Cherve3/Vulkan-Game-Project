@@ -31,14 +31,22 @@ void gf3d_validation_query_layer_properties()
     gf3d_validation.availableLayers = (VkLayerProperties *)gfc_allocate_array(sizeof(VkLayerProperties),gf3d_validation.layerCount);
     vkEnumerateInstanceLayerProperties(&gf3d_validation.layerCount, gf3d_validation.availableLayers);
     
-    gf3d_validation.layerNames = (const char* * )gfc_allocate_array(sizeof(const char *),gf3d_validation.layerCount);
+    gf3d_validation.layerNames = (const char**)gfc_allocate_array(sizeof(const char*),gf3d_validation.layerCount);
+    gf3d_validation.layerCount = 0;
     for (i = 0; i < gf3d_validation.layerCount;i++)
     {
-        gf3d_validation.layerNames[i] = (const char *)gf3d_validation.availableLayers[i].layerName;
-        slog("Validation layer available: %s",gf3d_validation.availableLayers[i].layerName);
+        // This is checking to see if the layers include something related to Galaxy. I assume this means
+        // mobile phones since I have a samsung galaxy. These layers are not showing up as available and 
+        // crashing the engine. These layers are issues: VK_LAYER_Galaxy_Overlay, VK_LAYER_Galaxy_Overlay_VERBOSE,
+        // VK_LAYER_Galaxy_Overlay_DEBUG
+        if (strstr(gf3d_validation.availableLayers[i].layerName, "VK_LAYER_Galaxy") != NULL)
+        {
+            gf3d_validation.layerCount++;
+            gf3d_validation.layerNames[i] = (const char*)gf3d_validation.availableLayers[i].layerName;
+            slog("Validation layer available: %s", gf3d_validation.availableLayers[i].layerName);
+        }
     }
 }
-
 
 void gf3d_validation_close()
 {
