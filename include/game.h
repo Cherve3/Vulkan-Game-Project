@@ -7,8 +7,8 @@
 
 #include "simple_logger.h"
 #include "simple_json.h"
-#include "gfc_vector.h"
-#include "gfc_matrix.h"
+#include "vector.h"
+#include "matrix.h"
 #include "gfc_types.h"
 
 #include "gf3d_vgraphics.h"

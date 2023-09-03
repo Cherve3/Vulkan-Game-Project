@@ -42,7 +42,7 @@ Item rpg_item_new_weapon(char* name, Uint8 quantity);
 
 Item rpg_item_new_armor(char* name, Uint8 quantity);
 
-Item *rpg_item_new(ItemType type, char* name, Vector3D position);
+Item *rpg_item_new(ItemType type, char* name, Vector3 position);
 
 void rpg_item_entity_init(Uint32 maxItems);
 

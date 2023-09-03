@@ -1,13 +1,14 @@
-# Blender MTL File: 'chest.blend'
-# Material Count: 1
+# Blender 3.4.1 MTL File: 'chest.blend'
+# www.blender.org
 
-newmtl DefaultMaterial
-Ns 225.000000
+newmtl chest
 Ka 1.000000 1.000000 1.000000
-Kd 0.600000 0.600000 0.600000
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
-Ni 1.000000
-d 0.000000
-illum 9
-map_Kd C:\\Git\\Users\\rckal\\OneDrive\\Desktop\\School Stuff\\Vulkan-Game-Project\\images\\chest.png
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/basecolor.png
+map_Ns C:/roughness.png
+map_refl C:/metallic.png
+map_Bump -bm 1.000000 C:/normal.png

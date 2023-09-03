@@ -1,8 +1,8 @@
 #include <string.h>
 
 #include "simple_logger.h"
-#include "gfc_matrix.h"
-#include "gfc_vector.h"
+#include "vector.h"
+#include "matrix.h"
 
 #include "gf3d_vgraphics.h"
 #include "gf3d_camera.h"
@@ -18,19 +18,19 @@ void gf3d_camera_init()
 	camera.proj = gf3d_vgraphics_get_ubo_proj();
 	camera.model = gf3d_vgraphics_get_ubo_model();
 	camera.view = gf3d_vgraphics_get_ubo_view();
-	camera.position = vector3d(0, -10, 0);
-	camera.forward = vector3d(0, 0, 1);
-	camera.up = vector3d(0, 1, 0);
-	camera.rotation = vector3d(0, 0, 0);
-	camera.offset = vector3d(0, -10, -5);
+	camera.position = vector3d_create(0, -10, 0);
+	camera.forward = vector3d_create(0, 0, 1);
+	camera.up = vector3d_create(0, 1, 0);
+	camera.rotation = vector3d_create(0, 0, 0);
+	camera.offset = vector3d_create(0, -10, -5);
 	camera.speed = 0.5;
 	camera.zoom = 20;
 
-	vector3d_normalize(&camera.forward);
-	vector3d_normalize(&camera.up);
+	vector3d_normal(camera.forward);
+	vector3d_normal(camera.up);
 }
 
-void camera_update(Vector3D position, Vector3D rotate, const int x_rel, const int y_rel)
+void camera_update(Vector3 position, Vector3 rotate, const int x_rel, const int y_rel)
 {	//Take 1
 	//gfc_matrix_new_translation(camera.view, camera.position);
 	//gfc_matrix_rotate(camera.view, camera.view, -x_rel*GFC_DEGTORAD, camera.up);
@@ -84,51 +84,50 @@ void camera_update(Vector3D position, Vector3D rotate, const int x_rel, const in
 	float s = SDL_sinf(camera.yaw - 2.35619);
 	float c = SDL_cosf(camera.yaw - 2.35619);
 
-	Vector2D cpos;
+	Vector2 cpos;
 	cpos.x = ((-camera.zoom) * c) - ((-camera.zoom) * s);
 	cpos.y = ((-camera.zoom) * s) + ((-camera.zoom) * c);
 	
-	gfc_matrix_view(
-		camera.view,
-		vector3d(cpos.x + position.x, 15 + position.y, cpos.y + position.z),
-		vector3d(position.x,position.y,position.z),
-		vector3d(0, 1, 0));
+	matrix4d_look_at(
+		vector3d_create(cpos.x + position.x, 15 + position.y, cpos.y + position.z),
+		vector3d_create(position.x,position.y,position.z),
+		vector3d_create(0, 1, 0), 
+		camera.view);
 
 
 
 }
 
-Matrix4 *gf3d_get_camera()
+Matrix4D *gf3d_get_camera()
 {
 	return camera.view;
 }
 
-void gf3d_camera_look_at(Vector3D position, Vector3D target, Vector3D up)
+void gf3d_camera_look_at(Vector3 position, Vector3 target, Vector3 up)
 {
-	gfc_matrix_view(
-		camera.view,
+	matrix4d_look_at(
 		position,
 		target,
-		up
-		);
+		up,
+		camera.view);
 }
 
-Vector3D gf3d_camera_get_position()
+Vector3 gf3d_camera_get_position()
 {
 	return camera.position;
 }
 
-void gf3d_camera_set_position(Vector3D position)
+void gf3d_camera_set_position(Vector3 position)
 {
 	camera.position.x = position.x;
 	camera.position.y = position.y;
 	camera.position.z = position.z;
 }
 
-void gf3d_camera_move(Vector3D move)
+void gf3d_camera_move(Vector3 move)
 {
-	vector3d_add(camera.position, camera.position, move);
-	gfc_matrix_translate(camera.view, move);
+	vector3d_addition(camera.position, move, camera.position);
+	matrix4d_translate(move, camera.view);
 }
 
 /*eol@eof*/

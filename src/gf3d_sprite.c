@@ -11,14 +11,14 @@
 
 typedef struct
 {
-	Matrix4     model;          /**<how the sprite should be transformed each frame*/
-	Vector2D    frame_offset;   /**<where to sample the texture from this frame*/
+	Matrix4D     model;          /**<how the sprite should be transformed each frame*/
+	Vector2    frame_offset;   /**<where to sample the texture from this frame*/
 }SpriteUBO;
 
 typedef struct
 {
-	Vector2D vertex;
-	Vector2D texel;
+	Vector2 vertex;
+	Vector2 texel;
 }SpriteVertex;
 
 typedef struct
@@ -40,7 +40,7 @@ typedef struct
 
 }SpriteManager;
 
-void gf3d_sprite_update_basic_descriptor_set(Sprite *model, VkDescriptorSet descriptorSet, Uint32 chainIndex, Matrix4 modelMat, Uint32 frame);
+void gf3d_sprite_update_basic_descriptor_set(Sprite *model, VkDescriptorSet descriptorSet, Uint32 chainIndex, Matrix4D modelMat, Uint32 frame);
 void gf3d_sprite_create_uniform_buffer(Sprite *sprite);
 void gf3d_sprite_create_vertex_buffer(Sprite *sprite);
 void gf3d_sprite_delete(Sprite *sprite);
@@ -293,10 +293,10 @@ void gf3d_sprite_render(Sprite *sprite, VkCommandBuffer commandBuffer, VkDescrip
 }
 
 
-void gf3d_sprite_draw(Sprite *sprite, Vector2D position, Vector2D scale, Uint32 frame, Uint32 buffer_frame, VkCommandBuffer commandBuffer)
+void gf3d_sprite_draw(Sprite *sprite, Vector2 position, Vector2 scale, Uint32 frame, Uint32 buffer_frame, VkCommandBuffer commandBuffer)
 {
 	VkDescriptorSet *descriptorSet = NULL;
-	Matrix4 modelMat;
+	Matrix4D modelMat;
 	VkExtent2D extent = gf3d_vgraphics_get_view_extent();
 
 	if (!sprite)
@@ -320,7 +320,7 @@ void gf3d_sprite_draw(Sprite *sprite, Vector2D position, Vector2D scale, Uint32 
 	modelMat,
 	vector3d(position.x * 2 / (float)extent.width, position.y * 2 / (float)extent.height, 0));
 	*/
-	gfc_matrix_identity(modelMat);
+	matrix4d_identity(modelMat);
 
 	modelMat[0][0] = scale.x;
 	modelMat[1][1] = scale.y;
@@ -390,11 +390,11 @@ void gf3d_sprite_create_vertex_buffer(Sprite *sprite)
 	vkFreeMemory(device, stagingBufferMemory, NULL);
 }
 
-void gf3d_sprite_update_uniform_buffer(Sprite *sprite, uint32_t currentImage, Matrix4 modelMat, Uint32 frame)
+void gf3d_sprite_update_uniform_buffer(Sprite *sprite, uint32_t currentImage, Matrix4D modelMat, Uint32 frame)
 {
 	void* data;
 	SpriteUBO ubo;
-	gfc_matrix_copy(ubo.model, modelMat);
+	matrix4d_copy(modelMat, ubo.model);
 	ubo.frame_offset.x = (frame%sprite->framesPerLine * sprite->frameWidth) / (float)sprite->texture->width;
 	ubo.frame_offset.y = (frame / sprite->framesPerLine * sprite->frameHeight) / (float)sprite->texture->height;
 	vkMapMemory(gf3d_sprite.device, sprite->uniformBuffersMemory[currentImage], 0, sizeof(SpriteUBO), 0, &data);
@@ -404,7 +404,7 @@ void gf3d_sprite_update_uniform_buffer(Sprite *sprite, uint32_t currentImage, Ma
 	vkUnmapMemory(gf3d_sprite.device, sprite->uniformBuffersMemory[currentImage]);
 }
 
-void gf3d_sprite_update_basic_descriptor_set(Sprite *sprite, VkDescriptorSet descriptorSet, Uint32 chainIndex, Matrix4 modelMat, Uint32 frame)
+void gf3d_sprite_update_basic_descriptor_set(Sprite *sprite, VkDescriptorSet descriptorSet, Uint32 chainIndex, Matrix4D modelMat, Uint32 frame)
 {
 	VkDescriptorImageInfo imageInfo = { 0 };
 	VkWriteDescriptorSet descriptorWrite[2] = { 0 };

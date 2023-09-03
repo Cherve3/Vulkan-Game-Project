@@ -2,14 +2,14 @@
 #define __GF3D_MESH_H__
 
 #include <vulkan/vulkan.h>
-#include "gfc_vector.h"
+#include "vector.h"
 #include "gfc_text.h"
 
 typedef struct
 {
-    Vector3D vertex;
-    Vector3D normal;
-    Vector2D texel;
+    Vector3 vertex;
+    Vector3 normal;
+    Vector2 texel;
 }Vertex;
 
 typedef struct

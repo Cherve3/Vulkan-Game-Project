@@ -19,13 +19,16 @@ typedef struct
 
 static ModelManager gf3d_model = {0};
 
+char file_path[60];
+char* mpath = "D:/Git/Projects/Vulkan-Game-Project/";
+
 void gf3d_model_delete(Model *model);
 
 void gf3d_model_create_uniform_buffer(Model *model);
 void gf3d_model_create_descriptor_pool(Model *model);
 void gf3d_model_create_descriptor_sets(Model *model);
 void gf3d_model_create_descriptor_set_layout();
-void gf3d_model_update_uniform_buffer(Model *model,uint32_t currentImage,Matrix4 modelMat);
+void gf3d_model_update_uniform_buffer(Model *model,uint32_t currentImage,Matrix4D modelMat);
 VkDescriptorSetLayout * gf3d_model_get_descriptor_set_layout();
 
 void gf3d_model_manager_close()
@@ -101,6 +104,7 @@ Model * gf3d_model_load_animated(char * filename, Uint32 startFrame, Uint32 endF
 	for (i = 0; i < count; i++)
 	{
 		snprintf(assetname, GFCLINELEN, "models/%s_%06i.obj", filename, startFrame + i);
+        snprintf(file_path, sizeof(file_path), "%s%s", mpath, assetname);
 		slog("%s",assetname);
 		model->mesh[i] = gf3d_mesh_load(assetname);
 	}
@@ -117,10 +121,13 @@ Model * gf3d_model_load(char * filename)
     Model *model;
     model = gf3d_model_new();
     if (!model)return NULL;
+    
     snprintf(assetname,GFCLINELEN,"models/%s.obj",filename);
-    model->mesh = gf3d_mesh_load(assetname);
+    snprintf(file_path, sizeof(file_path), "%s%s", mpath, assetname);
+    model->mesh = gf3d_mesh_load(file_path);
 
     snprintf(assetname,GFCLINELEN,"images/%s.png",filename);
+    snprintf(file_path, sizeof(file_path), "%s%s", mpath, assetname);
     model->texture = gf3d_texture_load(assetname, NULL);
     
     return model;
@@ -154,7 +161,7 @@ void gf3d_model_delete(Model *model)
 	memset(model, 0, sizeof(Model));
 }
 
-void gf3d_model_draw(Model *model,Uint32 bufferFrame, VkCommandBuffer commandBuffer,Matrix4 modelMat)
+void gf3d_model_draw(Model *model,Uint32 bufferFrame, VkCommandBuffer commandBuffer,Matrix4D modelMat)
 {
     VkDescriptorSet *descriptorSet = NULL;
     if (!model)
@@ -172,7 +179,7 @@ void gf3d_model_draw(Model *model,Uint32 bufferFrame, VkCommandBuffer commandBuf
     gf3d_mesh_render(model->mesh,commandBuffer,descriptorSet);
 }
 
-void gf3d_model_draw_anim(Model *model, Uint32 bufferFrame, VkCommandBuffer commandBuffer, Matrix4 modelMat, Uint32 frame)
+void gf3d_model_draw_anim(Model *model, Uint32 bufferFrame, VkCommandBuffer commandBuffer, Matrix4D modelMat, Uint32 frame)
 {
 	VkDescriptorSet *descriptorSet = NULL;
 	if (!model)
@@ -196,7 +203,7 @@ void gf3d_model_draw_anim(Model *model, Uint32 bufferFrame, VkCommandBuffer comm
 
 }
 
-void gf3d_model_update_basic_model_descriptor_set(Model *model,VkDescriptorSet descriptorSet,Uint32 chainIndex,Matrix4 modelMat)
+void gf3d_model_update_basic_model_descriptor_set(Model *model,VkDescriptorSet descriptorSet,Uint32 chainIndex,Matrix4D modelMat)
 {
     VkDescriptorImageInfo imageInfo = {0};
     VkWriteDescriptorSet descriptorWrite[2] = {0};
@@ -220,7 +227,7 @@ void gf3d_model_update_basic_model_descriptor_set(Model *model,VkDescriptorSet d
     gf3d_model_update_uniform_buffer(model,chainIndex,modelMat);
     bufferInfo.buffer = model->uniformBuffers[chainIndex];
     bufferInfo.offset = 0;
-    bufferInfo.range = sizeof(UniformBufferObject);        
+    bufferInfo.range = sizeof(MVPMatrix);
     
     descriptorWrite[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
     descriptorWrite[0].dstSet = descriptorSet;
@@ -242,15 +249,15 @@ void gf3d_model_update_basic_model_descriptor_set(Model *model,VkDescriptorSet d
     vkUpdateDescriptorSets(gf3d_model.device, 2, descriptorWrite, 0, NULL);
 }
 
-void gf3d_model_update_uniform_buffer(Model *model,uint32_t currentImage,Matrix4 modelMat)
+void gf3d_model_update_uniform_buffer(Model *model,uint32_t currentImage,Matrix4D modelMat)
 {
     void* data;
-    UniformBufferObject ubo;
-    ubo = gf3d_vgraphics_get_uniform_buffer_object();
-    gfc_matrix_copy(ubo.model,modelMat);
-    vkMapMemory(gf3d_model.device, model->uniformBuffersMemory[currentImage], 0, sizeof(UniformBufferObject), 0, &data);
+    MVPMatrix mvp;
+    mvp = gf3d_vgraphics_get_uniform_buffer_object();
+    matrix4d_copy(modelMat, mvp.model);
+    vkMapMemory(gf3d_model.device, model->uniformBuffersMemory[currentImage], 0, sizeof(MVPMatrix), 0, &data);
     
-        memcpy(data, &ubo, sizeof(UniformBufferObject));
+        memcpy(data, &mvp, sizeof(MVPMatrix));
 
     vkUnmapMemory(gf3d_model.device, model->uniformBuffersMemory[currentImage]);
 }
@@ -260,7 +267,7 @@ void gf3d_model_create_uniform_buffer(Model *model)
 {
     int i;
     Uint32 buffercount = gf3d_model.chain_length;
-    VkDeviceSize bufferSize = sizeof(UniformBufferObject);
+    VkDeviceSize bufferSize = sizeof(MVPMatrix);
 
     model->uniformBuffers = (VkBuffer*)gfc_allocate_array(sizeof(VkBuffer),buffercount);
     model->uniformBuffersMemory = (VkDeviceMemory*)gfc_allocate_array(sizeof(VkDeviceMemory),buffercount);

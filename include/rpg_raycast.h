@@ -5,11 +5,11 @@
 
 typedef struct
 {
-	Vector3D origin;
-	Vector3D direction;
+	Vector3 origin;
+	Vector3 direction;
 	float maxDistance;
 }Raycast;
 
-Raycast *raycast(Vector3D origin, Vector3D direction, float maxDistance);
+Raycast *raycast(Vector3 origin, Vector3 direction, float maxDistance);
 
 #endif

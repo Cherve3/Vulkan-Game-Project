@@ -24,7 +24,7 @@
 
 #include "gfc_types.h"
 #include "gfc_vector.h"
-#include "gfc_matrix.h"
+#include "matrix.h"
 #include "gfc_text.h"
 
 #include "gf3d_texture.h"
@@ -68,8 +68,8 @@ Model * gf3d_model_new();
  * @param commandBuffer the command used to send this render request
  * @param modelMat the model matrix (MVP)
  */
-void gf3d_model_draw(Model *model,Uint32 bufferFrame,VkCommandBuffer commandBuffer,Matrix4 modelMat);
-void gf3d_model_draw_anim(Model *model, Uint32 bufferFrame, VkCommandBuffer commandBuffer, Matrix4 modelMat, Uint32 frame);
+void gf3d_model_draw(Model *model,Uint32 bufferFrame,VkCommandBuffer commandBuffer,Matrix4D modelMat);
+void gf3d_model_draw_anim(Model *model, Uint32 bufferFrame, VkCommandBuffer commandBuffer, Matrix4D modelMat, Uint32 frame);
 void gf3d_model_free(Model *model);
 
 /**
@@ -79,7 +79,7 @@ void gf3d_model_free(Model *model);
  * @param chainIndex the swap chain frame to do this for
  * @param modelMat the matrix to transform the model by
  */
-void gf3d_model_update_basic_model_descriptor_set(Model *model,VkDescriptorSet descriptorSet,Uint32 chainIndex,Matrix4 modelMat);
+void gf3d_model_update_basic_model_descriptor_set(Model *model,VkDescriptorSet descriptorSet,Uint32 chainIndex,Matrix4D modelMat);
 
 
 #endif

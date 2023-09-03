@@ -2,8 +2,8 @@
 #define __GF3D_VGRAPHICS_H__
 
 #include <vulkan/vulkan.h>
-#include "gfc_vector.h"
-#include "gfc_matrix.h"
+#include "matrix.h"
+#include "vector.h"
 
 #include "gf3d_pipeline.h"
 #include "gf3d_commands.h"
@@ -17,7 +17,7 @@ void gf3d_vgraphics_init(
     char *windowName,
     int renderWidth,
     int renderHeight,
-    Vector4D bgcolor,
+    Vector4 bgcolor,
     Bool fullscreen,
     Bool enableValidation
 );
@@ -48,13 +48,13 @@ void gf3d_vgraphics_rotate_y(float degrees);
 
 VkBuffer gf3d_vgraphics_get_uniform_buffer_by_index(Uint32 index);
 
-UniformBufferObject gf3d_vgraphics_get_uniform_buffer_object();
+MVPMatrix gf3d_vgraphics_get_uniform_buffer_object();
 
-Matrix4 *gf3d_vgraphics_get_ubo_view();
+Matrix4D *gf3d_vgraphics_get_ubo_view();
 
-Matrix4 *gf3d_vgraphics_get_ubo_model();
+Matrix4D *gf3d_vgraphics_get_ubo_model();
 
-Matrix4 *gf3d_vgraphics_get_ubo_proj();
+Matrix4D *gf3d_vgraphics_get_ubo_proj();
 
 SDL_Window *gf3d_vgraphics_get_window();
 

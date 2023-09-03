@@ -75,7 +75,7 @@ Chest *rpg_chest_new()
 
 			rpg_chests.chest_list[i].ent = gf3d_entity_new();
 			rpg_chests.chest_list[i].ent->model = gf3d_model_load("chest");
-			rpg_chests.chest_list[i].ent->position = vector3d(-15, 2.4, 0);
+			rpg_chests.chest_list[i].ent->position = vector3d_create(-15, 2.4, 0);
 			rpg_chests.chest_list[i].ent->type = INTERACT;
 			rpg_chests.chest_list[i].ent->name = "Chest";
 			rpg_chests.chest_list[i].ent->boxCollider.width  = 4;
@@ -86,7 +86,7 @@ Chest *rpg_chest_new()
 			rpg_chests.chest_list[i].ent->boxCollider.y = rpg_chests.chest_list[i].ent->position.y;
 			rpg_chests.chest_list[i].ent->boxCollider.z = rpg_chests.chest_list[i].ent->position.z;
 	
-			gfc_matrix_make_translation(rpg_chests.chest_list[i].ent->modelMatrix, rpg_chests.chest_list[i].ent->position);
+			matrix4d_translate(rpg_chests.chest_list[i].ent->position, rpg_chests.chest_list[i].ent->modelMatrix);
 
 			float lootSize = rand() % 10;
 			slog("LootSize: %f", lootSize);

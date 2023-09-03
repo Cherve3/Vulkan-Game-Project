@@ -11,8 +11,8 @@
 
 #include "simple_logger.h"
 #include "gfc_types.h"
-#include "gfc_vector.h"
-#include "gfc_matrix.h"
+#include "matrix.h"
+#include "vector.h"
 
 #include "gf3d_validation.h"
 #include "gf3d_extensions.h"
@@ -67,7 +67,7 @@ typedef struct vGraphics
     
     Command                    *graphicsCommandPool;
 
-    UniformBufferObject         ubo;
+    MVPMatrix                   mvp;
 }vGraphics;
 
 static vGraphics gf3d_vgraphics = {0};
@@ -106,26 +106,26 @@ void gf3d_vgraphics_init(
 {
     VkDevice device;
     
-    gfc_matrix_identity(gf3d_vgraphics.ubo.model);
-    gfc_matrix_identity(gf3d_vgraphics.ubo.view);
-    gfc_matrix_identity(gf3d_vgraphics.ubo.proj);
+    matrix4d_identity(gf3d_vgraphics.mvp.model);
+    matrix4d_identity(gf3d_vgraphics.mvp.view);
+    matrix4d_identity(gf3d_vgraphics.mvp.proj);
 
-	gfc_matrix_view(
-		gf3d_vgraphics.ubo.view, 
-		vector3d(0, -10, 5), 
-		vector3d(0, 0, 0), 
-        vector3d(0, 0, 1)
-		);
+	matrix4d_look_at(
+        vector3d_create(0, -10, 5),
+        vector3d_create(0, 0, 0),
+        vector3d_create(0, 0, 1),
+        gf3d_vgraphics.mvp.view);
 
-    gfc_matrix_perspective(
-        gf3d_vgraphics.ubo.proj,
-        70 * GFC_DEGTORAD,
-        renderWidth/(float)renderHeight,
+    matrix4d_perspective(
+        renderWidth,
+        renderHeight,
+        120 * GFC_DEGTORAD,
+        2000,
         0.1f,
-        2000
+        gf3d_vgraphics.mvp.proj
     );
     
-    gf3d_vgraphics.ubo.proj[1][1] *= -1;
+    //gf3d_vgraphics.mvp.proj[1][1] *= -1;
 	
 
     gf3d_vgraphics_setup(
@@ -242,7 +242,7 @@ void gf3d_vgraphics_setup(
     Uint32 flags = SDL_WINDOW_VULKAN;
     VkDeviceCreateInfo createInfo = {0};
     
-    if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
+    if (SDL_Init(SDL_INIT_EVERYTHING | SDL_INIT_NOPARACHUTE) != 0)
     {
         slog("Unable to initilaize SDL system: %s",SDL_GetError());
         return;
@@ -699,31 +699,25 @@ uint32_t gf3d_vgraphics_find_memory_type(uint32_t typeFilter, VkMemoryPropertyFl
 
 void gf3d_vgraphics_rotate_z(float degrees)
 {
-    gfc_matrix_rotate(
-        gf3d_vgraphics.ubo.view,
-        gf3d_vgraphics.ubo.view,
+    matrix4d_rotate_zaxis(
         degrees,
-        vector3d(0,0,1));
+        gf3d_vgraphics.mvp.view);
 
 }
 
 void gf3d_vgraphics_rotate_x(float degrees)
 {
-	gfc_matrix_rotate(
-		gf3d_vgraphics.ubo.view,
-		gf3d_vgraphics.ubo.view,
+	matrix4d_rotate_xaxis(
 		degrees,
-		vector3d(1, 0, 0));
+		gf3d_vgraphics.mvp.view);
 
 }
 
 void gf3d_vgraphics_rotate_y(float degrees)
 {
-	gfc_matrix_rotate(
-		gf3d_vgraphics.ubo.view,
-		gf3d_vgraphics.ubo.view,
+	matrix4d_rotate_yaxis(
 		degrees,
-		vector3d(0, 1, 0));
+		gf3d_vgraphics.mvp.view);
 
 }
 
@@ -743,24 +737,24 @@ Command *gf3d_vgraphics_get_graphics_command_pool()
     return gf3d_vgraphics.graphicsCommandPool;
 }
 
-UniformBufferObject gf3d_vgraphics_get_uniform_buffer_object()
+MVPMatrix gf3d_vgraphics_get_uniform_buffer_object()
 {
-    return gf3d_vgraphics.ubo;
+    return gf3d_vgraphics.mvp;
 }
 
-Matrix4 *gf3d_vgraphics_get_ubo_view()
+Matrix4D *gf3d_vgraphics_get_ubo_view()
 {
-	return gf3d_vgraphics.ubo.view;
+	return gf3d_vgraphics.mvp.view;
 }
 
-Matrix4 *gf3d_vgraphics_get_ubo_model()
+Matrix4D *gf3d_vgraphics_get_ubo_model()
 {
-	return gf3d_vgraphics.ubo.model;
+	return gf3d_vgraphics.mvp.model;
 }
 
-Matrix4 *gf3d_vgraphics_get_ubo_proj()
+Matrix4D *gf3d_vgraphics_get_ubo_proj()
 {
-	return gf3d_vgraphics.ubo.proj;
+	return gf3d_vgraphics.mvp.proj;
 }
 
 SDL_Window *gf3d_vgraphics_get_window()

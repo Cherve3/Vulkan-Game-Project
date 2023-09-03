@@ -2,7 +2,7 @@
 #define __GF3D_ENTITY_H__
 
 #include "gfc_types.h"
-#include "gfc_matrix.h"
+#include "matrix.h"
 
 #include "gf3d_model.h"
 
@@ -31,15 +31,15 @@ typedef struct Entity_S
 	struct Entity_S   *parent;
 	EntityType	type;
 
-	Vector3D	position;
-	Vector3D	rotation;
-	Vector3D	direction;
-	Vector3D	velocity;
-	float		rotate;
-	Vector2D	forward;
+	Vector3	position;
+	Vector3	rotation;
+	Vector3	direction;
+	Vector3	velocity;
+	float	rotate;
+	Vector2	forward;
 
 	Model		*model;
-	Matrix4		modelMatrix;
+	Matrix4D	modelMatrix;
 	BoxCollider boxCollider;
 
 	Bool		animated;

@@ -5,6 +5,9 @@
 #include "rpg_npc.h"
 #include "rpg_quest.h"
 
+char file_path[60];
+char* npath = "D:/Git/Projects/Vulkan-Game-Project/";
+
 static NPC *npc = NULL;
 static int count = 0;
 
@@ -47,7 +50,8 @@ void rpg_npc_init(){
 	npc = gfc_allocate_array(sizeof(NPC), 10);
 
 	// Load npc json file
-	npc_info		= sj_load("json/npc.json");
+	snprintf(file_path, sizeof(file_path), "%s%s", npath, "json/npc.json");
+	npc_info		= sj_load(file_path);
 	itemshop_info	= sj_object_get_value(npc_info, "ItemShop");
 	weaponshop_info = sj_object_get_value(npc_info, "WeaponShop");
 	armorshop_info	= sj_object_get_value(npc_info, "ArmorShop");
@@ -64,7 +68,7 @@ void rpg_npc_init(){
 	slog("NPC's Initialized");
 }
 
-void rpg_npc_spawn(NPCType type, Vector3D position)
+void rpg_npc_spawn(NPCType type, Vector3 position)
 {
 
 	npc[count].ent = rpg_npc_new();
@@ -80,8 +84,8 @@ void rpg_npc_spawn(NPCType type, Vector3D position)
 	npc[count].ent->type = NONPLAYER;
 
 	npc[count].ent->position = position;
-	npc[count].ent->velocity = vector3d(0, 0, 0);
-	npc[count].ent->rotation = vector3d(0,0,0);
+	npc[count].ent->velocity = vector3d_create(0, 0, 0);
+	npc[count].ent->rotation = vector3d_create(0,0,0);
 
 	npc[count].ent->interact = rpg_npc_interact;
 
@@ -92,7 +96,7 @@ void rpg_npc_spawn(NPCType type, Vector3D position)
 	npc[count].ent->boxCollider.y = npc[count].ent->position.y;
 	npc[count].ent->boxCollider.z = npc[count].ent->position.z;
 
-	gfc_matrix_make_translation(npc[count].ent->modelMatrix, npc[count].ent->position);
+	matrix4d_translate(npc[count].ent->position, npc[count].ent->modelMatrix);
 
 	switch (type)
 	{

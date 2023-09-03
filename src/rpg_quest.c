@@ -19,6 +19,9 @@ static QuestManager quests = { 0 };
 
 static SJson* quest_info;
 
+char file_path[60];
+char* qpath = "D:/Git/Projects/Vulkan-Game-Project/";
+
 void rpg_quest_close()
 {
 	int i;
@@ -37,7 +40,8 @@ void rpg_quest_close()
 void rpg_quest_init()
 {
 	quest_info = NULL;
-	quest_info = sj_load("json/quest.json");
+	snprintf(file_path, sizeof(file_path), "%s%s", qpath, "json/quest.json");
+	quest_info = sj_load(file_path);
 	if (!quest_info)
 		slog("Quest info json is null");
 
@@ -56,7 +60,7 @@ void rpg_quest_init()
 		return;
 	}
 	atexit(rpg_quest_close);
-	slog("Entity System Initialized");
+	slog("Quest System Initialized");
 }
 
 void rpg_main_quests_init()
@@ -111,6 +115,7 @@ void rpg_main_quests_init()
 
 	sj_get_integer_value(sj_object_get_value(quest_5, "bits"), &quests.quest_list[4].bits);
 	sj_get_integer_value(sj_object_get_value(quest_5, "exp"), &quests.quest_list[4].exp);
+	slog("Main Quest Initialized");
 }
 
 Quest rpg_start_quest(int quest_number)
@@ -120,11 +125,11 @@ Quest rpg_start_quest(int quest_number)
 		slog("Quest 1 started");
 		quests.current_quest = 1;
 		quests.item_spawn_list = gfc_allocate_array(sizeof(Item), 5);
-		quests.item_spawn_list[0] = rpg_item_new(material, "Wood Log", vector3d(-5, 2, 20));
-		quests.item_spawn_list[1] = rpg_item_new(material, "Wood Log", vector3d(-5, 2, 22.5));
-		quests.item_spawn_list[2] = rpg_item_new(material, "Wood Log", vector3d(-5, 2, 24.5));
-		quests.item_spawn_list[3] = rpg_item_new(material, "Wood Log", vector3d(-5, 4, 21.5));
-		quests.item_spawn_list[4] = rpg_item_new(material, "Wood Log", vector3d(-5, 4, 23.5));
+		quests.item_spawn_list[0] = rpg_item_new(material, "Wood Log", vector3d_create(-5, 2, 20));
+		quests.item_spawn_list[1] = rpg_item_new(material, "Wood Log", vector3d_create(-5, 2, 22.5));
+		quests.item_spawn_list[2] = rpg_item_new(material, "Wood Log", vector3d_create(-5, 2, 24.5));
+		quests.item_spawn_list[3] = rpg_item_new(material, "Wood Log", vector3d_create(-5, 4, 21.5));
+		quests.item_spawn_list[4] = rpg_item_new(material, "Wood Log", vector3d_create(-5, 4, 23.5));
 
 		return quests.quest_list[0];
 	}
@@ -133,11 +138,11 @@ Quest rpg_start_quest(int quest_number)
 	{
 		slog("Quest 2 started");
 		quests.current_quest = 2;
-		rpg_goblin_spawn(GoblinGrunt, vector3d(-200, 5, -205));
-		rpg_goblin_spawn(GoblinGrunt, vector3d(-200, 5, -210));
-		rpg_goblin_spawn(GoblinGrunt, vector3d(-200, 5, -215));
-		rpg_goblin_spawn(GoblinGrunt, vector3d(-210, 5, -225));
-		rpg_goblin_spawn(GoblinGrunt, vector3d(-210, 5, -205));
+		rpg_goblin_spawn(GoblinGrunt, vector3d_create(-200, 5, -205));
+		rpg_goblin_spawn(GoblinGrunt, vector3d_create(-200, 5, -210));
+		rpg_goblin_spawn(GoblinGrunt, vector3d_create(-200, 5, -215));
+		rpg_goblin_spawn(GoblinGrunt, vector3d_create(-210, 5, -225));
+		rpg_goblin_spawn(GoblinGrunt, vector3d_create(-210, 5, -205));
 
 		return quests.quest_list[1];
 	}

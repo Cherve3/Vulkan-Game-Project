@@ -12,9 +12,11 @@
 #include "rpg_projectile.h"
 #include "rpg_levelup.h"
 
+char file_path[60];
+char* ppath = "D:/Git/Projects/Vulkan-Game-Project/";
 
 static Player *player = { 0 };
-Matrix4 *camera = { 0 };
+Matrix4D *camera = { 0 };
 
 Uint32 timer;
 Uint32 old_time;
@@ -63,7 +65,8 @@ void rpg_player_init(char* model){
 
 	total_movement = 0;
 	// Load player json file
-	player_info = sj_load("json/player.json");
+	snprintf(file_path, sizeof(file_path), "%s%s", ppath, "json/player.json");
+	player_info = sj_load(file_path);
 
 	if (!player_info)
 		slog("Failed to load player json data %s", sj_get_error());
@@ -75,22 +78,22 @@ void rpg_player_init(char* model){
 	 */
 	if (strcmp(model, "Player") == 0)
 	{
-		player->ent->model = gf3d_model_load_animated("player", 1, 20);//gf3d_model_load("player"); //
+		player->ent->model = gf3d_model_load_animated(model, 1, 20);//gf3d_model_load("player"); //
 		player->ent->animated = true;
 	}
 	else
 	{
-		player->ent->model = gf3d_model_load("player2");
+		player->ent->model = gf3d_model_load(model);
 		player->ent->animated = false;
 	}
 	player->ent->think = rpg_player_think;
 	player->ent->update = rpg_player_update;
 	player->ent->type = PLAYER;
 	player->ent->name = "Player";
-	player->ent->position = vector3d(0, 8, -10);
-	player->ent->velocity = vector3d(0, 0, 0);
-	player->ent->rotation = vector3d(0, 0, 0);
-	player->ent->direction = vector3d(0, 0, 1);
+	player->ent->position = vector3d_create(0, 8, -10);
+	player->ent->velocity = vector3d_create(0, 0, 0);
+	player->ent->rotation = vector3d_create(0, 0, 0);
+	player->ent->direction = vector3d_create(0, 0, 1);
 
 	player->ent->boxCollider.width = 3.0;
 	player->ent->boxCollider.height = 8.5;
@@ -187,7 +190,7 @@ void rpg_player_bag_free(Item *bag)
 void rpg_player_update(Entity *self)
 {
 	
-	if (vector3d_magnitude(self->velocity) > 0.001)
+	if (vector3d_length(self->velocity) > 0.001)
 	{
 		self->velocity.y += GRAVITY;
 		vector3d_scale(self->velocity, self->velocity, 0.4);
@@ -311,8 +314,9 @@ void rpg_player_move(Entity *self){
 	SDL_GetRelativeMouseState(&x_rel, &y_rel);
 
 	//Move model to position
-	gfc_matrix_make_translation(self->modelMatrix, self->position);
-	gfc_matrix_rotate(self->modelMatrix, self->modelMatrix, -self->rotate, vector3d(0, 0, 1));
+	matrix4d_translate(self->position, self->modelMatrix);
+	matrix4d_rotate_arbitrary(-self->rotate, vector3d_create(0, 0, 1), self->modelMatrix);
+	//matrix4d_rotate(self->modelMatrix, self->modelMatrix, -self->rotate, vector3d(0, 0, 1));
 
 	self->rotate += x_rel * GFC_DEGTORAD;
 
@@ -413,7 +417,7 @@ void rpg_player_move(Entity *self){
 	else
 		player->state.crouched = false;
 
-	camera_update(self->position, vector3d(0, x_rel, self->rotate), x_rel, y_rel);
+	camera_update(self->position, vector3d_create(0, x_rel, self->rotate), x_rel, y_rel);
 }
 
 rpg_player_input(Entity *self)

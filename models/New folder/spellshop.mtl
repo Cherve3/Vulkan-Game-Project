@@ -1,0 +1,28 @@
+# Blender MTL File: 'spellshop.blend'
+# Material Count: 2
+
+newmtl Arissa_MAT.002
+Ns 387.692326
+Ka 1.000000 1.000000 1.000000
+Kd 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump C:\\home\\app\\mixamo-mini\\tmp\\skins_f5f70f11-7784-4808-b21a-cde584c3532f.fbm\\Arissa_NM_normal.png
+map_Kd C:\\home\\app\\mixamo-mini\\tmp\\skins_f5f70f11-7784-4808-b21a-cde584c3532f.fbm\\Arissa_DIFF_diffuse.png
+map_Ks C:\\home\\app\\mixamo-mini\\tmp\\skins_f5f70f11-7784-4808-b21a-cde584c3532f.fbm\\Arissa_SPEC_specular.png
+
+newmtl Arissa_MAT.003
+Ns 387.692326
+Ka 1.000000 1.000000 1.000000
+Kd 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump C:\\home\\app\\mixamo-mini\\tmp\\skins_f5f70f11-7784-4808-b21a-cde584c3532f.fbm\\Arissa_NM_normal.png
+map_Kd C:\\home\\app\\mixamo-mini\\tmp\\skins_f5f70f11-7784-4808-b21a-cde584c3532f.fbm\\Arissa_DIFF_diffuse.png
+map_Ks C:\\home\\app\\mixamo-mini\\tmp\\skins_f5f70f11-7784-4808-b21a-cde584c3532f.fbm\\Arissa_SPEC_specular.png

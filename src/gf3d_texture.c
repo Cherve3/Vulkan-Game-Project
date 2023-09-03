@@ -14,6 +14,9 @@ typedef struct
 
 static TextureManager gf3d_texture = { 0 };
 
+char file_path[60];
+char* tpath = "D:/Git/Projects/Vulkan-Game-Project/";
+
 void gf3d_texture_close();
 void gf3d_texture_delete(Texture *tex);
 void gf3d_texture_delete_all();
@@ -119,7 +122,8 @@ Texture *gf3d_texture_get_by_filename(char * filename)
 	for (i = 0; i < gf3d_texture.max_textures; i++)
 	{
 		if (!gf3d_texture.texture_list[i]._inuse)continue;
-		if (gfc_line_cmp(gf3d_texture.texture_list[i].filename, filename) == 0)
+		snprintf(file_path, sizeof(file_path), "%s%s", tpath, filename);
+		if (gfc_line_cmp(gf3d_texture.texture_list[i].filename, file_path) == 0)
 		{
 			return &gf3d_texture.texture_list[i];
 		}
@@ -223,8 +227,12 @@ Texture *gf3d_texture_load(char *filename, SDL_Surface *surf)
 		//slog("Surface = surf");
 		surface = surf;
 	}
-	else
-		surface = IMG_Load(filename);
+	else 
+	{
+		snprintf(file_path, sizeof(file_path), "%s%s", tpath, filename);
+		surface = IMG_Load(file_path);
+	}
+		
 	
 	if (!surface)
 	{

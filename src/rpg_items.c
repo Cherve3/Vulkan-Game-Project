@@ -17,6 +17,9 @@ typedef struct
 
 static ItemManager items = { 0 };
 
+char file_path[60];
+char* ipath = "D:/Git/Projects/Vulkan-Game-Project/";
+
 static SJson *item_info			= NULL;
 static SJson *consumable_info	= NULL;
 static SJson *material_info		= NULL;
@@ -61,13 +64,20 @@ void rpg_item_entity_init(Uint32 maxItems)
 	items.item_list = gfc_allocate_array(sizeof(Item), maxItems);
 	if (!items.item_list){slog("failed to allocate item list");return;}
 
-	item_info		= sj_load("json/items.json");
+	snprintf(file_path, sizeof(file_path), "%s%s", ipath, "json/items.json");
+
+	item_info		= sj_load(file_path);
 	consumable_info = sj_object_get_value(item_info, "Consumable");
 	material_info	= sj_object_get_value(item_info, "Material");
-	armors			= sj_load("json/armor.json");
+
+	snprintf(file_path, sizeof(file_path), "%s%s", ipath, "json/armor.json");
+	armors			= sj_load(file_path);
 	armor_info = sj_object_get_value(armors, "Armor");
-	weapons			= sj_load("json/weapons.json");
+
+	snprintf(file_path, sizeof(file_path), "%s%s", ipath, "json/weapons.json");
+	weapons			= sj_load(file_path);
 	weapon_info = sj_object_get_value(weapons, "Weapons");
+
 
 	if (!item_info){ slog("failed to load item info"); return; }
 	if (!consumable_info){ slog("failed to load consumable info"); return; }
@@ -312,7 +322,7 @@ Item rpg_item_create(Item item, ItemType type, char *name)
 	}
 }
 
-Item *rpg_item_new(ItemType type, char* name, Vector3D position)
+Item *rpg_item_new(ItemType type, char* name, Vector3 position)
 {
 	int i;
 	for (i = 0; i < items.item_count; i++)
@@ -325,8 +335,8 @@ Item *rpg_item_new(ItemType type, char* name, Vector3D position)
 			items.item_list[i].ent = gf3d_entity_new();
 			items.item_list[i].ent->model = gf3d_model_load(name);
 			items.item_list[i].ent->position = position;
-			gfc_matrix_scale(items.item_list[i].ent->modelMatrix, vector3d(2,2,2), items.item_list[i].ent->modelMatrix);
-			gfc_matrix_translate(items.item_list[i].ent->modelMatrix,position);
+			matrix4d_scale(2, items.item_list[i].ent->modelMatrix);
+			matrix4d_translate(position, items.item_list[i].ent->modelMatrix);
 			items.item_list[i].ent->type = ITEM;
 			items.item_list[i].ent->name = name;
 			items.item_list[i].ent->boxCollider.width = 2;

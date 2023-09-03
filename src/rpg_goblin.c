@@ -6,6 +6,9 @@
 #include "rpg_npc.h"
 #include "rpg_projectile.h"
 
+char file_path[60];
+char* gpath = "D:/Git/Projects/Vulkan-Game-Project/";
+
 static NPC *goblin = NULL;
 static int count = 0;
 
@@ -35,7 +38,8 @@ void rpg_goblin_init(){
 	goblin = (NPC *)gfc_allocate_array(sizeof(NPC), 10);
 
 	// Load goblin json file
-	goblin_info = sj_load("json/goblin.json");
+	snprintf(file_path, sizeof(file_path), "%s%s", gpath, "json/goblin.json");
+	goblin_info = sj_load(file_path);
 	grunt_info = sj_object_get_value(goblin_info, "GoblinGrunt");
 	heavy_info = sj_object_get_value(goblin_info, "GoblinHeavy");
 	archer_info = sj_object_get_value(goblin_info, "GoblinArcher");
@@ -50,7 +54,7 @@ void rpg_goblin_init(){
 	atexit(goblin_close);
 }
 
-void rpg_goblin_spawn(GoblinType type, Vector3D position)
+void rpg_goblin_spawn(GoblinType type, Vector3 position)
 {
 
 	slog("Goblin Count: %i", count);
@@ -68,8 +72,8 @@ void rpg_goblin_spawn(GoblinType type, Vector3D position)
 	goblin[count].ent->type					= MONSTER;
 
 	goblin[count].ent->position				= position;
-	goblin[count].ent->velocity				= vector3d(0, 0, 0);
-	goblin[count].ent->rotation				= vector3d(0, 0, 0);
+	goblin[count].ent->velocity				= vector3d_create(0, 0, 0);
+	goblin[count].ent->rotation				= vector3d_create(0, 0, 0);
 
 	goblin[count].ent->boxCollider.width	= 2.0;
 	goblin[count].ent->boxCollider.height	= 10.0;
@@ -187,9 +191,9 @@ void rpg_goblin_think(Entity *self){
 
 void rpg_goblin_move(Entity *self){
 
-	self->velocity = vector3d(gfc_crandom()*0.8, 0, gfc_crandom()*0.8);
+	self->velocity = vector3d_create(gfc_crandom()*0.8, 0, gfc_crandom()*0.8);
 	vector3d_add(self->position,self->position, self->velocity);
-	gfc_matrix_make_translation(self->modelMatrix,self->position);
+	matrix4d_translate(self->position, self->modelMatrix);
 	self->boxCollider.x = self->position.x;
 	self->boxCollider.y = self->position.y;
 	self->boxCollider.z = self->position.z;

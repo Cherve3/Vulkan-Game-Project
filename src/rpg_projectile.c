@@ -74,7 +74,7 @@ void rpg_fireball_spawn(Entity *player)
 			rpg_projectiles.projectile_list[i].ent->type = PROJECTILE;
 
 			rpg_projectiles.projectile_list[i].ent->position = 
-				vector3d(player->position.x, player->position.y +2, player->position.z);
+				vector3d_create(player->position.x, player->position.y +2, player->position.z);
 
 			rpg_projectiles.projectile_list[i].ent->data = (void*)&rpg_projectiles.projectile_list[i];
 			rpg_projectiles.projectile_list[i].ent->name = "Fireball";
@@ -91,9 +91,9 @@ void rpg_fireball_spawn(Entity *player)
 			timer = SDL_GetTicks();
 			rpg_projectiles.projectile_list[i].cd_lifetime.old_time = timer;
 
-			gfc_matrix_make_translation(
-				rpg_projectiles.projectile_list[i].ent->modelMatrix, 
-				rpg_projectiles.projectile_list[i].ent->position);
+			matrix4d_translate(
+				rpg_projectiles.projectile_list[i].ent->position, 
+				rpg_projectiles.projectile_list[i].ent->modelMatrix);
 
 			return &rpg_projectiles.projectile_list[i];
 		}
@@ -147,7 +147,7 @@ void rpg_fireball_think(Entity *self)
 		pro->_inuse = 0;
 		rpg_fireball_despawn(self);
 	}
-	self->velocity = vector3d(x, 0, z);
+	self->velocity = vector3d_create(x, 0, z);
 
 
 	if (timer > pro->cd_lifetime.old_time + 10000)
@@ -162,6 +162,6 @@ void rpg_fireball_update(Entity *self)
 	if (!self)return;
 	vector3d_scale(self->velocity, self->velocity, 0.7);
 	vector3d_add(self->position, self->position, self->velocity);
-	gfc_matrix_make_translation(self->modelMatrix,self->position);
+	matrix4d_translate(self->position, self->modelMatrix);
 	
 }

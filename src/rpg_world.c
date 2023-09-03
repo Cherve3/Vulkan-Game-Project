@@ -9,11 +9,15 @@ static SJson *water_info = NULL;
 static SJson *building_info = NULL;
 static SJson *tree_info = NULL;
 
+char file_path[60];
+char* path = "D:/Git/Projects/Vulkan-Game-Project/";
+
 void rpg_world_init()
 {
 	slog("Initializing world");
 
-	world_info = sj_load("json/world.json");
+	snprintf(file_path, sizeof(file_path), "%s%s", path, "json/world.json");
+	world_info = sj_load(file_path);
 	if (!world_info)
 	{
 		slog("World json not loaded");
@@ -45,25 +49,25 @@ void rpg_world_init()
 		exit(0);
 	}
 
-	world.ground = gf3d_entity_new();
-	if (world.ground)
+	world.terrain = gf3d_entity_new();
+	if (world.terrain)
 	{
-		world.ground->model = gf3d_model_load( sj_get_string_value(sj_object_get_value(ground_info, "model")));
-		world.ground->name = "World";//sj_get_string_value(sj_object_get_value(ground_info, "name"));
+		world.terrain->model = gf3d_model_load( sj_get_string_value(sj_object_get_value(ground_info, "model")));
+		world.terrain->name = "World";//sj_get_string_value(sj_object_get_value(ground_info, "name"));
 
-		sj_get_float_value(sj_array_get_nth(sj_object_get_value(ground_info, "position"), 0), &world.ground->position.x);
-		sj_get_float_value(sj_array_get_nth(sj_object_get_value(ground_info, "position"), 1), &world.ground->position.y);
-		sj_get_float_value(sj_array_get_nth(sj_object_get_value(ground_info, "position"), 2), &world.ground->position.z);
+		sj_get_float_value(sj_array_get_nth(sj_object_get_value(ground_info, "position"), 0), &world.terrain->position.x);
+		sj_get_float_value(sj_array_get_nth(sj_object_get_value(ground_info, "position"), 1), &world.terrain->position.y);
+		sj_get_float_value(sj_array_get_nth(sj_object_get_value(ground_info, "position"), 2), &world.terrain->position.z);
 		
-		sj_get_integer_value(sj_object_get_value(ground_info, "type"), &world.ground->type);
+		sj_get_integer_value(sj_object_get_value(ground_info, "type"), &world.terrain->type);
 
-		gfc_matrix_make_translation(world.ground->modelMatrix, world.ground->position);
-		world.ground->boxCollider.depth = 1000.0;
-		world.ground->boxCollider.height = 0;
-		world.ground->boxCollider.width = 1000.0;
-		world.ground->boxCollider.x = world.ground->position.x;
-		world.ground->boxCollider.y = world.ground->position.y;
-		world.ground->boxCollider.z = world.ground->position.z;
+		matrix4d_translate(world.terrain->position, world.terrain->modelMatrix);
+		world.terrain->boxCollider.depth = 1000.0;
+		world.terrain->boxCollider.height = 0;
+		world.terrain->boxCollider.width = 1000.0;
+		world.terrain->boxCollider.x = world.terrain->position.x;
+		world.terrain->boxCollider.y = world.terrain->position.y;
+		world.terrain->boxCollider.z = world.terrain->position.z;
 	}
 	else
 	{
@@ -104,7 +108,7 @@ int water_init()
 		sj_get_float_value(sj_array_get_nth(sj_object_get_value(water_info, "position"), 2), &world.water->position.z);
 
 		sj_get_integer_value(sj_object_get_value(water_info, "type"), &world.water->type);
-		gfc_matrix_make_translation(world.water->modelMatrix, world.water->position);
+		matrix4d_translate(world.water->position, world.water->modelMatrix);
 		return 1;
 	}
 
@@ -131,7 +135,7 @@ int buildings_init(Uint32 building_count)
 		world.buildings[0]->boxCollider.width = 26;
 		world.buildings[0]->boxCollider.height = 26;
 		world.buildings[0]->boxCollider.depth = 26;
-		gfc_matrix_make_translation(world.buildings[0]->modelMatrix, world.buildings[0]->position);
+		matrix4d_translate(world.buildings[0]->position, world.buildings[0]->modelMatrix);
 	}
 
 	world.buildings[1] = gf3d_entity_new();
@@ -150,46 +154,46 @@ int buildings_init(Uint32 building_count)
 		world.buildings[1]->boxCollider.width = 25;
 		world.buildings[1]->boxCollider.height = 25;
 		world.buildings[1]->boxCollider.depth = 25;
-		gfc_matrix_make_translation(world.buildings[1]->modelMatrix, world.buildings[1]->position);
+		matrix4d_translate(world.buildings[1]->position, world.buildings[1]->modelMatrix);
 	}
 
-	world.buildings[2] = gf3d_entity_new();
-	if (world.buildings[2])
-	{
-		SJson *house3 = sj_object_get_value(building_info, "house3");
-		world.buildings[2]->model = gf3d_model_load(sj_get_string_value(sj_object_get_value(house3, "model")));
-		world.buildings[2]->name = sj_get_string_value(sj_object_get_value(house3, "name"));;
-		sj_get_integer_value(sj_object_get_value(house3, "type"), &world.buildings[2]->type);
-		sj_get_float_value(sj_array_get_nth(sj_object_get_value(house3, "position"), 0), &world.buildings[2]->position.x);
-		sj_get_float_value(sj_array_get_nth(sj_object_get_value(house3, "position"), 1), &world.buildings[2]->position.y);
-		sj_get_float_value(sj_array_get_nth(sj_object_get_value(house3, "position"), 2), &world.buildings[2]->position.z);
-		world.buildings[2]->boxCollider.x = world.buildings[2]->position.x;
-		world.buildings[2]->boxCollider.y = world.buildings[2]->position.y;
-		world.buildings[2]->boxCollider.z = world.buildings[2]->position.z;
-		world.buildings[2]->boxCollider.width = 25;
-		world.buildings[2]->boxCollider.height = 25;
-		world.buildings[2]->boxCollider.depth = 25;
-		gfc_matrix_make_translation(world.buildings[2]->modelMatrix, world.buildings[2]->position);
-	}
+	//world.buildings[2] = gf3d_entity_new();
+	//if (world.buildings[2])
+	//{
+	//	SJson *house3 = sj_object_get_value(building_info, "house3");
+	//	world.buildings[2]->model = gf3d_model_load(sj_get_string_value(sj_object_get_value(house3, "model")));
+	//	world.buildings[2]->name = sj_get_string_value(sj_object_get_value(house3, "name"));;
+	//	sj_get_integer_value(sj_object_get_value(house3, "type"), &world.buildings[2]->type);
+	//	sj_get_float_value(sj_array_get_nth(sj_object_get_value(house3, "position"), 0), &world.buildings[2]->position.x);
+	//	sj_get_float_value(sj_array_get_nth(sj_object_get_value(house3, "position"), 1), &world.buildings[2]->position.y);
+	//	sj_get_float_value(sj_array_get_nth(sj_object_get_value(house3, "position"), 2), &world.buildings[2]->position.z);
+	//	world.buildings[2]->boxCollider.x = world.buildings[2]->position.x;
+	//	world.buildings[2]->boxCollider.y = world.buildings[2]->position.y;
+	//	world.buildings[2]->boxCollider.z = world.buildings[2]->position.z;
+	//	world.buildings[2]->boxCollider.width = 25;
+	//	world.buildings[2]->boxCollider.height = 25;
+	//	world.buildings[2]->boxCollider.depth = 25;
+	//	matrix4d_translate(world.buildings[2]->position, world.buildings[2]->modelMatrix);
+	//}
 
-	world.buildings[3] = gf3d_entity_new();
-	if (world.buildings[3])
-	{
-		SJson *house4 = sj_object_get_value(building_info, "house4");
-		world.buildings[3]->model = gf3d_model_load(sj_get_string_value(sj_object_get_value(house4, "model")));
-		world.buildings[3]->name = sj_get_string_value(sj_object_get_value(house4, "name"));;
-		sj_get_integer_value(sj_object_get_value(house4, "type"), &world.buildings[3]->type);
-		sj_get_float_value(sj_array_get_nth(sj_object_get_value(house4, "position"), 0), &world.buildings[3]->position.x);
-		sj_get_float_value(sj_array_get_nth(sj_object_get_value(house4, "position"), 1), &world.buildings[3]->position.y);
-		sj_get_float_value(sj_array_get_nth(sj_object_get_value(house4, "position"), 2), &world.buildings[3]->position.z);
-		world.buildings[3]->boxCollider.x = world.buildings[3]->position.x;
-		world.buildings[3]->boxCollider.y = world.buildings[3]->position.y;
-		world.buildings[3]->boxCollider.z = world.buildings[3]->position.z;
-		world.buildings[3]->boxCollider.width = 25;
-		world.buildings[3]->boxCollider.height = 25;
-		world.buildings[3]->boxCollider.depth = 25;
-		gfc_matrix_make_translation(world.buildings[3]->modelMatrix, world.buildings[3]->position);
-	}
+	//world.buildings[3] = gf3d_entity_new();
+	//if (world.buildings[3])
+	//{
+	//	SJson *house4 = sj_object_get_value(building_info, "house4");
+	//	world.buildings[3]->model = gf3d_model_load(sj_get_string_value(sj_object_get_value(house4, "model")));
+	//	world.buildings[3]->name = sj_get_string_value(sj_object_get_value(house4, "name"));;
+	//	sj_get_integer_value(sj_object_get_value(house4, "type"), &world.buildings[3]->type);
+	//	sj_get_float_value(sj_array_get_nth(sj_object_get_value(house4, "position"), 0), &world.buildings[3]->position.x);
+	//	sj_get_float_value(sj_array_get_nth(sj_object_get_value(house4, "position"), 1), &world.buildings[3]->position.y);
+	//	sj_get_float_value(sj_array_get_nth(sj_object_get_value(house4, "position"), 2), &world.buildings[3]->position.z);
+	//	world.buildings[3]->boxCollider.x = world.buildings[3]->position.x;
+	//	world.buildings[3]->boxCollider.y = world.buildings[3]->position.y;
+	//	world.buildings[3]->boxCollider.z = world.buildings[3]->position.z;
+	//	world.buildings[3]->boxCollider.width = 25;
+	//	world.buildings[3]->boxCollider.height = 25;
+	//	world.buildings[3]->boxCollider.depth = 25;
+	//	matrix4d_translate(world.buildings[3]->position, world.buildings[3]->modelMatrix);
+	//}
 	/*
 	world.buildings[4] = gf3d_entity_new();
 	if (world.buildings[4])
@@ -207,26 +211,26 @@ int buildings_init(Uint32 building_count)
 		world.buildings[4]->boxCollider.width = 10;
 		world.buildings[4]->boxCollider.height = 10;
 		world.buildings[4]->boxCollider.depth = 10;
-		gfc_matrix_new_translation(world.buildings[4]->modelMatrix, world.buildings[4]->position);
+		matrix4d_translate(world.buildings[4]->position, world.buildings[4]->modelMatrix);
 	}
 	*/
-	world.buildings[5] = gf3d_entity_new();
-	if (world.buildings[5])
-	{
-		SJson *goblinbase = sj_object_get_value(building_info, "goblinbase");
-		world.buildings[5]->model = gf3d_model_load(sj_get_string_value(sj_object_get_value(goblinbase, "model")));
-		world.buildings[5]->name = sj_get_string_value(sj_object_get_value(goblinbase, "name"));;
-		sj_get_integer_value(sj_object_get_value(goblinbase, "type"), &world.buildings[5]->type);
-		sj_get_float_value(sj_array_get_nth(sj_object_get_value(goblinbase, "position"), 0), &world.buildings[5]->position.x);
-		sj_get_float_value(sj_array_get_nth(sj_object_get_value(goblinbase, "position"), 1), &world.buildings[5]->position.y);
-		sj_get_float_value(sj_array_get_nth(sj_object_get_value(goblinbase, "position"), 2), &world.buildings[5]->position.z);
-		world.buildings[5]->boxCollider.x = world.buildings[5]->position.x;
-		world.buildings[5]->boxCollider.y = world.buildings[5]->position.y;
-		world.buildings[5]->boxCollider.z = world.buildings[5]->position.z;
+	//world.buildings[5] = gf3d_entity_new();
+	//if (world.buildings[5])
+	//{
+	//	SJson *goblinbase = sj_object_get_value(building_info, "goblinbase");
+	//	world.buildings[5]->model = gf3d_model_load(sj_get_string_value(sj_object_get_value(goblinbase, "model")));
+	//	world.buildings[5]->name = sj_get_string_value(sj_object_get_value(goblinbase, "name"));;
+	//	sj_get_integer_value(sj_object_get_value(goblinbase, "type"), &world.buildings[5]->type);
+	//	sj_get_float_value(sj_array_get_nth(sj_object_get_value(goblinbase, "position"), 0), &world.buildings[5]->position.x);
+	//	sj_get_float_value(sj_array_get_nth(sj_object_get_value(goblinbase, "position"), 1), &world.buildings[5]->position.y);
+	//	sj_get_float_value(sj_array_get_nth(sj_object_get_value(goblinbase, "position"), 2), &world.buildings[5]->position.z);
+	//	world.buildings[5]->boxCollider.x = world.buildings[5]->position.x;
+	//	world.buildings[5]->boxCollider.y = world.buildings[5]->position.y;
+	//	world.buildings[5]->boxCollider.z = world.buildings[5]->position.z;
 
-		gfc_matrix_make_translation(world.buildings[5]->modelMatrix, world.buildings[5]->position);
-		return 1;
-	}
+	//	matrix4d_translate(world.buildings[5]->position, world.buildings[5]->modelMatrix);
+	//	return 1;
+	//}
 	return 0;
 }
 
@@ -250,7 +254,7 @@ int trees_init(Uint32 tree_count)
 		world.trees[0]->boxCollider.width = 3;
 		world.trees[0]->boxCollider.height = 3;
 		world.trees[5]->boxCollider.depth = 3;
-		gfc_matrix_make_translation(world.trees[0]->modelMatrix, world.trees[0]->position);
+		matrix4d_translate(world.trees[0]->position, world.trees[0]->modelMatrix);
 		return 1;
 	}
 	return 0;

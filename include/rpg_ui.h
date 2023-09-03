@@ -25,7 +25,7 @@ typedef struct
 	Sprite **text;
 	Sprite *map;
 	Sprite *map_point;
-	Vector2D point_position;
+	Vector2 point_position;
 
 	Uint8 text_count;
 }Menu;
@@ -39,6 +39,8 @@ typedef struct
 	Uint8 text_count;
 
 }ShopUI;
+
+void rpg_ui_close();
 
 void rpg_ui_init();
 

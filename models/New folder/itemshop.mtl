@@ -1,0 +1,16 @@
+# Blender MTL File: 'itemshop.blend'
+# Material Count: 1
+
+newmtl Mdea_MAT
+Ns 179.999996
+Ka 0.100000 0.100000 0.100000
+Kd 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+Ke 0.500000 0.500000 0.500000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Kd C:\\Git\\Vulkan-Game-Project\\images\\itemshop.png
+map_Ke C:\\home\\app\\mixamo-mini\\tmp\\skins_44f06610-47bd-4944-95d7-b54bbd9c9b7b.fbm\\MEDEA glow.png
+map_Ks C:\\home\\app\\mixamo-mini\\tmp\\skins_44f06610-47bd-4944-95d7-b54bbd9c9b7b.fbm\\MEDEA specular.png
+map_d C:\\home\\app\\mixamo-mini\\tmp\\skins_44f06610-47bd-4944-95d7-b54bbd9c9b7b.fbm\\MEDEA diffuse.png

@@ -23,8 +23,8 @@ SOFTWARE.
 */
 
 #include "gfc_types.h"
-#include "gfc_vector.h"
-#include "gfc_matrix.h"
+#include "vector.h"
+#include "matrix.h"
 #include "gfc_text.h"
 
 #include "gf3d_texture.h"
@@ -77,7 +77,7 @@ void gf3d_sprite_free(Sprite *sprite);
 * @param buffer_frame the current rendering context
 * @param commandBuffer the command to use to execute the draw call
 */
-void gf3d_sprite_draw(Sprite *sprite, Vector2D position, Vector2D scale, Uint32 frame, Uint32 buffer_frame, VkCommandBuffer commandBuffer);
+void gf3d_sprite_draw(Sprite *sprite, Vector2 position, Vector2 scale, Uint32 frame, Uint32 buffer_frame, VkCommandBuffer commandBuffer);
 
 /**
 * @brief get the binding description for a sprite

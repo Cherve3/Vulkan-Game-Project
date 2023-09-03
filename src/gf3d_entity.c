@@ -61,7 +61,7 @@ Entity *gf3d_entity_new()
 		if (!gf3d_entity.entity_list[i]._inuse)
 		{
 			gf3d_entity.entity_list[i]._inuse = 1;
-			gfc_matrix_identity(gf3d_entity.entity_list[i].modelMatrix);
+			matrix4d_identity(gf3d_entity.entity_list[i].modelMatrix);
 			return &gf3d_entity.entity_list[i];
 		}
 	}
