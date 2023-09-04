@@ -190,7 +190,7 @@ void rpg_player_bag_free(Item *bag)
 void rpg_player_update(Entity *self)
 {
 	
-	if (vector3d_length(self->velocity) > 0.001)
+	if (vector3d_length(&self->velocity) > 0.001)
 	{
 		self->velocity.y += GRAVITY;
 		vector3d_scale(self->velocity, self->velocity, 0.4);

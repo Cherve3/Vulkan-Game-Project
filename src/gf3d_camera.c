@@ -26,8 +26,8 @@ void gf3d_camera_init()
 	camera.speed = 0.5;
 	camera.zoom = 20;
 
-	vector3d_normal(camera.forward);
-	vector3d_normal(camera.up);
+	vector3d_normal(&camera.forward);
+	vector3d_normal(&camera.up);
 }
 
 void camera_update(Vector3 position, Vector3 rotate, const int x_rel, const int y_rel)
@@ -94,8 +94,7 @@ void camera_update(Vector3 position, Vector3 rotate, const int x_rel, const int 
 		vector3d_create(0, 1, 0), 
 		camera.view);
 
-
-
+	matrix4d_print(camera.view);
 }
 
 Matrix4D *gf3d_get_camera()
@@ -126,8 +125,8 @@ void gf3d_camera_set_position(Vector3 position)
 
 void gf3d_camera_move(Vector3 move)
 {
-	vector3d_addition(camera.position, move, camera.position);
-	matrix4d_translate(move, camera.view);
+	vector3d_addition(camera.position, move, &camera.position);
+ 	matrix4d_translate(move, camera.view);
 }
 
 /*eol@eof*/

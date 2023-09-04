@@ -60,16 +60,10 @@
     <ClInclude Include="..\gfc\include\gfc_list.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\gfc\include\gfc_matrix.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\gfc\include\gfc_text.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\gfc\include\gfc_types.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gfc\include\gfc_vector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\gfc\simple_logger\include\simple_logger.h">
@@ -183,6 +177,15 @@
     <ClInclude Include="..\gfc\include\miniz.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Libraries\Utils\Math\include\vector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Libraries\Utils\Math\include\matrix.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gfc\include\gfc_vector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\gfc\simple_json\src\simple_json.c">
@@ -221,16 +224,10 @@
     <ClCompile Include="..\gfc\src\gfc_list.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\gfc\src\gfc_matrix.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\gfc\src\gfc_text.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\gfc\src\gfc_types.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\gfc\src\gfc_vector.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\game.c">
@@ -345,6 +342,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\gfc\src\miniz.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libraries\Utils\Math\src\matrix.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libraries\Utils\Math\src\vector.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\src\gfc_vector.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

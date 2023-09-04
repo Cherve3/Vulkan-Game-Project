@@ -27,10 +27,10 @@ void rpg_quest_close()
 	int i;
 	if (quests.quest_list != NULL)
 	{
-		for (i = 0; i < quests.quest_count; i++)
-		{
-			gf3d_entity_free(&quests.quest_list[i]);
-		}
+		//for (i = 0; i < quests.quest_count; i++)
+		//{
+		//	gf3d_entity_free(&quests.quest_list[i]);
+		//}
 		free(quests.quest_list);
 	}
 	memset(&quests, 0, sizeof(QuestManager));

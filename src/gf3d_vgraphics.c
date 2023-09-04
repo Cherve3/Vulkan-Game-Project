@@ -111,15 +111,15 @@ void gf3d_vgraphics_init(
     matrix4d_identity(gf3d_vgraphics.mvp.proj);
 
 	matrix4d_look_at(
-        vector3d_create(0, -10, 5),
         vector3d_create(0, 0, 0),
         vector3d_create(0, 0, 1),
+        vector3d_create(0, 1, 0),
         gf3d_vgraphics.mvp.view);
 
     matrix4d_perspective(
-        renderWidth,
-        renderHeight,
-        120 * GFC_DEGTORAD,
+        (float)renderWidth,
+        (float)renderHeight,
+        70 * GFC_DEGTORAD,
         2000,
         0.1f,
         gf3d_vgraphics.mvp.proj

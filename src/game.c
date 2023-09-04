@@ -13,7 +13,7 @@ int main(int argc,char *argv[])
 	float deltaTime = 0;
     Uint8 validate = 1;
 	Matrix4D modelMat;
-	Matrix4D modelMat2;
+	Matrix4D modelMat2, modelMat3, modelMat4, modelMat5, modelMat6, modelMat7;
     const Uint8 * keys;
 	int x, y;
     Uint32 bufferFrame = 0;
@@ -303,7 +303,7 @@ int main(int argc,char *argv[])
 	SDL_RenderCopyEx(renderer, load_icon, NULL, &load_rect, 324, NULL, SDL_FLIP_NONE);
 	SDL_RenderPresent(renderer);
 	
-//	rpg_projectile_init(10);
+	rpg_projectile_init(10);
 
 	rpg_ui_init();
 
@@ -311,11 +311,21 @@ int main(int argc,char *argv[])
 	
 	matrix4d_identity(modelMat);
 	matrix4d_identity(modelMat2);
+	matrix4d_identity(modelMat3);
+	matrix4d_identity(modelMat4);
+	matrix4d_identity(modelMat5);
+	matrix4d_identity(modelMat6);
+	matrix4d_identity(modelMat7);
 
 	model = gf3d_model_load("dino");
 	dino = gf3d_model_load("dino");
-	matrix4d_translate(vector3d_create(5,4,5),modelMat);
-	matrix4d_translate(vector3d_create(0, 8, 10), modelMat2);
+	matrix4d_translate(vector3d_create(0,0,0),modelMat);
+	matrix4d_translate(vector3d_create(10, 0, 0), modelMat2);
+	matrix4d_translate(vector3d_create(0, 10, 0), modelMat3);
+	matrix4d_translate(vector3d_create(0, 0, 10), modelMat4);
+	matrix4d_translate(vector3d_create(-10, 0, 0), modelMat5);
+	matrix4d_translate(vector3d_create(0, -10, 0), modelMat6);
+	matrix4d_translate(vector3d_create(0, 0, -10), modelMat7);
 	
 //		get_player()->ent->model = gf3d_model_load_animated("player", 1,19);
 
@@ -368,7 +378,13 @@ int main(int argc,char *argv[])
 		//Model Buffer
 		commandBuffer = gf3d_command_rendering_begin(bufferFrame, gf3d_vgraphics_get_graphics_model_pipeline());
 
-			//gf3d_model_draw_anim(dino, bufferFrame, commandBuffer,modelMat, frame);
+			gf3d_model_draw(dino, bufferFrame, commandBuffer,modelMat);
+			gf3d_model_draw(dino, bufferFrame, commandBuffer, modelMat2);
+			gf3d_model_draw(dino, bufferFrame, commandBuffer, modelMat3);
+			gf3d_model_draw(dino, bufferFrame, commandBuffer, modelMat4);
+			gf3d_model_draw(dino, bufferFrame, commandBuffer, modelMat5);
+			gf3d_model_draw(dino, bufferFrame, commandBuffer, modelMat6);
+			gf3d_model_draw(dino, bufferFrame, commandBuffer, modelMat7);
 			if (get_player()->ent->animated)
 				gf3d_model_draw_anim(get_player_entity()->model, bufferFrame, commandBuffer, get_player_entity()->modelMatrix, frame2);
 

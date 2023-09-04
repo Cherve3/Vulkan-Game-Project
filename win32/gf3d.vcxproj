@@ -42,14 +42,14 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>D:\Git\Libraries\SDL2-2.0.22\include;D:\Git\Libraries\SDL2_ttf-2.0.18\include;D:\Git\Libraries\SDL2_mixer-2.0.4\include;D:\Git\Libraries\SDL2_image-2.0.5\include;D:\Git\Projects\Vulkan-Game-Project\include;D:\Git\Projects\Vulkan-Game-Project\gfc\include;D:\Git\Projects\Vulkan-Game-Project\gfc\simple_json\include;D:\Git\Projects\Vulkan-Game-Project\gfc\simple_logger\include;C:\VulkanSDK\1.3.250.1\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\VulkanSDK\1.3.250.1\Lib32;D:\Git\Projects\Vulkan-Game-Project\gfc\simple_json\libs;D:\Git\Projects\Vulkan-Game-Project\gfc\simple_logger\libs;D:\Git\Projects\Vulkan-Game-Project\gfc\libs;D:\Git\Libraries\SDL2-2.0.22\lib\x86;D:\Git\Libraries\SDL2_ttf-2.0.18\lib\x86;D:\Git\Libraries\SDL2_mixer-2.0.4\lib\x86;D:\Git\Libraries\SDL2_image-2.0.5\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>D:\Git\Libraries\SDL2-2.0.22\include;D:\Git\Libraries\SDL2_ttf-2.0.18\include;D:\Git\Libraries\SDL2_mixer-2.0.4\include;D:\Git\Libraries\SDL2_image-2.0.5\include;D:\Git\Projects\Vulkan-Game-Project\include;D:\Git\Projects\Vulkan-Game-Project\gfc\include;D:\Git\Projects\Vulkan-Game-Project\gfc\simple_json\include;D:\Git\Projects\Vulkan-Game-Project\gfc\simple_logger\include;C:\VulkanSDK\1.3.250.1\Include;D:\Git\Libraries\Utils\Math\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\VulkanSDK\1.3.250.1\Lib32;D:\Git\Projects\Vulkan-Game-Project\gfc\simple_json\libs;D:\Git\Projects\Vulkan-Game-Project\gfc\simple_logger\libs;D:\Git\Projects\Vulkan-Game-Project\gfc\libs;D:\Git\Libraries\SDL2-2.0.22\lib\x86;D:\Git\Libraries\SDL2_ttf-2.0.18\lib\x86;D:\Git\Libraries\SDL2_mixer-2.0.4\lib\x86;D:\Git\Libraries\SDL2_image-2.0.5\lib\x86;D:\Git\Libraries\Utils\Debug;$(LibraryPath)</LibraryPath>
     <OutDir>..\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>D:\Git\Libraries\SDL2-2.0.22\include;D:\Git\Libraries\SDL2_ttf-2.0.18\include;D:\Git\Libraries\SDL2_mixer-2.0.4\include;D:\Git\Libraries\SDL2_image-2.0.5\include;D:\Git\Projects\Vulkan-Game-Project\include;D:\Git\Projects\Vulkan-Game-Project\gfc\include;D:\Git\Projects\Vulkan-Game-Project\gfc\simple_json\include;D:\Git\Projects\Vulkan-Game-Project\gfc\simple_logger\include;C:\VulkanSDK\1.3.250.1\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\VulkanSDK\1.3.250.1\Lib32;D:\Git\Projects\Vulkan-Game-Project\gfc\simple_json\libs;D:\Git\Projects\Vulkan-Game-Project\gfc\simple_logger\libs;D:\Git\Projects\Vulkan-Game-Project\gfc\libs;D:\Git\Libraries\SDL2-2.0.22\lib\x86;D:\Git\Libraries\SDL2_ttf-2.0.18\lib\x86;D:\Git\Libraries\SDL2_mixer-2.0.4\lib\x86;D:\Git\Libraries\SDL2_image-2.0.5\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>D:\Git\Libraries\SDL2-2.0.22\include;D:\Git\Libraries\SDL2_ttf-2.0.18\include;D:\Git\Libraries\SDL2_mixer-2.0.4\include;D:\Git\Libraries\SDL2_image-2.0.5\include;D:\Git\Projects\Vulkan-Game-Project\include;D:\Git\Projects\Vulkan-Game-Project\gfc\include;D:\Git\Projects\Vulkan-Game-Project\gfc\simple_json\include;D:\Git\Projects\Vulkan-Game-Project\gfc\simple_logger\include;C:\VulkanSDK\1.3.250.1\Include;D:\Git\Libraries\Utils\Math\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\VulkanSDK\1.3.250.1\Lib32;D:\Git\Projects\Vulkan-Game-Project\gfc\simple_json\libs;D:\Git\Projects\Vulkan-Game-Project\gfc\simple_logger\libs;D:\Git\Projects\Vulkan-Game-Project\gfc\libs;D:\Git\Libraries\SDL2-2.0.22\lib\x86;D:\Git\Libraries\SDL2_ttf-2.0.18\lib\x86;D:\Git\Libraries\SDL2_mixer-2.0.4\lib\x86;D:\Git\Libraries\SDL2_image-2.0.5\lib\x86;D:\Git\Libraries\Utils\Debug;$(LibraryPath)</LibraryPath>
     <OutDir>..</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -60,6 +60,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <SDLCheck>false</SDLCheck>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -78,6 +79,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
+      <SDLCheck>false</SDLCheck>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -88,6 +90,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\Libraries\Utils\Math\include\matrix.h" />
+    <ClInclude Include="..\..\..\Libraries\Utils\Math\include\vector.h" />
     <ClInclude Include="..\gfc\include\gfc_audio.h" />
     <ClInclude Include="..\gfc\include\gfc_callbacks.h" />
     <ClInclude Include="..\gfc\include\gfc_color.h" />
@@ -96,7 +100,6 @@
     <ClInclude Include="..\gfc\include\gfc_hashmap.h" />
     <ClInclude Include="..\gfc\include\gfc_input.h" />
     <ClInclude Include="..\gfc\include\gfc_list.h" />
-    <ClInclude Include="..\gfc\include\gfc_matrix.h" />
     <ClInclude Include="..\gfc\include\gfc_noise.h" />
     <ClInclude Include="..\gfc\include\gfc_pak.h" />
     <ClInclude Include="..\gfc\include\gfc_primitives.h" />
@@ -146,6 +149,8 @@
     <ClInclude Include="..\include\rpg_world.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\Libraries\Utils\Math\src\matrix.c" />
+    <ClCompile Include="..\..\..\Libraries\Utils\Math\src\vector.c" />
     <ClCompile Include="..\gfc\simple_json\src\simple_json.c" />
     <ClCompile Include="..\gfc\simple_json\src\simple_json_array.c" />
     <ClCompile Include="..\gfc\simple_json\src\simple_json_error.c" />
@@ -162,7 +167,6 @@
     <ClCompile Include="..\gfc\src\gfc_hashmap.c" />
     <ClCompile Include="..\gfc\src\gfc_input.c" />
     <ClCompile Include="..\gfc\src\gfc_list.c" />
-    <ClCompile Include="..\gfc\src\gfc_matrix.c" />
     <ClCompile Include="..\gfc\src\gfc_noise.c" />
     <ClCompile Include="..\gfc\src\gfc_pak.c" />
     <ClCompile Include="..\gfc\src\gfc_primitives.c" />
