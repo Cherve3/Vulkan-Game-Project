@@ -52,12 +52,12 @@ void rpg_npc_init(){
 	// Load npc json file
 	snprintf(file_path, sizeof(file_path), "%s%s", npath, "json/npc.json");
 	npc_info		= sj_load(file_path);
-	itemshop_info	= sj_object_get_value(npc_info, "ItemShop");
-	weaponshop_info = sj_object_get_value(npc_info, "WeaponShop");
-	armorshop_info	= sj_object_get_value(npc_info, "ArmorShop");
-	spellshop_info	= sj_object_get_value(npc_info, "SpellShop");
-	generic_info	= sj_object_get_value(npc_info, "Generic");
-	questgiver_info = sj_object_get_value(npc_info, "Questgiver");
+	itemshop_info	= sj_object_get_value(npc_info, "itemshop");
+	weaponshop_info = sj_object_get_value(npc_info, "weaponshop");
+	armorshop_info	= sj_object_get_value(npc_info, "armorshop");
+	spellshop_info	= sj_object_get_value(npc_info, "spellshop");
+	generic_info	= sj_object_get_value(npc_info, "generic");
+	questgiver_info = sj_object_get_value(npc_info, "questgiver");
 
 	if (!itemshop_info || !weaponshop_info || !armorshop_info || !spellshop_info || !generic_info || !questgiver_info)
 	{

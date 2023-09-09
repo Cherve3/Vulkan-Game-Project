@@ -13,6 +13,7 @@
 #include "gfc_types.h"
 #include "matrix.h"
 #include "vector.h"
+#include "gfc_matrix.h"
 
 #include "gf3d_validation.h"
 #include "gf3d_extensions.h"
@@ -25,7 +26,6 @@
 #include "gf3d_texture.h"
 #include "gf3d_camera.h"
 #include "gf3d_sprite.h"
-
 
 typedef struct vGraphics
 {
@@ -74,6 +74,10 @@ static vGraphics gf3d_vgraphics = {0};
 
 extern Mesh *testMesh;
 
+char file_vert_path[70];
+char file_frag_path[70];
+char* vgpath = "D:/Git/Projects/Vulkan-Game-Project/";
+
 void gf3d_vgraphics_close();
 void gf3d_vgraphics_logical_device_close();
 void gf3d_vgraphics_extension_init();
@@ -104,29 +108,21 @@ void gf3d_vgraphics_init(
     Bool enableValidation
 )
 {
-    VkDevice device;
-    
+   
     matrix4d_identity(gf3d_vgraphics.mvp.model);
     matrix4d_identity(gf3d_vgraphics.mvp.view);
     matrix4d_identity(gf3d_vgraphics.mvp.proj);
 
-	matrix4d_look_at(
-        vector3d_create(0, 0, 0),
-        vector3d_create(0, 0, 1),
-        vector3d_create(0, 1, 0),
-        gf3d_vgraphics.mvp.view);
-
     matrix4d_perspective(
-        (float)renderWidth,
+        renderWidth,
         (float)renderHeight,
-        70 * GFC_DEGTORAD,
-        2000,
-        0.1f,
+        50,
+        10000,
+        0.01f,
+        false,
         gf3d_vgraphics.mvp.proj
     );
-    
-    //gf3d_vgraphics.mvp.proj[1][1] *= -1;
-	
+
 
     gf3d_vgraphics_setup(
         windowName,
@@ -136,24 +132,30 @@ void gf3d_vgraphics_init(
         fullscreen,
         enableValidation);
     
-    device = gf3d_vgraphics_get_default_logical_device();
+    gf3d_vgraphics.device = gf3d_vgraphics_get_default_logical_device();
 
     gf3d_vqueues_setup_device_queues(gf3d_vgraphics.device);
     // swap chain!!!
-    gf3d_swapchain_init(gf3d_vgraphics.gpu,gf3d_vgraphics.device,gf3d_vgraphics.surface,renderWidth,renderHeight);
+    gf3d_swapchain_init(gf3d_vgraphics.gpu,gf3d_vgraphics.device, gf3d_vgraphics.surface, renderWidth, renderHeight);
     
 	gf3d_mesh_init(1024);//TODO: pull this from a parameter
     gf3d_texture_init(1024);
     
 	gf3d_pipeline_init(4);// how many different rendering pipelines we need
-    gf3d_vgraphics.modelPipe = gf3d_pipeline_basic_model_create(device,"shaders/vert.spv","shaders/frag.spv",gf3d_vgraphics_get_view_extent(),1024);
-	gf3d_vgraphics.spritePipe = gf3d_pipeline_basic_sprite_create(device, "shaders/sprite_vert.spv", "shaders/sprite_frag.spv", gf3d_vgraphics_get_view_extent(), 1024);
-	gf3d_model_manager_init(1024, gf3d_swapchain_get_swap_image_count(), device);
+
+    snprintf(file_vert_path, sizeof(file_vert_path), "%s%s", vgpath, "shaders/vert.spv");
+    snprintf(file_frag_path, sizeof(file_frag_path), "%s%s", vgpath, "shaders/frag.spv");
+    gf3d_vgraphics.modelPipe = gf3d_pipeline_basic_model_create(gf3d_vgraphics.device, file_vert_path, file_frag_path, gf3d_vgraphics_get_view_extent(),1024);
 	
-	gf3d_command_system_init(8 * gf3d_swapchain_get_swap_image_count(), device);
+    snprintf(file_vert_path, sizeof(file_vert_path), "%s%s", vgpath, "shaders/sprite_vert.spv");
+    snprintf(file_frag_path, sizeof(file_frag_path), "%s%s", vgpath, "shaders/sprite_frag.spv");
+    gf3d_vgraphics.spritePipe = gf3d_pipeline_basic_sprite_create(gf3d_vgraphics.device, file_vert_path, file_frag_path, gf3d_vgraphics_get_view_extent(), 1024);
 	
+	gf3d_command_system_init(8 * gf3d_swapchain_get_swap_image_count(), gf3d_vgraphics.device);
 	gf3d_vgraphics.graphicsCommandPool = gf3d_command_graphics_pool_setup(gf3d_swapchain_get_swap_image_count());
-	gf3d_sprite_manager_init(1024, gf3d_swapchain_get_swap_image_count(),device);
+    
+    gf3d_model_manager_init(1024, gf3d_swapchain_get_swap_image_count(), gf3d_vgraphics.device);
+    gf3d_sprite_manager_init(1024, gf3d_swapchain_get_swap_image_count(), gf3d_vgraphics.device);
 	
     gf3d_swapchain_create_depth_image();
     gf3d_swapchain_setup_frame_buffers(gf3d_vgraphics.modelPipe);

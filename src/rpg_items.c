@@ -98,19 +98,19 @@ Item rpg_item_new_random(int random)
 	{
 		case consumable:
 
-			return rpg_item_new_consumable("Health Potion", 1);
+			return rpg_item_new_consumable("healthpotion", 1);
 			break;
 		case material:
 
-			return rpg_item_new_material("Wood Log", 1);
+			return rpg_item_new_material("woodlog", 1);
 			break;
 		case weapon:
 
-			return rpg_item_new_weapon("Wooden Sword", 1);
+			return rpg_item_new_weapon("woodensword", 1);
 			break;
 		case armor:
 
-			return rpg_item_new_armor("Leather Boots", 1);
+			return rpg_item_new_armor("leatherboots", 1);
 			break;
 	}
 }

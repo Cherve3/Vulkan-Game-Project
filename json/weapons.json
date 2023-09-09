@@ -1,7 +1,7 @@
 {
     "Weapons":
     {
-        "Dagger":
+        "dagger":
         {
             "ItemType":     2,
             "damage":       10,
@@ -10,7 +10,7 @@
             "name":         "Dagger",
             "description":  "A small thin metal weapon. Stick 'em with the pointy end."
         },
-        "Hammer":
+        "hammer":
         {
             "ItemType":     2,
             "damage":       10,
@@ -18,7 +18,7 @@
             "cost":         1000,
             "name":         "Hammer",
             "description":  "A thick blunt metal object with a tiny handle. That's what she said..."},
-        "Wooden Sword":
+        "woodensword":
         {
             "ItemType":     2,
             "damage":       5,
@@ -27,7 +27,7 @@
             "name":         "Wooden Sword",
             "description":  "A mid-sized sword made of a solid wood. It is not very sharp but those splinters."
         },
-        "Iron Sword":
+        "ironsword":
         {
             "ItemType":     2,
             "damage":       15,
@@ -36,7 +36,7 @@
             "name":         "Iron Sword",
             "description":  "A mid-sized cast iron sword. The quality is questionable but it will work."
         },
-        "Bow":
+        "bow":
         {
             "ItemType":     2,
             "damage":       5,

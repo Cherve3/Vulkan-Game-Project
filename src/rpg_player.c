@@ -3,20 +3,18 @@
 #include "simple_logger.h"
 #include "simple_json.h"
 
-#include "gf3d_camera.h"
-
 #include "rpg_cooldowns.h"
 #include "rpg_player.h"
 #include "rpg_spellbook.h"
 #include "rpg_items.h"
 #include "rpg_projectile.h"
 #include "rpg_levelup.h"
+#include "rpg_ui.h";
 
 char file_path[60];
 char* ppath = "D:/Git/Projects/Vulkan-Game-Project/";
 
 static Player *player = { 0 };
-Matrix4D *camera = { 0 };
 
 Uint32 timer;
 Uint32 old_time;
@@ -45,13 +43,16 @@ void rpg_player_update();
 void print_inventory();
 void print_stats();
 
-void rpg_player_init(char* model){
-	camera = gf3d_get_camera();
+void rpg_player_init(){
+	char* model = rpg_ui_get_player_model_name();
 
 	player = (Player *)gfc_allocate_array(sizeof(Player), 1);
 
 	player->ent = rpg_player_new();
-
+	if (!player->ent)
+	{
+		slog("Player ent null");
+	}
 	cd_interact.old_time = 0;
 	cd_jump.old_time = 0;
 	cd_primary_attack.old_time = 0;
@@ -76,16 +77,20 @@ void rpg_player_init(char* model){
 	/**
 	 * Player Stats
 	 */
-	if (strcmp(model, "Player") == 0)
+	if (model)
 	{
-		player->ent->model = gf3d_model_load_animated(model, 1, 20);//gf3d_model_load("player"); //
-		player->ent->animated = true;
+		if (strcmp(model, "Player") == 0)
+		{
+			player->ent->model = gf3d_model_load_animated(model, 1, 20);//gf3d_model_load("player"); //
+			player->ent->animated = true;
+		}
+		else
+		{
+			player->ent->model = gf3d_model_load(model);
+			player->ent->animated = false;
+		}
 	}
-	else
-	{
-		player->ent->model = gf3d_model_load(model);
-		player->ent->animated = false;
-	}
+	
 	player->ent->think = rpg_player_think;
 	player->ent->update = rpg_player_update;
 	player->ent->type = PLAYER;
@@ -106,6 +111,7 @@ void rpg_player_init(char* model){
 	player->interactBound.x = player->ent->position.x;
 	player->interactBound.y = player->ent->position.z;
 
+	gf3d_camera_set_target_entity(player->ent);
 	player->stats.name =sj_get_string_value(sj_object_get_value(player_info, "name"));
 
 	sj_get_integer_value(sj_object_get_value(player_info, "level"), &player->stats.level);
@@ -196,8 +202,8 @@ void rpg_player_update(Entity *self)
 		vector3d_scale(self->velocity, self->velocity, 0.4);
 		self->position.x += self->velocity.x;
 
-		if (player->state.onGround = true);
-		self->position.y += self->velocity.y;
+		//if (player->state.onGround = true);
+		//self->position.y += self->velocity.y;
 
 		self->position.z += self->velocity.z;
 
@@ -217,9 +223,9 @@ void rpg_player_update(Entity *self)
 	self->boxCollider.y = self->position.y;
 	self->boxCollider.z = self->position.z;
 
-	//slog("\nPosition: x:%f, y:%f, z:%f", self->position.x, self->position.y, self->position.z);
-	//slog("\nVelocity: x:%f, y:%f, z:%f", self->velocity.x, self->velocity.y, self->velocity.z);
-	//slog("\nRotation: x:%f, y:%f, z:%f", self->rotation.x, self->rotation.y, self->rotation.z);
+	slog("\nPosition: x:%f, y:%f, z:%f", self->position.x, self->position.y, self->position.z);
+	slog("\nVelocity: x:%f, y:%f, z:%f", self->velocity.x, self->velocity.y, self->velocity.z);
+	slog("\nRotation: x:%f, y:%f, z:%f", self->rotation.x, self->rotation.y, self->rotation.z);
 
 }
 
@@ -417,7 +423,7 @@ void rpg_player_move(Entity *self){
 	else
 		player->state.crouched = false;
 
-	camera_update(self->position, vector3d_create(0, x_rel, self->rotate), x_rel, y_rel);
+	//gf3d_camera_update(self->position, vector3d_create(0, x_rel, self->rotate), x_rel, y_rel);
 }
 
 rpg_player_input(Entity *self)

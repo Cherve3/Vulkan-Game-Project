@@ -32,6 +32,17 @@ typedef struct
 
 typedef struct
 {
+	SDL_Renderer *renderer;
+	SDL_Texture  *bg_texture;
+	SDL_Texture  *tex_loading;
+	SDL_Rect	 load_rect;
+	SDL_Rect	 button_1_rect;
+	SDL_Rect	 button_2_rect;
+	char         *model_name;
+}MainMenu;
+
+typedef struct
+{
 	Sprite *menu;
 	Sprite **text;
 	Sprite *textbox;
@@ -40,7 +51,28 @@ typedef struct
 
 }ShopUI;
 
+typedef enum
+{
+	StartScreen,
+	CharacterSelectScreen,
+	LoadingScreen
+}MainMenuScreen;
+
+void rpg_main_menu_close();
+
 void rpg_ui_close();
+
+void rpg_destroy_main_menu();
+
+bool isCursorHoveringButton(SDL_Rect *button, int x, int y);
+
+char* rpg_ui_get_player_model_name();
+
+int rpg_main_menu_load_screen(MainMenuScreen screen);
+
+void rpg_update_loading_texture(const float angle, const SDL_RendererFlip flip);
+
+void rpg_main_menu_init();
 
 void rpg_ui_init();
 

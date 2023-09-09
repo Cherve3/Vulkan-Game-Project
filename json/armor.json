@@ -1,7 +1,7 @@
 {
     "Armor":
     {
-        "Leather Cap":
+        "leathercap":
         {
             "ItemType":         3,
             "armor":            1,
@@ -10,7 +10,7 @@
             "name":             "Leather Cap",
             "description":      "A worn leather cap. It is your cap right?"
         },
-        "Leather Cuirass":
+        "leathercuirass":
         {
             "ItemType"          :3,
             "armor":            15,
@@ -19,7 +19,7 @@
             "name":             "Leather Cuirass",
             "description":      "A cuirass crafted from leather. It is better than nothing."
         },
-        "Leather Greaves":
+        "leathergreaves":
         {
             "ItemType":         3,
             "armor":            5,
@@ -28,7 +28,7 @@
             "name":             "Leather Greaves",
             "description":      "A small leather covering for your legs. Don't take an arrow to the knee."
         },
-        "Leather Boots":
+        "leatherboots":
         {
             "ItemType":         3,
             "armor":            5,

@@ -84,7 +84,7 @@ typedef struct Player_S
 /**
  *	@brief initialize a player character
  */
-void rpg_player_init(char* model);
+void rpg_player_init();
 
 /**
  *	@brief runs gf3d_entity_new function to add player to entity system

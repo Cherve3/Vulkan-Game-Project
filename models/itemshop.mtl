@@ -1,0 +1,22 @@
+# Blender 3.4.1 MTL File: 'None'
+# www.blender.org
+
+newmtl Mdea_MAT
+Ns 200.000000
+Ka 0.100000 0.100000 0.100000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Kd C:/body diffuse.png
+map_Ks C:/MEDEA specular.png
+map_Ke C:/MEDEA glow.png
+
+newmtl Mdea_MAT_
+Ns 200.000000
+Ka 0.500000 0.500000 0.500000
+Ni 1.450000
+illum 3
+map_Kd C:/MEDEA diffuse.png
+map_Ks C:/MEDEA specular.png
+map_Ke C:/MEDEA glow.png
+map_d C:/MEDEA diffuse.png

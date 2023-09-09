@@ -204,7 +204,7 @@ void gf3d_command_configure_render_pass(VkCommandBuffer commandBuffer, VkRenderP
     renderPassInfo.renderArea.offset.x = 0;
     renderPassInfo.renderArea.offset.y = 0;
     renderPassInfo.renderArea.extent = gf3d_swapchain_get_extent();
-    renderPassInfo.clearValueCount = 2;
+    renderPassInfo.clearValueCount = sizeof(clearValues) / sizeof(VkClearValue); // should be 2
     renderPassInfo.pClearValues = clearValues;
     
     vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
@@ -227,12 +227,18 @@ VkCommandBuffer gf3d_command_begin_single_time(Command* com)
     allocInfo.commandPool = com->commandPool;
     allocInfo.commandBufferCount = 1;
 
-    vkAllocateCommandBuffers(gf3d_commands.device, &allocInfo, &commandBuffer);
+    if (vkAllocateCommandBuffers(gf3d_commands.device, &allocInfo, &commandBuffer) != VK_SUCCESS)
+    {
+        slog("failed to allocate command buffers");
+    };
 
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
     beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
 
-    vkBeginCommandBuffer(commandBuffer, &beginInfo);
+    if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS)
+    {
+        slog("Failed to begin recording command buffer");
+    }
 	
     return commandBuffer;
 }

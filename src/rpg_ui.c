@@ -21,8 +21,9 @@ typedef struct
 {
 	HUD hud;
 	Menu menu;
+	MainMenu main_menu;
 	ShopUI shop;
-	TTF_Font *font;
+	TTF_Font* font;
 }UIManager;
 
 static UIManager UI = { 0 };
@@ -42,11 +43,63 @@ float old_x, old_y;
 Sprite *rpg_ui_text_stats(char* name, char* text);
 void setup_hud();
 void setup_npc_ui();
+void rpg_menu_loading_screen();
 
 void rpg_ui_close()
 {
 	memset(&UI, 0, sizeof(UIManager));
 	slog("UIManager System Closed");
+}
+
+void rpg_destroy_main_menu()
+{
+
+}
+
+bool isCursorHoveringButton(SDL_Rect button, int x, int y)
+{
+	return (x > button.x) && (x < button.x + button.w) &&
+		(y > button.y) && (y < button.y + button.h) ? true : false;
+}
+
+char* rpg_ui_get_player_model_name()
+{
+	return UI.main_menu.model_name;
+}
+
+void rpg_main_menu_init()
+{
+	slog("initializing menu...");
+
+	UI.main_menu.renderer = SDL_CreateRenderer(gf3d_vgraphics_get_window(), -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
+	if (!UI.main_menu.renderer)
+	{ 
+		slog("Main menu renderer not created. SDL ERROR: %s", SDL_GetError()); 
+		SDL_Quit(); exit(0); 
+	}
+
+	snprintf(file_path, sizeof(file_path), "%s%s", uipath, "images/mainmenu.png");
+
+	UI.main_menu.bg_texture = IMG_LoadTexture(UI.main_menu.renderer, file_path);
+	if (!UI.main_menu.bg_texture) { slog("Main menu texture not created."); SDL_Quit(); exit(0); }
+
+	SDL_RenderClear(UI.main_menu.renderer);
+	SDL_RenderCopy(UI.main_menu.renderer, UI.main_menu.bg_texture, NULL, NULL);
+
+	SDL_ShowCursor(SDL_TRUE);
+
+	UI.main_menu.button_1_rect.h = 80;
+	UI.main_menu.button_1_rect.w = 150;
+	UI.main_menu.button_1_rect.x = 250;
+	UI.main_menu.button_1_rect.y = 230;
+
+	UI.main_menu.button_2_rect.h = 80;
+	UI.main_menu.button_2_rect.w = 150;
+	UI.main_menu.button_2_rect.x = 250;
+	UI.main_menu.button_2_rect.y = 350;
+
+	SDL_RenderPresent(UI.main_menu.renderer);
+	slog("Main Menu loaded");
 }
 
 void rpg_ui_init()
@@ -109,6 +162,153 @@ void rpg_ui_init()
 
 	setup_npc_ui();
 	atexit(rpg_ui_close);
+}
+
+int rpg_menu_start_screen(int x, int y)
+{
+	int exit = 0;
+	if (isCursorHoveringButton(UI.main_menu.button_1_rect, x, y))
+	{
+		slog("Pressed Start button");
+
+		snprintf(file_path, sizeof(file_path), "%s%s", uipath, "images/charchoice.png");
+
+		UI.main_menu.bg_texture = IMG_LoadTexture(UI.main_menu.renderer, file_path);
+		if (!UI.main_menu.bg_texture)
+		{
+			slog("Character choice texture not created.");
+		}
+		SDL_RenderClear(UI.main_menu.renderer);
+		
+
+		SDL_RenderCopy(UI.main_menu.renderer, UI.main_menu.bg_texture, NULL, NULL);
+		SDL_RenderPresent(UI.main_menu.renderer);
+		exit = 1;
+	}
+
+	if (isCursorHoveringButton(UI.main_menu.button_2_rect, x, y))
+	{
+		slog("Pressed Quit button");
+		SDL_DestroyRenderer(UI.main_menu.renderer);
+		SDL_DestroyTexture(UI.main_menu.bg_texture);
+		exit = -1;
+	}
+	return exit;
+}
+
+int rpg_menu_character_select_screen(int x, int y)
+{
+	int done = 0;
+	if (isCursorHoveringButton(UI.main_menu.button_1_rect, x, y))
+	{
+		slog("Pressed Knight button");
+		done = 1;
+		UI.main_menu.model_name = "player";
+		rpg_menu_loading_screen();
+	}
+	else if (isCursorHoveringButton(UI.main_menu.button_2_rect, x, y))
+	{
+		slog("Pressed Mage button");
+		done = 1;
+		UI.main_menu.model_name = "player2";
+		rpg_menu_loading_screen();
+	}
+	return done;
+}
+
+void rpg_menu_loading_screen()
+{
+	SDL_RenderClear(UI.main_menu.renderer);
+	snprintf(file_path, sizeof(file_path), "%s%s", uipath, "images/loading.png");
+	UI.main_menu.bg_texture = IMG_LoadTexture(UI.main_menu.renderer, file_path);
+	if (!UI.main_menu.bg_texture) { slog("Loading texture not created."); SDL_Quit(); exit(0); }
+
+	snprintf(file_path, sizeof(file_path), "%s%s", uipath, "images/load_icon.png");
+	UI.main_menu.tex_loading = IMG_LoadTexture(UI.main_menu.renderer, file_path);
+	
+	VkExtent2D extent = gf3d_vgraphics_get_view_extent();
+
+	UI.main_menu.button_1_rect.h = 0;
+	UI.main_menu.button_1_rect.w = 0;
+	UI.main_menu.button_1_rect.x = 0;
+	UI.main_menu.button_1_rect.y = 0;
+
+	UI.main_menu.button_2_rect.h = 0;
+	UI.main_menu.button_2_rect.w = 0;
+	UI.main_menu.button_2_rect.x = 0;
+	UI.main_menu.button_2_rect.y = 0;
+
+	UI.main_menu.load_rect.h = 150;
+	UI.main_menu.load_rect.w = 150;
+	UI.main_menu.load_rect.x = (extent.width - UI.main_menu.load_rect.w) / 2;
+	UI.main_menu.load_rect.y = (extent.width - UI.main_menu.load_rect.h) / 2;
+
+	SDL_RenderCopy(UI.main_menu.renderer, UI.main_menu.bg_texture, NULL, NULL);
+	
+	SDL_RenderCopyEx(UI.main_menu.renderer, UI.main_menu.tex_loading, NULL, &UI.main_menu.load_rect, 1, NULL, SDL_FLIP_NONE);
+	
+	SDL_RenderPresent(UI.main_menu.renderer);
+	
+}
+
+int rpg_main_menu_load_screen(MainMenuScreen screen)
+{
+	SDL_Event event;
+	int x, y;
+	int done = 0;
+
+	while (!done)
+	{
+		if (SDL_PollEvent(&event))
+		{				
+			x = event.motion.x;
+			y = event.motion.y;
+			if (event.type == SDL_MOUSEMOTION)
+			{
+				if (isCursorHoveringButton(UI.main_menu.button_1_rect, x, y))
+				{
+					slog("Hovering over button 1");
+				}
+
+				if (isCursorHoveringButton(UI.main_menu.button_2_rect, x, y))
+				{
+					slog("Hovering over button 2");
+				}
+			}
+			if (event.type == SDL_MOUSEBUTTONDOWN)
+			{
+				if (event.button.button == SDL_BUTTON_LEFT)
+				{
+					switch (screen)
+					{
+						case StartScreen:
+							done = rpg_menu_start_screen(x, y);
+							break;
+						case CharacterSelectScreen:
+							done = rpg_menu_character_select_screen(x, y);
+							break;
+						case LoadingScreen:
+							rpg_menu_loading_screen();
+							done = 1;
+							break;
+						default:
+							slog("There is no menu loaded.");
+					};
+					
+				}
+			}
+		}
+	}
+	return done;
+}
+
+void rpg_update_loading_texture(const float angle, const SDL_RendererFlip flip)
+{
+	SDL_RenderClear(UI.main_menu.renderer);
+	SDL_RenderCopy(UI.main_menu.renderer, UI.main_menu.bg_texture, NULL, NULL);
+	SDL_RenderCopyEx(UI.main_menu.renderer, UI.main_menu.tex_loading, NULL, &UI.main_menu.load_rect, angle, NULL, flip);
+	slog("SDL ERROR: %s", SDL_GetError());
+	SDL_RenderPresent(UI.main_menu.renderer);
 }
 
 void rpg_ui_draw_all(Uint32 bufferFrame, VkCommandBuffer commandbuffer)
@@ -254,12 +454,12 @@ Sprite *rpg_ui_text(char* name, char* text, Bool wrap)
 
 void load_npc_dialog()
 {
-	SJson *item_shop = sj_object_get_value(dialog_info, "ItemShop");
-	SJson *weapon_shop = sj_object_get_value(dialog_info, "WeaponShop");
-	SJson *armor_shop = sj_object_get_value(dialog_info, "ArmorShop");
-	SJson *spell_shop = sj_object_get_value(dialog_info, "SpellShop");
-	SJson *generic_info = sj_object_get_value(dialog_info, "Generic");
-	SJson *quest_info = sj_object_get_value(dialog_info, "Quest");
+	SJson *item_shop = sj_object_get_value(dialog_info, "itemshop");
+	SJson *weapon_shop = sj_object_get_value(dialog_info, "weaponshop");
+	SJson *armor_shop = sj_object_get_value(dialog_info, "armorshop");
+	SJson *spell_shop = sj_object_get_value(dialog_info, "spellshop");
+	SJson *generic_info = sj_object_get_value(dialog_info, "generic");
+	SJson *quest_info = sj_object_get_value(dialog_info, "quest");
 
 	UI.shop.text[0] = rpg_ui_text("Item Shop Text", sj_get_string_value(sj_object_get_value(item_shop, "1")), true);
 	UI.shop.text[1] = rpg_ui_text("Weapon Shop Text", sj_get_string_value(sj_object_get_value(weapon_shop, "1")), true);
@@ -317,7 +517,7 @@ void setup_hud()
 	char float_buffer[10];
 
 	strcpy(buffer, "Name: ");
-	strcat(buffer, get_player()->stats.name);
+	snprintf(buffer, sizeof(buffer), "%s%s", buffer, get_player()->stats.name);
 	UI.menu.text[0] = rpg_ui_text("NameText", buffer, false);
 	
 	strcpy(buffer, "Level: ");

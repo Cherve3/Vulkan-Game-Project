@@ -1,19 +1,19 @@
 {
-    "Ground":
+    "ground":
     {
         "name":"world",
         "model":"world",
         "type":6,
         "position":[0.0,0.0,0.0]
     },
-    "Water":
+    "water":
     {
         "name":"Water",
         "model":"water",
         "type":6,
         "position":[0.0,-4.0,0.0]
     },
-    "Buildings":
+    "buildings":
     {
         "house1":
         {
@@ -63,7 +63,7 @@
             "position":[-400.0, 0.0, -500.0]
         }
     },
-    "Trees":
+    "trees":
     {
         "tree1":
         {

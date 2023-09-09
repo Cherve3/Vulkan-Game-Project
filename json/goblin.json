@@ -1,5 +1,5 @@
 {
-    "GoblinGrunt":
+    "goblingrunt":
     {
         "name":"Goblin Grunt",
         "level":                1,
@@ -31,7 +31,7 @@
         "luck":                 1,
         "max_luck":             100
     },
-    "GoblinArcher":
+    "goblinarcher":
     {
         "name":"Goblin Archer",
 	
@@ -65,7 +65,7 @@
         "luck":                 1,
         "max_luck":             100
     },
-    "GoblinHeavy":
+    "goblinheavy":
     {
         "name":"Goblin Heavy",
 	
@@ -99,7 +99,7 @@
         "luck":                 1,
         "max_luck":             100
     },
-    "GoblinKing":
+    "goblinking":
     {
         "name":"Goblin King",
 	

@@ -40,10 +40,10 @@ void rpg_goblin_init(){
 	// Load goblin json file
 	snprintf(file_path, sizeof(file_path), "%s%s", gpath, "json/goblin.json");
 	goblin_info = sj_load(file_path);
-	grunt_info = sj_object_get_value(goblin_info, "GoblinGrunt");
-	heavy_info = sj_object_get_value(goblin_info, "GoblinHeavy");
-	archer_info = sj_object_get_value(goblin_info, "GoblinArcher");
-	king_info = sj_object_get_value(goblin_info, "GoblinKing");
+	grunt_info = sj_object_get_value(goblin_info, "goblingrunt");
+	heavy_info = sj_object_get_value(goblin_info, "goblinheavy");
+	archer_info = sj_object_get_value(goblin_info, "goblinarcher");
+	king_info = sj_object_get_value(goblin_info, "goblinking");
 
 	if (!goblin_info || !grunt_info || !heavy_info || !archer_info || !king_info)
 	{
@@ -86,7 +86,7 @@ void rpg_goblin_spawn(GoblinType type, Vector3 position)
 	{
 	case GoblinGrunt:
 
-		goblin_info = sj_object_get_value(goblin_info, "GoblinGrunt");
+		goblin_info = sj_object_get_value(goblin_info, "goblingrunt");
 
 		goblin[count].ent->name = "Goblin Grunt";
 		goblin[count].ent->model = gf3d_model_load("goblingrunt");
@@ -98,7 +98,7 @@ void rpg_goblin_spawn(GoblinType type, Vector3 position)
 		break;
 	case GoblinHeavy:
 
-		goblin_info = sj_object_get_value(heavy_info, "GoblinHeavy");
+		goblin_info = sj_object_get_value(heavy_info, "goblinheavy");
 
 		goblin[count].ent->name = "Goblin Heavy";
 		goblin[count].ent->model = gf3d_model_load("goblingrunt");
@@ -119,7 +119,7 @@ void rpg_goblin_spawn(GoblinType type, Vector3 position)
 
 	case GoblinArcher:
 
-		goblin_info = sj_object_get_value(archer_info, "GoblinArcher");
+		goblin_info = sj_object_get_value(archer_info, "goblinarcher");
 
 		goblin[count].ent->name = "Goblin Archer";
 		goblin[count].ent->model = gf3d_model_load("goblinarcher");
@@ -134,7 +134,7 @@ void rpg_goblin_spawn(GoblinType type, Vector3 position)
 
 	case GoblinKing:
 
-		goblin_info = sj_object_get_value(goblin_info, "GoblinKing");
+		goblin_info = sj_object_get_value(goblin_info, "goblinking");
 
 		goblin[count].ent->name = "Goblin King";
 

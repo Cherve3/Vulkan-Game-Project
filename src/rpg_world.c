@@ -24,25 +24,25 @@ void rpg_world_init()
 		slog("%s", sj_get_error());
 		exit(0);
 	}
-	ground_info	= sj_object_get_value(world_info, "Ground");
+	ground_info	= sj_object_get_value(world_info, "ground");
 	if (!ground_info)
 	{
 		slog("Ground not found in World json");
 		exit(0);
 	}
-	water_info = sj_object_get_value(world_info, "Water");
+	water_info = sj_object_get_value(world_info, "water");
 	if (!water_info)
 	{
 		slog("Water not found in World json");
 		exit(0);
 	}
-	building_info = sj_object_get_value(world_info, "Buildings");
+	building_info = sj_object_get_value(world_info, "buildings");
 	if (!building_info)
 	{
 		slog("Buildings not found in World json");
 		exit(0);
 	}
-	tree_info = sj_object_get_value(world_info, "Trees");
+	tree_info = sj_object_get_value(world_info, "trees");
 	if (!tree_info)
 	{
 		slog("Trees not found in World json");
@@ -74,7 +74,7 @@ void rpg_world_init()
 		slog("Ground entity is null");
 		return;
 	}
-
+/*
 	if (!water_init())
 	{
 		slog("Water is null");
@@ -86,7 +86,7 @@ void rpg_world_init()
 		slog("Building is null");
 			return;
 	}
-	/*
+	
 	if (!trees_init(10))
 	{
 		slog("tree is null");

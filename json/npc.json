@@ -1,5 +1,5 @@
 {
-    "ItemShop":
+    "itemshop":
     {
         "name":                 "Item Shop",
         "level":                3,
@@ -31,7 +31,7 @@
         "luck":                 1,
         "max_luck":             100
     },
-    "WeaponShop":
+    "weaponshop":
     {
         "name":                 "Weapon Shop",
         "level":                3,
@@ -63,7 +63,7 @@
         "luck":                 2,
         "max_luck":             100
     },
-    "ArmorShop":
+    "armorshop":
     {
         "name":                 "Armor Shop",
         "level":                3,
@@ -95,7 +95,7 @@
         "luck":                 2,
         "max_luck":             100
     },
-    "SpellShop":
+    "spellshop":
     {
         "name":                 "Spell Shop",
         "level":                3,
@@ -127,7 +127,7 @@
         "luck":                 1,
         "max_luck":             100
     },
-    "Generic":
+    "generic":
     {
         "name":                 "Generic",
         "level":                1,
@@ -159,7 +159,7 @@
         "luck":                 1,
         "max_luck":             100
     },
-    "Questgiver":
+    "questgiver":
     {
         "name":                 "Questgiver",
         "level":                5,

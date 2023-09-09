@@ -1,21 +1,21 @@
 {
-    "ItemShop":
+    "itemshop":
     {
         "1":"Welcome to the item shop! Need some potions? You probably need potions."
     },
-    "WeaponShop":
+    "weaponshop":
     {
         "1":"Welcome to the weapon shop! If you need a weapon I'm your dwarf. You won't last long without a weapon."
     },
-    "ArmorShop":
+    "armorshop":
     {
         "1":"Welcome to the armor shop! Looks like you need some armor. Always wear protection."
     },
-    "SpellShop":
+    "spellshop":
     {
         "1":"Welcome to the spell shop! One does not simply buy and cast spells."
     },
-    "Generic":
+    "generic":
     {
         "1":"Visit the shops in town they have everything you could ever need.",
         "2":"I hear some strange noises coming from the forest you should stay away from there...",
@@ -24,7 +24,7 @@
         "5":"You are going to find the goblins? It would be foolish to not prepare first. Good luck.",
         "6":"You defeated the Goblin King... Wow your life will never be the same after this."
     },
-    "Quest":
+    "quest":
     {
         "1":"Hey stranger! I am the Questgiver. You should do some quests. Don't worry, i'll go easy on ya for now.",
         "2":"Stranger you are back! Here take this. A towns person said they spotted some goblins outside of town go slay them.",

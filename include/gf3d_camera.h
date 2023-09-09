@@ -4,17 +4,25 @@
 #include "matrix.h"
 #include "vector.h"
 
+#include "gf3d_entity.h"
+
 typedef struct
 {
 	Matrix4D *proj;
 	Matrix4D *model;
 	Matrix4D *view;
+
 	Vector3 position;
+	Vector3 velocity;
+	Vector3 projVel;
 	Vector3 forward;
 	Vector3 up;
 	Vector3 right;
+
 	Vector3 offset;
 	Vector3 rotation;
+
+	Entity *target;
 
 	float yaw;
 	float pitch;
@@ -25,7 +33,7 @@ typedef struct
 
 void gf3d_camera_init();
 
-void camera_update(Vector3 Position, Vector3 rotation, const int x_rel, const int y_rel);
+void gf3d_camera_update();
 //void camera_update(Vector3 rotation, Vector3 playerPosition, Matrix4 playerMat);
 
 Matrix4D *gf3d_get_camera();
@@ -65,8 +73,8 @@ void gf3d_camera_set_position(Vector3 position);
 * @brief move the camera relatively based on the vector provided
 * @param move the ammount to move the camera
 */
-void gf3d_camera_move(Vector3 move);
+void gf3d_camera_move();
 
-void gf3d_camera_update(Vector3 pos, Vector3 rotate);
+void gf3d_camera_set_target_entity(Entity *target);
 
 #endif
