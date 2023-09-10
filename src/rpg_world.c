@@ -1,4 +1,8 @@
 #include "rpg_world.h"
+
+#include "game.h"
+
+#include "simple_logger.h"
 #include "simple_json.h"
 
 static World world = { 0 };
@@ -10,13 +14,13 @@ static SJson *building_info = NULL;
 static SJson *tree_info = NULL;
 
 char file_path[60];
-char* path = "D:/Git/Projects/Vulkan-Game-Project/";
+
 
 void rpg_world_init()
 {
 	slog("Initializing world");
 
-	snprintf(file_path, sizeof(file_path), "%s%s", path, "json/world.json");
+	snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, "json/world.json");
 	world_info = sj_load(file_path);
 	if (!world_info)
 	{
@@ -74,7 +78,7 @@ void rpg_world_init()
 		slog("Ground entity is null");
 		return;
 	}
-/*
+
 	if (!water_init())
 	{
 		slog("Water is null");
@@ -86,7 +90,7 @@ void rpg_world_init()
 		slog("Building is null");
 			return;
 	}
-	
+/*
 	if (!trees_init(10))
 	{
 		slog("tree is null");

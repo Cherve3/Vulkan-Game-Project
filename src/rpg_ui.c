@@ -1,6 +1,7 @@
 
 //#include <string>
 
+#include "game.h"
 #include "simple_logger.h"
 #include "simple_json.h"
 
@@ -32,7 +33,6 @@ static SJson  *dialog_info	= NULL;
 static SJson  *quest_info	= NULL;
 
 char file_path[70];
-char* uipath = "D:/Git/Projects/Vulkan-Game-Project/";
 
 float life_ratio;
 float mana_ratio;
@@ -78,7 +78,7 @@ void rpg_main_menu_init()
 		SDL_Quit(); exit(0); 
 	}
 
-	snprintf(file_path, sizeof(file_path), "%s%s", uipath, "images/mainmenu.png");
+	snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, "images/mainmenu.png");
 
 	UI.main_menu.bg_texture = IMG_LoadTexture(UI.main_menu.renderer, file_path);
 	if (!UI.main_menu.bg_texture) { slog("Main menu texture not created."); SDL_Quit(); exit(0); }
@@ -132,7 +132,7 @@ void rpg_ui_init()
 	}
 
 	slog("Loading font...");
-	snprintf(file_path, sizeof(file_path), "%s%s", uipath, "fonts/OfenbacherSchwabCAT.ttf");
+	snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, "fonts/OfenbacherSchwabCAT.ttf");
 	UI.font = TTF_OpenFont(file_path, 32);
 	if (!UI.font)
 	{
@@ -152,10 +152,10 @@ void rpg_ui_init()
 	UI.menu.white.b = 255;
 
 
-	snprintf(file_path, sizeof(file_path), "%s%s", uipath, "json/npc_dialog.json");
+	snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, "json/npc_dialog.json");
 	dialog_info = sj_load(file_path);
 
-	snprintf(file_path, sizeof(file_path), "%s%s", uipath, "json/quest.json");
+	snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, "json/quest.json");
 	quest_info = sj_load(file_path);
 
 	setup_hud();
@@ -171,7 +171,7 @@ int rpg_menu_start_screen(int x, int y)
 	{
 		slog("Pressed Start button");
 
-		snprintf(file_path, sizeof(file_path), "%s%s", uipath, "images/charchoice.png");
+		snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, "images/charchoice.png");
 
 		UI.main_menu.bg_texture = IMG_LoadTexture(UI.main_menu.renderer, file_path);
 		if (!UI.main_menu.bg_texture)
@@ -219,11 +219,11 @@ int rpg_menu_character_select_screen(int x, int y)
 void rpg_menu_loading_screen()
 {
 	SDL_RenderClear(UI.main_menu.renderer);
-	snprintf(file_path, sizeof(file_path), "%s%s", uipath, "images/loading.png");
+	snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, "images/loading.png");
 	UI.main_menu.bg_texture = IMG_LoadTexture(UI.main_menu.renderer, file_path);
 	if (!UI.main_menu.bg_texture) { slog("Loading texture not created."); SDL_Quit(); exit(0); }
 
-	snprintf(file_path, sizeof(file_path), "%s%s", uipath, "images/load_icon.png");
+	snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, "images/load_icon.png");
 	UI.main_menu.tex_loading = IMG_LoadTexture(UI.main_menu.renderer, file_path);
 	
 	VkExtent2D extent = gf3d_vgraphics_get_view_extent();
@@ -307,7 +307,6 @@ void rpg_update_loading_texture(const float angle, const SDL_RendererFlip flip)
 	SDL_RenderClear(UI.main_menu.renderer);
 	SDL_RenderCopy(UI.main_menu.renderer, UI.main_menu.bg_texture, NULL, NULL);
 	SDL_RenderCopyEx(UI.main_menu.renderer, UI.main_menu.tex_loading, NULL, &UI.main_menu.load_rect, angle, NULL, flip);
-	slog("SDL ERROR: %s", SDL_GetError());
 	SDL_RenderPresent(UI.main_menu.renderer);
 }
 
@@ -609,11 +608,11 @@ void setup_npc_ui()
 {
 	char buffer[100];
 
-	snprintf(file_path, sizeof(file_path), "%s%s", uipath, "json/npc_dialog.json");
+	snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, "json/npc_dialog.json");
 	dialog_info = sj_load(file_path);
 	if (!dialog_info){ slog("Dialog info json not found."); return; }
 
-	snprintf(file_path, sizeof(file_path), "%s%s", uipath, "json/quest.json");
+	snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, "json/quest.json");
 	quest_info = sj_load(file_path);
 	if (!dialog_info){ slog("Quest info json not found."); return; }
 

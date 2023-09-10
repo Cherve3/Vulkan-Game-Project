@@ -1,5 +1,6 @@
 #include "simple_logger.h"
 
+#include "game.h"
 #include "simple_json.h"
 
 #include "rpg_goblin.h"
@@ -7,7 +8,6 @@
 #include "rpg_projectile.h"
 
 char file_path[60];
-char* gpath = "D:/Git/Projects/Vulkan-Game-Project/";
 
 static NPC *goblin = NULL;
 static int count = 0;
@@ -38,7 +38,7 @@ void rpg_goblin_init(){
 	goblin = (NPC *)gfc_allocate_array(sizeof(NPC), 10);
 
 	// Load goblin json file
-	snprintf(file_path, sizeof(file_path), "%s%s", gpath, "json/goblin.json");
+	snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, "json/goblin.json");
 	goblin_info = sj_load(file_path);
 	grunt_info = sj_object_get_value(goblin_info, "goblingrunt");
 	heavy_info = sj_object_get_value(goblin_info, "goblinheavy");

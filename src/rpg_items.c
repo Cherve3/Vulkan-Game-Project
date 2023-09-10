@@ -2,6 +2,7 @@
 #include "simple_logger.h"
 #include "simple_json.h"
 
+#include "game.h"
 #include "gfc_matrix.h"
 
 #include "rpg_items.h"
@@ -18,7 +19,6 @@ typedef struct
 static ItemManager items = { 0 };
 
 char file_path[60];
-char* ipath = "D:/Git/Projects/Vulkan-Game-Project/";
 
 static SJson *item_info			= NULL;
 static SJson *consumable_info	= NULL;
@@ -64,17 +64,17 @@ void rpg_item_entity_init(Uint32 maxItems)
 	items.item_list = gfc_allocate_array(sizeof(Item), maxItems);
 	if (!items.item_list){slog("failed to allocate item list");return;}
 
-	snprintf(file_path, sizeof(file_path), "%s%s", ipath, "json/items.json");
+	snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, "json/items.json");
 
 	item_info		= sj_load(file_path);
 	consumable_info = sj_object_get_value(item_info, "Consumable");
 	material_info	= sj_object_get_value(item_info, "Material");
 
-	snprintf(file_path, sizeof(file_path), "%s%s", ipath, "json/armor.json");
+	snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, "json/armor.json");
 	armors			= sj_load(file_path);
 	armor_info = sj_object_get_value(armors, "Armor");
 
-	snprintf(file_path, sizeof(file_path), "%s%s", ipath, "json/weapons.json");
+	snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, "json/weapons.json");
 	weapons			= sj_load(file_path);
 	weapon_info = sj_object_get_value(weapons, "Weapons");
 

@@ -80,24 +80,20 @@ void gf3d_camera_zoom()
 		{
 			if (event.wheel.y > 0) // scroll up
 			{
-				camera.zoom += event.wheel.y;
-				if (camera.zoom == 0)
-					camera.zoom = 1;
+				camera.zoom -= event.wheel.y;
 
 			}
 			else if (event.wheel.y < 0) // scroll down
 			{
-				camera.zoom += event.wheel.y;
-				if (camera.zoom == 0)
-					camera.zoom = -1;
+				camera.zoom -= event.wheel.y;
 			}
 		}
 	}
 
-	if (camera.zoom > 300)
-		camera.zoom = 300;
-	if (camera.zoom < -2)
-		camera.zoom = -2;
+	if (camera.zoom > 200)
+		camera.zoom = 200;
+	if (camera.zoom < 2)
+		camera.zoom = 2;
 }
 
 void gf3d_camera_update()

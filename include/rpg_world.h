@@ -1,7 +1,7 @@
 #ifndef __RPG_WORLD_H__
 #define __RPG_WORLD_H__
 
-#include "game.h"
+#include "gf3d_entity.h"
 
 typedef struct
 {

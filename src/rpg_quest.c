@@ -1,3 +1,5 @@
+
+#include "game.h"
 #include "simple_json.h"
 #include "simple_logger.h"
 
@@ -20,7 +22,6 @@ static QuestManager quests = { 0 };
 static SJson* quest_info;
 
 char file_path[60];
-char* qpath = "D:/Git/Projects/Vulkan-Game-Project/";
 
 void rpg_quest_close()
 {
@@ -40,7 +41,7 @@ void rpg_quest_close()
 void rpg_quest_init()
 {
 	quest_info = NULL;
-	snprintf(file_path, sizeof(file_path), "%s%s", qpath, "json/quest.json");
+	snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, "json/quest.json");
 	quest_info = sj_load(file_path);
 	if (!quest_info)
 		slog("Quest info json is null");

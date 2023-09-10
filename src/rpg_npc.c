@@ -1,4 +1,6 @@
 
+
+#include "game.h"
 #include "simple_logger.h"
 #include "simple_json.h"
 
@@ -6,7 +8,6 @@
 #include "rpg_quest.h"
 
 char file_path[60];
-char* npath = "D:/Git/Projects/Vulkan-Game-Project/";
 
 static NPC *npc = NULL;
 static int count = 0;
@@ -50,7 +51,7 @@ void rpg_npc_init(){
 	npc = gfc_allocate_array(sizeof(NPC), 10);
 
 	// Load npc json file
-	snprintf(file_path, sizeof(file_path), "%s%s", npath, "json/npc.json");
+	snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, "json/npc.json");
 	npc_info		= sj_load(file_path);
 	itemshop_info	= sj_object_get_value(npc_info, "itemshop");
 	weaponshop_info = sj_object_get_value(npc_info, "weaponshop");

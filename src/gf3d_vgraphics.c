@@ -9,11 +9,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "simple_logger.h"
-#include "gfc_types.h"
-#include "matrix.h"
-#include "vector.h"
-#include "gfc_matrix.h"
+#include "game.h"
 
 #include "gf3d_validation.h"
 #include "gf3d_extensions.h"
@@ -76,7 +72,6 @@ extern Mesh *testMesh;
 
 char file_vert_path[70];
 char file_frag_path[70];
-char* vgpath = "D:/Git/Projects/Vulkan-Game-Project/";
 
 void gf3d_vgraphics_close();
 void gf3d_vgraphics_logical_device_close();
@@ -116,9 +111,9 @@ void gf3d_vgraphics_init(
     matrix4d_perspective(
         renderWidth,
         (float)renderHeight,
-        50,
+        110,
         10000,
-        0.01f,
+        0.1f,
         false,
         gf3d_vgraphics.mvp.proj
     );
@@ -143,12 +138,12 @@ void gf3d_vgraphics_init(
     
 	gf3d_pipeline_init(4);// how many different rendering pipelines we need
 
-    snprintf(file_vert_path, sizeof(file_vert_path), "%s%s", vgpath, "shaders/vert.spv");
-    snprintf(file_frag_path, sizeof(file_frag_path), "%s%s", vgpath, "shaders/frag.spv");
+    snprintf(file_vert_path, sizeof(file_vert_path), "%s%s", FILE_PATH, "shaders/vert.spv");
+    snprintf(file_frag_path, sizeof(file_frag_path), "%s%s", FILE_PATH, "shaders/frag.spv");
     gf3d_vgraphics.modelPipe = gf3d_pipeline_basic_model_create(gf3d_vgraphics.device, file_vert_path, file_frag_path, gf3d_vgraphics_get_view_extent(),1024);
 	
-    snprintf(file_vert_path, sizeof(file_vert_path), "%s%s", vgpath, "shaders/sprite_vert.spv");
-    snprintf(file_frag_path, sizeof(file_frag_path), "%s%s", vgpath, "shaders/sprite_frag.spv");
+    snprintf(file_vert_path, sizeof(file_vert_path), "%s%s", FILE_PATH, "shaders/sprite_vert.spv");
+    snprintf(file_frag_path, sizeof(file_frag_path), "%s%s", FILE_PATH, "shaders/sprite_frag.spv");
     gf3d_vgraphics.spritePipe = gf3d_pipeline_basic_sprite_create(gf3d_vgraphics.device, file_vert_path, file_frag_path, gf3d_vgraphics_get_view_extent(), 1024);
 	
 	gf3d_command_system_init(8 * gf3d_swapchain_get_swap_image_count(), gf3d_vgraphics.device);

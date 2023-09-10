@@ -3,6 +3,8 @@
 #include "simple_logger.h"
 #include "simple_json.h"
 
+#include "game.h"
+
 #include "rpg_cooldowns.h"
 #include "rpg_player.h"
 #include "rpg_spellbook.h"
@@ -12,7 +14,6 @@
 #include "rpg_ui.h";
 
 char file_path[60];
-char* ppath = "D:/Git/Projects/Vulkan-Game-Project/";
 
 static Player *player = { 0 };
 
@@ -66,7 +67,7 @@ void rpg_player_init(){
 
 	total_movement = 0;
 	// Load player json file
-	snprintf(file_path, sizeof(file_path), "%s%s", ppath, "json/player.json");
+	snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, "json/player.json");
 	player_info = sj_load(file_path);
 
 	if (!player_info)
@@ -223,9 +224,9 @@ void rpg_player_update(Entity *self)
 	self->boxCollider.y = self->position.y;
 	self->boxCollider.z = self->position.z;
 
-	slog("\nPosition: x:%f, y:%f, z:%f", self->position.x, self->position.y, self->position.z);
-	slog("\nVelocity: x:%f, y:%f, z:%f", self->velocity.x, self->velocity.y, self->velocity.z);
-	slog("\nRotation: x:%f, y:%f, z:%f", self->rotation.x, self->rotation.y, self->rotation.z);
+	//slog("\nPosition: x:%f, y:%f, z:%f", self->position.x, self->position.y, self->position.z);
+	//slog("\nVelocity: x:%f, y:%f, z:%f", self->velocity.x, self->velocity.y, self->velocity.z);
+	//slog("\nRotation: x:%f, y:%f, z:%f", self->rotation.x, self->rotation.y, self->rotation.z);
 
 }
 

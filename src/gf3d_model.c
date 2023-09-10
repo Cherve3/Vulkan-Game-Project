@@ -1,6 +1,8 @@
 #include <assert.h>
 #include <stdio.h>
 
+
+#include "game.h"
 #include "simple_logger.h"
 
 #include "gf3d_model.h"
@@ -20,7 +22,6 @@ typedef struct
 static ModelManager gf3d_model = {0};
 
 char file_path[60];
-char* mpath = "D:/Git/Projects/Vulkan-Game-Project/";
 
 void gf3d_model_delete(Model *model);
 
@@ -104,7 +105,7 @@ Model * gf3d_model_load_animated(char * filename, Uint32 startFrame, Uint32 endF
 	for (i = 0; i < count; i++)
 	{
 		snprintf(assetname, GFCLINELEN, "models/%s_%06i.obj", filename, startFrame + i);
-        snprintf(file_path, sizeof(file_path), "%s%s", mpath, assetname);
+        snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, assetname);
 		slog("%s",assetname);
 		model->mesh[i] = gf3d_mesh_load(assetname);
 	}
@@ -123,11 +124,11 @@ Model * gf3d_model_load(char * filename)
     if (!model)return NULL;
     
     snprintf(assetname,GFCLINELEN,"models/%s.obj",filename);
-    snprintf(file_path, sizeof(file_path), "%s%s", mpath, assetname);
+    snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, assetname);
     model->mesh = gf3d_mesh_load(file_path);
 
     snprintf(assetname,GFCLINELEN,"images/%s.png",filename);
-    snprintf(file_path, sizeof(file_path), "%s%s", mpath, assetname);
+    snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, assetname);
     model->texture = gf3d_texture_load(assetname, NULL);
     
     return model;

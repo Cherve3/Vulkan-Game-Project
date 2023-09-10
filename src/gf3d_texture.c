@@ -1,6 +1,8 @@
 #include <SDL_image.h>
 #include "simple_logger.h"
 
+
+#include "game.h"
 #include "gf3d_texture.h"
 #include "gf3d_vgraphics.h"
 #include "gf3d_swapchain.h"
@@ -15,7 +17,6 @@ typedef struct
 static TextureManager gf3d_texture = { 0 };
 
 char file_path[60];
-char* tpath = "D:/Git/Projects/Vulkan-Game-Project/";
 
 void gf3d_texture_close();
 void gf3d_texture_delete(Texture *tex);
@@ -122,7 +123,7 @@ Texture *gf3d_texture_get_by_filename(char * filename)
 	for (i = 0; i < gf3d_texture.max_textures; i++)
 	{
 		if (!gf3d_texture.texture_list[i]._inuse)continue;
-		snprintf(file_path, sizeof(file_path), "%s%s", tpath, filename);
+		snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, filename);
 		if (gfc_line_cmp(gf3d_texture.texture_list[i].filename, file_path) == 0)
 		{
 			return &gf3d_texture.texture_list[i];
@@ -229,7 +230,7 @@ Texture *gf3d_texture_load(char *filename, SDL_Surface *surf)
 	}
 	else 
 	{
-		snprintf(file_path, sizeof(file_path), "%s%s", tpath, filename);
+		snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, filename);
 		surface = IMG_Load(file_path);
 	}
 		
