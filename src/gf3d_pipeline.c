@@ -236,6 +236,7 @@ void gf3d_pipeline_sprite_render_pass_setup(Pipeline *pipe)
 Pipeline *gf3d_pipeline_basic_model_create(VkDevice device, char *vertFile, char *fragFile, VkExtent2D extent, Uint32 descriptorCount)
 {
 	Pipeline *pipe;
+	Uint32 draw_calls = 1024;
 	VkRect2D scissor = { 0 };
 	VkViewport viewport = { 0 };
 	VkGraphicsPipelineCreateInfo pipelineInfo = { 0 };
@@ -253,13 +254,29 @@ Pipeline *gf3d_pipeline_basic_model_create(VkDevice device, char *vertFile, char
 	VkPipelineDepthStencilStateCreateInfo depthStencil = { 0 };
 
 	pipe = gf3d_pipeline_new();
-	if (!pipe)return NULL;
+	if (!pipe)
+	{
+		slog("failed to get memory for a new pipeline");
+		return NULL;
+	}
 
-	pipe->vertShader = gf3d_shaders_load_data(vertFile, &pipe->vertSize);
-	pipe->fragShader = gf3d_shaders_load_data(fragFile, &pipe->fragSize);
-
+	pipe->vertShader = (char *)gf3d_shaders_load_data(vertFile, &pipe->vertSize);
 	pipe->vertModule = gf3d_shaders_create_module(pipe->vertShader, pipe->vertSize, device);
+	
+	vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+	vertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
+	vertShaderStageInfo.module = pipe->vertModule;
+	vertShaderStageInfo.pName = "main";
+	shaderStages[0] = vertShaderStageInfo;
+
+	pipe->fragShader = gf3d_shaders_load_data(fragFile, &pipe->fragSize);
 	pipe->fragModule = gf3d_shaders_create_module(pipe->fragShader, pipe->fragSize, device);
+
+	fragShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+	fragShaderStageInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+	fragShaderStageInfo.module = pipe->fragModule;
+	fragShaderStageInfo.pName = "main";
+	shaderStages[1] = fragShaderStageInfo;
 
 	pipe->device = device;
 	pipe->descriptorSetCount = descriptorCount;
@@ -273,22 +290,10 @@ Pipeline *gf3d_pipeline_basic_model_create(VkDevice device, char *vertFile, char
 	depthStencil.maxDepthBounds = 1.0f; // Optional
 	depthStencil.stencilTestEnable = VK_FALSE;
 
-	vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-	vertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
-	vertShaderStageInfo.module = pipe->vertModule;
-	vertShaderStageInfo.pName = "main";
-
-	fragShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-	fragShaderStageInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-	fragShaderStageInfo.module = pipe->fragModule;
-	fragShaderStageInfo.pName = "main";
-
-	shaderStages[0] = vertShaderStageInfo;
-	shaderStages[1] = fragShaderStageInfo;
-
 	vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 	vertexInputInfo.vertexBindingDescriptionCount = 1;
 	vertexInputInfo.pVertexBindingDescriptions = gf3d_mesh_get_bind_description(); // Optional
+	vertexInputInfo.vertexAttributeDescriptionCount = 3;
 	vertexInputInfo.pVertexAttributeDescriptions = gf3d_mesh_get_attribute_descriptions(&vertexInputInfo.vertexAttributeDescriptionCount); // Optional
 
 	// TODO: pull all this information from config file
@@ -382,7 +387,6 @@ Pipeline *gf3d_pipeline_basic_model_create(VkDevice device, char *vertFile, char
 	pipelineInfo.pDepthStencilState = NULL; // Optional
 	pipelineInfo.pColorBlendState = &colorBlending;
 	pipelineInfo.pDynamicState = NULL; // Optional
-
 	pipelineInfo.layout = pipe->pipelineLayout;
 	pipelineInfo.renderPass = pipe->renderPass;
 	pipelineInfo.subpass = 0;
@@ -396,6 +400,9 @@ Pipeline *gf3d_pipeline_basic_model_create(VkDevice device, char *vertFile, char
 		gf3d_pipeline_free(pipe);
 		return NULL;
 	}
+
+	pipe->uboList = gf3d_uniform_buffer_list_new(device, sizeof(MVPMatrix), draw_calls, gf3d_swapchain_get_swap_image_count());
+
 	return pipe;
 }
 
@@ -668,6 +675,13 @@ void gf3d_pipeline_reset_frame(Pipeline *pipe, Uint32 frame)
 		return;
 	}
 	pipe->descriptorCursor[frame] = 0;
+	pipe->commandBuffer = gf3d_command_rendering_begin(frame, pipe);
+}
+
+void gf3d_pipeline_submit_commands(Pipeline* pipe)
+{
+	if (!pipe)return;
+	gf3d_command_rendering_end(pipe->commandBuffer);
 }
 
 void gf3d_pipeline_create_descriptor_sets(Pipeline *pipe)

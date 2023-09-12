@@ -32,6 +32,7 @@ void gf3d_camera_init()
 
 	vector3d_normal(&camera.forward);
 	vector3d_normal(&camera.up);
+	vector3d_normal(&camera.right);
 }
 
 void gf3d_camera_update_velocity()
@@ -92,8 +93,8 @@ void gf3d_camera_zoom()
 
 	if (camera.zoom > 200)
 		camera.zoom = 200;
-	if (camera.zoom < 2)
-		camera.zoom = 2;
+	if (camera.zoom < 5)
+		camera.zoom = 5;
 }
 
 void gf3d_camera_update()
@@ -152,7 +153,7 @@ void gf3d_camera_update()
 	//matrix4d_multiply(rotation, camera.view, &camera.view);
 	
 	vector3d_zero(&camera.velocity);
-	matrix4d_print(camera.view);
+	//matrix4d_print(camera.view);
 }
 
 Matrix4D *gf3d_get_camera()

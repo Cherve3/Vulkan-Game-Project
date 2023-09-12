@@ -131,21 +131,21 @@ void gf3d_entity_think_all()
 	}
 }
 
-void gf3d_entity_draw(Entity *self, Uint32 bufferFrame, VkCommandBuffer commandBuffer)
+void gf3d_entity_draw(Entity *self)
 {
 	if (!self) return;
 	if (self->animated)return;
-	gf3d_model_draw(self->model, bufferFrame, commandBuffer, self->modelMatrix);
+	gf3d_model_draw(self->model, self->modelMatrix);
 
 }
 
-void gf3d_entity_draw_all(Uint32 bufferFrame, VkCommandBuffer commandBuffer)
+void gf3d_entity_draw_all()
 {
 	int i;
 	for (i = 0; i < gf3d_entity.entity_count; i++)
 	{
 		if (!gf3d_entity.entity_list[i]._inuse) continue;
-		gf3d_entity_draw(&gf3d_entity.entity_list[i], bufferFrame, commandBuffer);
+		gf3d_entity_draw(&gf3d_entity.entity_list[i]);
 	}
 }
 

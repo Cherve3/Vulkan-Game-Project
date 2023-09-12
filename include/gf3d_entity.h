@@ -77,10 +77,8 @@ void gf3d_entity_draw(Entity *self, Uint32 bufferFrame, VkCommandBuffer commandB
 
 /**
  *	@brief draw all active entities for a draw call
- *	@param bufferFrame the renderFrame to draw with
- *	@param commandBuffer the command to populate with this draw command
  */
-void gf3d_entity_draw_all(Uint32 bufferFrame, VkCommandBuffer commandBuffer);
+void gf3d_entity_draw_all();
 
 /**
 *	@brief call update function for all active entities

@@ -63,6 +63,20 @@ VkVertexInputBindingDescription * gf3d_mesh_get_bind_description();
 void gf3d_mesh_free(Mesh *mesh);
 
 /**
+ * @brief needs to be called once at the beginning of each render frame
+ */
+void gf3d_mesh_reset_pipes();
+
+/**
+ * @brief called to submit all draw commands to the mesh pipelines
+ */
+void gf3d_mesh_submit_pipe_commands();
+
+/**
+ * @brief get the current command buffer for the mesh system
+ */
+VkCommandBuffer gf3d_mesh_get_model_command_buffer();
+/**
  * @brief adds a mesh to the render pass
  * @note: must be called within the render pass
  * @param mesh the mesh to render

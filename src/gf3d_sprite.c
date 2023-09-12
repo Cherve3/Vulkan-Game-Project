@@ -2,6 +2,7 @@
 
 #include "gfc_types.h"
 
+#include "gf3d_swapchain.h"
 #include "gf3d_vgraphics.h"
 #include "gf3d_pipeline.h"
 #include "gf3d_commands.h"
@@ -11,8 +12,8 @@
 
 typedef struct
 {
-	Matrix4D     model;          /**<how the sprite should be transformed each frame*/
-	Vector2    frame_offset;   /**<where to sample the texture from this frame*/
+	Matrix4D	model;          /**<how the sprite should be transformed each frame*/
+	Vector2		frame_offset;   /**<where to sample the texture from this frame*/
 }SpriteUBO;
 
 typedef struct
@@ -37,7 +38,7 @@ typedef struct
 	VkDeviceMemory  faceBufferMemory; /**<memory habdle for the face memory*/
 	VkVertexInputAttributeDescription   attributeDescriptions[SPRITE_ATTRIBUTE_COUNT];
 	VkVertexInputBindingDescription     bindingDescription;
-
+	float           drawOrder;
 }SpriteManager;
 
 void gf3d_sprite_update_basic_descriptor_set(Sprite *model, VkDescriptorSet descriptorSet, Uint32 chainIndex, Matrix4D modelMat, Uint32 frame);
@@ -74,9 +75,10 @@ void gf3d_sprite_manager_close()
 	slog("sprite manager closed");
 }
 
-void gf3d_sprite_manager_init(Uint32 max_sprites, Uint32 chain_length, VkDevice device)
+void gf3d_sprite_manager_init(Uint32 max_sprites)
 {
 	void* data;
+	Uint32 count;
 	SpriteFace faces[2];
 	size_t bufferSize;
 	VkBuffer stagingBuffer;
@@ -87,10 +89,10 @@ void gf3d_sprite_manager_init(Uint32 max_sprites, Uint32 chain_length, VkDevice 
 		slog("cannot initialize sprite manager for 0 sprites");
 		return;
 	}
-	gf3d_sprite.chain_length = chain_length;
+	gf3d_sprite.chain_length = gf3d_swapchain_get_chain_length();
 	gf3d_sprite.sprite_list = (Sprite *)gfc_allocate_array(sizeof(Sprite), max_sprites);
 	gf3d_sprite.max_sprites = max_sprites;
-	gf3d_sprite.device = device;
+	gf3d_sprite.device = gf3d_vgraphics_get_default_logical_device();
 	gf3d_sprite.pipe = gf3d_vgraphics_get_graphics_overlay_pipeline();
 
 	// setup the face buffer, which will be used for ALL sprites
@@ -101,25 +103,38 @@ void gf3d_sprite_manager_init(Uint32 max_sprites, Uint32 chain_length, VkDevice 
 	faces[1].verts[1] = 3;
 	faces[1].verts[2] = 2;
 
-
 	bufferSize = sizeof(SpriteFace)* 2;
 
 	gf3d_vgraphics_create_buffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &stagingBuffer, &stagingBufferMemory);
 
-	vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
+	vkMapMemory(gf3d_sprite.device, stagingBufferMemory, 0, bufferSize, 0, &data);
 	memcpy(data, faces, (size_t)bufferSize);
-	vkUnmapMemory(device, stagingBufferMemory);
+	vkUnmapMemory(gf3d_sprite.device, stagingBufferMemory);
 
 	gf3d_vgraphics_create_buffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &gf3d_sprite.faceBuffer, &gf3d_sprite.faceBufferMemory);
 
 	gf3d_vgraphics_copy_buffer(stagingBuffer, gf3d_sprite.faceBuffer, bufferSize);
 
-	vkDestroyBuffer(device, stagingBuffer, NULL);
-	vkFreeMemory(device, stagingBufferMemory, NULL);
+	vkDestroyBuffer(gf3d_sprite.device, stagingBuffer, NULL);
+	vkFreeMemory(gf3d_sprite.device, stagingBufferMemory, NULL);
 
+	gf3d_sprite_get_attribute_descriptions(&count);
 
 	slog("sprite manager initiliazed");
 	atexit(gf3d_sprite_manager_close);
+}
+
+void gf3d_sprite_reset_pipes()
+{
+	Uint32 bufferFrame = gf3d_vgraphics_get_current_buffer_frame();
+
+	gf3d_pipeline_reset_frame(gf3d_sprite.pipe, bufferFrame);
+	gf3d_sprite.drawOrder = 0;
+}
+
+void gf3d_sprite_submit_pipe_commands()
+{
+	gf3d_pipeline_submit_commands(gf3d_sprite.pipe);
 }
 
 Sprite *gf3d_sprite_get_by_filename(char *filename)
@@ -217,11 +232,6 @@ Sprite * gf3d_sprite_load_surface(char * filename, SDL_Surface *surface, int fra
 		slog("Loading File");
 		sprite->texture = gf3d_texture_load(filename, NULL);
 	}
-	else
-	{
-		slog("Loading Surface");
-		sprite->texture = gf3d_texture_load("", surface);
-	}
 
 	if (!sprite->texture)
 	{
@@ -293,17 +303,22 @@ void gf3d_sprite_render(Sprite *sprite, VkCommandBuffer commandBuffer, VkDescrip
 }
 
 
-void gf3d_sprite_draw(Sprite *sprite, Vector2 position, Vector2 scale, Uint32 frame, Uint32 buffer_frame, VkCommandBuffer commandBuffer)
+void gf3d_sprite_draw(Sprite *sprite, Vector2 position, Vector2 scale, Uint32 frame)
 {
 	VkDescriptorSet *descriptorSet = NULL;
 	Matrix4D modelMat;
 	VkExtent2D extent = gf3d_vgraphics_get_view_extent();
+	Uint32 buffer_frame;
+	VkCommandBuffer commandBuffer;
 
 	if (!sprite)
 	{
 		slog("cannot render a NULL sprite");
 		return;
 	}
+
+	commandBuffer = gf3d_sprite.pipe->commandBuffer;
+	buffer_frame = gf3d_vgraphics_get_current_buffer_frame();
 
 	descriptorSet = gf3d_pipeline_get_descriptor_set(gf3d_sprite.pipe, buffer_frame);
 	if (descriptorSet == NULL)

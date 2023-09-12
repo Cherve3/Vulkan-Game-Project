@@ -16,6 +16,8 @@ typedef struct
 {
     Mesh *mesh_list;
     Uint32 mesh_max;
+    Pipeline* pipe;
+    Pipeline* sprite_pipe;
     VkVertexInputAttributeDescription attributeDescriptions[ATTRIBUTE_COUNT];
     VkVertexInputBindingDescription bindingDescription;
     Command *stagingCommandBuffer;
@@ -57,6 +59,8 @@ void gf3d_mesh_init(Uint32 mesh_max)
     gf3d_mesh.attributeDescriptions[2].offset = offsetof(Vertex, texel);
 
     gf3d_mesh.mesh_list = gfc_allocate_array(sizeof(Mesh),mesh_max);
+
+    gf3d_mesh.pipe = gf3d_vgraphics_get_graphics_model_pipeline();
     slog("mesh system initialized");
 }
 
@@ -267,6 +271,24 @@ Mesh *gf3d_mesh_load(char *filename)
     gf3d_obj_free(obj);
     gfc_line_cpy(mesh->filename,filename);
     return mesh;
+}
+
+void gf3d_mesh_reset_pipes()
+{
+    Uint32 bufferFrame = gf3d_vgraphics_get_current_buffer_frame();
+
+    gf3d_pipeline_reset_frame(gf3d_mesh.pipe, bufferFrame);
+}
+
+void gf3d_mesh_submit_pipe_commands()
+{
+    gf3d_pipeline_submit_commands(gf3d_mesh.pipe);
+}
+
+VkCommandBuffer gf3d_mesh_get_model_command_buffer()
+{
+    if (!gf3d_mesh.pipe)return VK_NULL_HANDLE;
+    return gf3d_mesh.pipe->commandBuffer;
 }
 
 /*eol@eof*/

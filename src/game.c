@@ -60,9 +60,6 @@ int main(int argc,char *argv[])
 	Matrix4D modelMat;
 	Matrix4D modelMat2;
 
-    Uint32 bufferFrame = 0;
-    VkCommandBuffer commandBuffer;
-
 	SDL_Event event;
 
 	SDL_Texture *char_create = NULL;
@@ -127,7 +124,6 @@ int main(int argc,char *argv[])
     );
 	slog_sync();
 	
-
 	rpg_main_menu_init();
 	main_menu = rpg_main_menu_load_screen(StartScreen);
 	if (main_menu == -1)
@@ -210,8 +206,8 @@ int main(int argc,char *argv[])
 	matrix4d_identity(modelMat2);
 
 	//model = gf3d_model_load("dino");
-	//dino = gf3d_model_load("dino");
-	//matrix4d_translate(vector3d_create(0,0,0),modelMat);
+	dino = gf3d_model_load("dino");
+	matrix4d_translate(vector3d_create(0,0,0),modelMat);
 	//matrix4d_translate(vector3d_create(10, 0, 0), modelMat2);
 	
 //		get_player()->ent->model = gf3d_model_load_animated("player", 1,19);
@@ -251,34 +247,13 @@ int main(int argc,char *argv[])
 		gf3d_entity_think_all();
 		gf3d_entity_update_all();
 
-		// configure render command for graphics command pool
-		// for each mesh, get a command and configure it from the pool
-		bufferFrame = gf3d_vgraphics_render_begin();
-		gf3d_pipeline_reset_frame(gf3d_vgraphics_get_graphics_model_pipeline(), bufferFrame);
-		gf3d_pipeline_reset_frame(gf3d_vgraphics_get_graphics_overlay_pipeline(), bufferFrame);
+		gf3d_vgraphics_render_start();
 
-		//Model Buffer
-		commandBuffer = gf3d_command_rendering_begin(bufferFrame, gf3d_vgraphics_get_graphics_model_pipeline());
+			gf3d_entity_draw_all();
+			rpg_ui_update();
+			rpg_ui_draw_all();
 
-			//gf3d_model_draw(dino, bufferFrame, commandBuffer,modelMat);
-			//gf3d_model_draw(dino, bufferFrame, commandBuffer, modelMat2);
-
-			if (get_player()->ent->animated)
-				gf3d_model_draw_anim(get_player_entity()->model, bufferFrame, commandBuffer, get_player_entity()->modelMatrix, frame2);
-
-			gf3d_entity_draw_all(bufferFrame, commandBuffer);
-			
-		gf3d_command_rendering_end(commandBuffer);
-
-		//Sprite Buffer
-			commandBuffer = gf3d_command_rendering_begin(bufferFrame, gf3d_vgraphics_get_graphics_overlay_pipeline());
-
-				rpg_ui_update();
-				rpg_ui_draw_all(bufferFrame,commandBuffer);
-
-			gf3d_command_rendering_end(commandBuffer);
-
-        gf3d_vgraphics_render_end(bufferFrame);
+        gf3d_vgraphics_render_end();
 
         if (keys[SDL_SCANCODE_ESCAPE])done = 1; // exit condition
     }    

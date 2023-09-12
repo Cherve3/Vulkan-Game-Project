@@ -13,9 +13,9 @@
         "type":6,
         "position":[0.0,-4.0,0.0]
     },
-    "buildings":
+    "structures":
     {
-        "house1":
+        "structure0":
         {
             "name":"House 0",
             "model":"house1",
@@ -23,7 +23,7 @@
             "position":[100.0, 26.0, 100.0]
 
         },
-        "house2":
+        "structure1":
         {
             "name":"House 1",
             "model":"house2",
@@ -31,7 +31,7 @@
             "position":[-100.0, 22.0, 100.0]
 
         },
-        "house3":
+        "structure2":
         {
             "name":"House 2",
             "model":"house3",
@@ -39,7 +39,7 @@
             "position":[-50.0, 22.0, 150.0]
 
         },
-        "house4":
+        "structure3":
         {
             "name":"House 3",
             "model":"house4",
@@ -47,7 +47,7 @@
             "position":[20.0, 29.0, 170.0]
 
         },
-        "well":
+        "structure4":
         {
             "name":"Well",
             "model":"well",
@@ -55,7 +55,7 @@
             "position":[20.0, 20.0, 150.0]
     
         },
-        "goblinbase":
+        "structure5":
         {
             "name":"Goblin Base",
             "model":"goblinbase",

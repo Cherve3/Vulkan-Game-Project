@@ -5,19 +5,21 @@
 
 #include "gfc_types.h"
 
+#include "gf3d_uniform_buffers.h"
+
 
 typedef struct
 {
     Bool                    inUse;
-    VkPipeline              pipeline;
+    VkPipeline              pipeline;               /**<pipeline handle*/
     VkRenderPass            renderPass;
     VkPipelineLayout        pipelineLayout;
-    size_t                  vertSize;
-    char                   *vertShader;
-    VkShaderModule          vertModule;
-    size_t                  fragSize;
-    char                   *fragShader;
-    VkShaderModule          fragModule;
+    size_t                  vertSize;               /**<memory size of the shader*/
+    char                   *vertShader;             /**<the shader loaded from disk*/
+    VkShaderModule          vertModule;             /**<the index of the shader module within the device*/
+    size_t                  fragSize;               /**<memory size of the shader*/
+    char                   *fragShader;             /**<the shader loaded from disk*/
+    VkShaderModule          fragModule;             /**<the index of the shader module within the device*/
     VkDevice                device;
     Uint32                 *descriptorCursor;       /**<keeps track of which descriptors have been used per frame*/
     VkDescriptorPool       *descriptorPool;
@@ -25,6 +27,8 @@ typedef struct
     VkDescriptorSet       **descriptorSets;
     Uint32                  descriptorPoolCount;
     Uint32                  descriptorSetCount;
+    UniformBufferList      *uboList;                /**<for draw calls sent through this pipeline*/
+    VkCommandBuffer         commandBuffer;          /**<for current command*/
 }Pipeline;
 
 /**
@@ -73,6 +77,12 @@ VkDescriptorSet * gf3d_pipeline_get_descriptor_set(Pipeline *pipe, Uint32 frame)
  * @param frame the swap chain rendering frame to reset the cursor for
  */
 void gf3d_pipeline_reset_frame(Pipeline *pipe,Uint32 frame);
+
+/**
+ * @brief submit the render calls to the pipeline for this frame.  Called after reset_frame and all draw calls
+ * @param pipe for the pipe in question
+ */
+void gf3d_pipeline_submit_commands(Pipeline* pipe);
 
 VkFormat gf3d_pipeline_find_depth_format();
 

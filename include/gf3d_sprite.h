@@ -51,7 +51,7 @@ typedef struct
 * @param chain_length how many images are available in the swap chain
 * @param device the logical vulkan device to be rendering to
 */
-void gf3d_sprite_manager_init(Uint32 max_sprites, Uint32 chain_length, VkDevice device);
+void gf3d_sprite_manager_init(Uint32 max_sprites);
 
 /**
 * @brief loads a sprite sheet into memory
@@ -77,7 +77,13 @@ void gf3d_sprite_free(Sprite *sprite);
 * @param buffer_frame the current rendering context
 * @param commandBuffer the command to use to execute the draw call
 */
-void gf3d_sprite_draw(Sprite *sprite, Vector2 position, Vector2 scale, Uint32 frame, Uint32 buffer_frame, VkCommandBuffer commandBuffer);
+void gf3d_sprite_draw(Sprite *sprite, Vector2 position, Vector2 scale, Uint32 frame);
+
+/**
+ * @brief get the default pipeline for overlay rendering
+ * @return NULL on error or not yet initlialized, the pipeline otherwise
+ */
+Pipeline* gf2d_sprite_get_pipeline();
 
 /**
 * @brief get the binding description for a sprite
@@ -86,5 +92,14 @@ VkVertexInputBindingDescription * gf3d_sprite_get_bind_description();
 
 VkVertexInputAttributeDescription * gf3d_sprite_get_attribute_descriptions(Uint32 *count);
 
+/**
+ * @brief needs to be called once at the beginning of each render frame
+ */
+void gf3d_sprite_reset_pipes();
+
+/**
+ * @brief called to submit all draw commands to the sprite pipelines
+ */
+void gf3d_sprite_submit_pipe_commands();
 
 #endif

@@ -39,16 +39,16 @@ typedef struct
     Uint8                       _inuse;
     TextLine                    filename;
 	Uint32						frameCount;
-    Mesh                    **   mesh;
+    Mesh                    *   mesh;
     Texture                 *   texture;
     VkDescriptorSet         *   descriptorSet;
-    VkBuffer                   *uniformBuffers;
-    VkDeviceMemory             *uniformBuffersMemory;
-    Uint32                      uniformBufferCount;
 }Model;
 
-
-void gf3d_model_manager_init(Uint32 max_models,Uint32 chain_length,VkDevice device);
+/**
+ * @brief setup the model manager
+ * @param max_models the maximum number of models that can be held in memory
+ */
+void gf3d_model_manager_init(Uint32 max_models);
 
 /**
 * @brief load an animated OBJ file
@@ -59,8 +59,19 @@ void gf3d_model_manager_init(Uint32 max_models,Uint32 chain_length,VkDevice devi
 */
 Model * gf3d_model_load_animated(char * filename, Uint32 startFrame, Uint32 endFrame);
 
+/**
+ * @brief load a model and texture 
+ * @param filename the common filename to load by
+ * @return NULL on error, or the loaded model data otherwise
+ */
 Model * gf3d_model_load(char * filename);
+
+/**
+ * @brief get a blank model address
+ * @return NULL on full, or a pointer to a blank model
+ */
 Model * gf3d_model_new();
+
 /**
  * @brief queue up a model for rendering
  * @param model the model to render
@@ -68,18 +79,13 @@ Model * gf3d_model_new();
  * @param commandBuffer the command used to send this render request
  * @param modelMat the model matrix (MVP)
  */
-void gf3d_model_draw(Model *model,Uint32 bufferFrame,VkCommandBuffer commandBuffer,Matrix4D modelMat);
+void gf3d_model_draw(Model *model, Matrix4D modelMat);
 void gf3d_model_draw_anim(Model *model, Uint32 bufferFrame, VkCommandBuffer commandBuffer, Matrix4D modelMat, Uint32 frame);
-void gf3d_model_free(Model *model);
 
 /**
- * @brief update the descriptorSet with the model data needed to submit the draw command for the model provided
- * @param model the model data to populate the descriptor set with
- * @param descriptSet the descriptorSet to populate
- * @param chainIndex the swap chain frame to do this for
- * @param modelMat the matrix to transform the model by
+ * @brief free a model
+ * @param the model that will be freed
  */
-void gf3d_model_update_basic_model_descriptor_set(Model *model,VkDescriptorSet descriptorSet,Uint32 chainIndex,Matrix4D modelMat);
-
+void gf3d_model_free(Model *model);
 
 #endif

@@ -1,11 +1,10 @@
 #include <assert.h>
 #include <stdio.h>
 
-
 #include "game.h"
-#include "simple_logger.h"
 
 #include "gf3d_model.h"
+#include "gf3d_swapchain.h"
 #include "gf3d_commands.h"
 #include "gf3d_vgraphics.h"
 #include "gf3d_obj_load.h"
@@ -23,14 +22,8 @@ static ModelManager gf3d_model = {0};
 
 char file_path[60];
 
-void gf3d_model_delete(Model *model);
-
-void gf3d_model_create_uniform_buffer(Model *model);
-void gf3d_model_create_descriptor_pool(Model *model);
-void gf3d_model_create_descriptor_sets(Model *model);
-void gf3d_model_create_descriptor_set_layout();
-void gf3d_model_update_uniform_buffer(Model *model,uint32_t currentImage,Matrix4D modelMat);
-VkDescriptorSetLayout * gf3d_model_get_descriptor_set_layout();
+void gf3d_model_delete(Model* model);
+void gf3d_model_update_basic_model_descriptor_set(Model* model, VkDescriptorSet descriptorSet, Uint32 chainIndex, Matrix4D modelMat);
 
 void gf3d_model_manager_close()
 {
@@ -47,21 +40,32 @@ void gf3d_model_manager_close()
     slog("model manager closed");
 }
 
-void gf3d_model_manager_init(Uint32 max_models,Uint32 chain_length,VkDevice device)
+void gf3d_model_manager_init(Uint32 max_models)
 {
     if (max_models == 0)
     {
-        slog("cannot intilizat model manager for 0 models");
+        slog("cannot initialize model manager with 0 models");
         return;
     }
-    gf3d_model.chain_length = chain_length;
+    gf3d_model.chain_length = gf3d_swapchain_get_chain_length();
     gf3d_model.model_list = (Model *)gfc_allocate_array(sizeof(Model),max_models);
     gf3d_model.max_models = max_models;
-    gf3d_model.device = device;
+    gf3d_model.device = gf3d_vgraphics_get_default_logical_device();
     gf3d_model.pipe = gf3d_vgraphics_get_graphics_model_pipeline();
     
     slog("model manager initilized");
     atexit(gf3d_model_manager_close);
+}
+
+void gf3d_model_delete(Model *model)
+{
+	int i;
+	if (!model)return;
+    if (!model->_inuse)return;
+
+	gf3d_mesh_free(model->mesh);
+	gf3d_texture_free(model->texture);
+	memset(model, 0, sizeof(Model));
 }
 
 Model * gf3d_model_new()
@@ -73,7 +77,6 @@ Model * gf3d_model_new()
         {
             gf3d_model_delete(&gf3d_model.model_list[i]);
             gf3d_model.model_list[i]._inuse = 1;
-            gf3d_model_create_uniform_buffer(&gf3d_model.model_list[i]);
             return &gf3d_model.model_list[i];
         }
     }
@@ -107,7 +110,7 @@ Model * gf3d_model_load_animated(char * filename, Uint32 startFrame, Uint32 endF
 		snprintf(assetname, GFCLINELEN, "models/%s_%06i.obj", filename, startFrame + i);
         snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, assetname);
 		slog("%s",assetname);
-		model->mesh[i] = gf3d_mesh_load(assetname);
+		model->mesh = gf3d_mesh_load(assetname);
 	}
 
 	snprintf(assetname, GFCLINELEN, "images/%s.png", filename);
@@ -125,12 +128,25 @@ Model * gf3d_model_load(char * filename)
     
     snprintf(assetname,GFCLINELEN,"models/%s.obj",filename);
     snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, assetname);
+
     model->mesh = gf3d_mesh_load(file_path);
+
+    if (!model->mesh)
+    {
+        gf3d_model_free(model);
+        return NULL;
+    }
 
     snprintf(assetname,GFCLINELEN,"images/%s.png",filename);
     snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, assetname);
+
     model->texture = gf3d_texture_load(assetname, NULL);
     
+    if (!model->texture)
+    {
+        snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, "images/default.png");
+        model->texture = gf3d_texture_load(file_path, NULL);
+    }
     return model;
 }
 
@@ -139,37 +155,18 @@ void gf3d_model_free(Model *model)
     gf3d_model_delete(model);
 }
 
-void gf3d_model_delete(Model *model)
-{
-	int i;
-	if (!model)return;
-
-	for (i = 0; i < model->uniformBufferCount; i++)
-	{
-		vkDestroyBuffer(gf3d_model.device, model->uniformBuffers[i], NULL);
-		vkFreeMemory(gf3d_model.device, model->uniformBuffersMemory[i], NULL);
-	}
-
-	for (i = 0; i < model->frameCount; i++)
-	{
-		gf3d_mesh_free(model->mesh[i]);
-	}
-	if (model->mesh)
-	{
-		free(model->mesh);
-	}
-	gf3d_texture_free(model->texture);
-	memset(model, 0, sizeof(Model));
-}
-
-void gf3d_model_draw(Model *model,Uint32 bufferFrame, VkCommandBuffer commandBuffer,Matrix4D modelMat)
+void gf3d_model_draw(Model *model, Matrix4D modelMat)
 {
     VkDescriptorSet *descriptorSet = NULL;
+    VkCommandBuffer commandBuffer;
+    Uint32 bufferFrame;
     if (!model)
     {
         slog("cannot render a NULL model");
         return;
     }
+    commandBuffer = gf3d_mesh_get_model_command_buffer();
+    bufferFrame = gf3d_vgraphics_get_current_buffer_frame();
     descriptorSet = gf3d_pipeline_get_descriptor_set(gf3d_model.pipe, bufferFrame);
     if (descriptorSet == NULL)
     {
@@ -177,31 +174,25 @@ void gf3d_model_draw(Model *model,Uint32 bufferFrame, VkCommandBuffer commandBuf
         return;
     }
     gf3d_model_update_basic_model_descriptor_set(model,*descriptorSet,bufferFrame,modelMat);
-    gf3d_mesh_render(model->mesh,commandBuffer,descriptorSet);
+    gf3d_mesh_render(model->mesh, commandBuffer, descriptorSet);
 }
 
-void gf3d_model_draw_anim(Model *model, Uint32 bufferFrame, VkCommandBuffer commandBuffer, Matrix4D modelMat, Uint32 frame)
+void gf3d_model_update_uniform_buffer(Model *model,UniformBuffer *ubo, Matrix4D modelMat)
 {
-	VkDescriptorSet *descriptorSet = NULL;
-	if (!model)
-	{
-		slog("cannot render a NULL model");
-		return;
-	}
-	if (frame >= model->frameCount)
-	{
-		slog("cannot render model frame %i, greater than frameCount", frame);
-		return;
-	}
-	descriptorSet = gf3d_pipeline_get_descriptor_set(gf3d_model.pipe, bufferFrame);
-	if (descriptorSet == NULL)
-	{
-		slog("failed to get a free descriptor Set for model rendering");
-		return;
-	}
-	gf3d_model_update_basic_model_descriptor_set(model, *descriptorSet, bufferFrame, modelMat);
-	gf3d_mesh_render(model->mesh[frame], commandBuffer, descriptorSet);
+    void* data;
+    MVPMatrix mvp;
+    MVPMatrix temp;
+    mvp = gf3d_vgraphics_get_uniform_buffer_object();
 
+    matrix4d_copy(modelMat,temp.model);
+    matrix4d_copy(mvp.view, temp.view);
+    matrix4d_copy(mvp.proj, temp.proj);
+
+    vkMapMemory(gf3d_model.device, ubo->uniformBufferMemory, 0, sizeof(MVPMatrix), 0, &data);
+    
+        memcpy(data, &temp, sizeof(MVPMatrix));
+
+    vkUnmapMemory(gf3d_model.device, ubo->uniformBufferMemory);
 }
 
 void gf3d_model_update_basic_model_descriptor_set(Model *model,VkDescriptorSet descriptorSet,Uint32 chainIndex,Matrix4D modelMat)
@@ -209,6 +200,7 @@ void gf3d_model_update_basic_model_descriptor_set(Model *model,VkDescriptorSet d
     VkDescriptorImageInfo imageInfo = {0};
     VkWriteDescriptorSet descriptorWrite[2] = {0};
     VkDescriptorBufferInfo bufferInfo = {0};
+    UniformBuffer* ubo = NULL;
 
     if (!model)
     {
@@ -220,13 +212,18 @@ void gf3d_model_update_basic_model_descriptor_set(Model *model,VkDescriptorSet d
         slog("null handle provided for descriptorSet");
         return;
     }
-
+    ubo = gf3d_uniform_buffer_list_get_buffer(gf3d_model.pipe->uboList, chainIndex);
+    if (!ubo)
+    {
+        slog("failed to get a free uniform buffer for draw call");
+        return;
+    }
     imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
     imageInfo.imageView = model->texture->textureImageView;
     imageInfo.sampler = model->texture->textureSampler;
 
-    gf3d_model_update_uniform_buffer(model,chainIndex,modelMat);
-    bufferInfo.buffer = model->uniformBuffers[chainIndex];
+    gf3d_model_update_uniform_buffer(model,ubo,modelMat);
+    bufferInfo.buffer = ubo->uniformBuffer;
     bufferInfo.offset = 0;
     bufferInfo.range = sizeof(MVPMatrix);
     
@@ -250,39 +247,28 @@ void gf3d_model_update_basic_model_descriptor_set(Model *model,VkDescriptorSet d
     vkUpdateDescriptorSets(gf3d_model.device, 2, descriptorWrite, 0, NULL);
 }
 
-void gf3d_model_update_uniform_buffer(Model *model,uint32_t currentImage,Matrix4D modelMat)
+void gf3d_model_draw_anim(Model *model, Uint32 bufferFrame, VkCommandBuffer commandBuffer, Matrix4D modelMat, Uint32 frame)
 {
-    void* data;
-    MVPMatrix mvp;
-    mvp = gf3d_vgraphics_get_uniform_buffer_object();
-    matrix4d_copy(modelMat, mvp.model);
-    vkMapMemory(gf3d_model.device, model->uniformBuffersMemory[currentImage], 0, sizeof(MVPMatrix), 0, &data);
-    
-        memcpy(data, &mvp, sizeof(MVPMatrix));
+	VkDescriptorSet *descriptorSet = NULL;
+	if (!model)
+	{
+		slog("cannot render a NULL model");
+		return;
+	}
+	if (frame >= model->frameCount)
+	{
+		slog("cannot render model frame %i, greater than frameCount", frame);
+		return;
+	}
+	descriptorSet = gf3d_pipeline_get_descriptor_set(gf3d_model.pipe, bufferFrame);
+	if (descriptorSet == NULL)
+	{
+		slog("failed to get a free descriptor Set for model rendering");
+		return;
+	}
+	gf3d_model_update_basic_model_descriptor_set(model, *descriptorSet, bufferFrame, modelMat);
+	gf3d_mesh_render(model->mesh, commandBuffer, descriptorSet);
 
-    vkUnmapMemory(gf3d_model.device, model->uniformBuffersMemory[currentImage]);
-}
-
-
-void gf3d_model_create_uniform_buffer(Model *model)
-{
-    int i;
-    Uint32 buffercount = gf3d_model.chain_length;
-    VkDeviceSize bufferSize = sizeof(MVPMatrix);
-
-    model->uniformBuffers = (VkBuffer*)gfc_allocate_array(sizeof(VkBuffer),buffercount);
-    model->uniformBuffersMemory = (VkDeviceMemory*)gfc_allocate_array(sizeof(VkDeviceMemory),buffercount);
-    model->uniformBufferCount = buffercount;
-
-    for (i = 0; i < buffercount; i++)
-    {
-        gf3d_vgraphics_create_buffer(
-            bufferSize, 
-            VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, 
-            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, 
-            &model->uniformBuffers[i], 
-            &model->uniformBuffersMemory[i]);
-    }
 }
 
 /*eol@eof*/

@@ -76,7 +76,7 @@ void rpg_main_menu_init();
 
 void rpg_ui_init();
 
-void rpg_ui_draw_all(Uint32 bufferFrame, VkCommandBuffer commandBuffer);
+void rpg_ui_draw_all();
 
 void rpg_ui_update();
 

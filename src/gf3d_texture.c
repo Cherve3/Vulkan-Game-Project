@@ -123,7 +123,10 @@ Texture *gf3d_texture_get_by_filename(char * filename)
 	for (i = 0; i < gf3d_texture.max_textures; i++)
 	{
 		if (!gf3d_texture.texture_list[i]._inuse)continue;
-		snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, filename);
+		////snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, filename);
+		//slog("SIZE: %d", strlen(FILE_PATH) + strlen(filename) + 1);
+		//file_path[strlen(FILE_PATH) + strlen(filename)] = '\0';
+
 		if (gfc_line_cmp(gf3d_texture.texture_list[i].filename, file_path) == 0)
 		{
 			return &gf3d_texture.texture_list[i];
@@ -202,9 +205,8 @@ void gf3d_texture_create_sampler(Texture *tex)
 	slog("created texture sampler");
 }
 
-Texture *gf3d_texture_load(char *filename, SDL_Surface *surf)
+Texture* gf3d_texture_convert_surface(SDL_Surface* surface)
 {
-	SDL_Surface * surface;
 	void* data;
 	Texture *tex;
 	VkDeviceSize imageSize;
@@ -214,40 +216,19 @@ Texture *gf3d_texture_load(char *filename, SDL_Surface *surf)
 	VkMemoryRequirements memRequirements;
 	VkMemoryAllocateInfo allocInfo = { 0 };
 
-	tex = gf3d_texture_get_by_filename(filename);
-	if (tex)
-	{
-		slog("Filename: %s", tex->filename);
-		slog("Tex is not null");
-		tex->_refcount++;
-		return tex;
-	}
-
-	if (surf)
-	{
-		//slog("Surface = surf");
-		surface = surf;
-	}
-	else 
-	{
-		snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, filename);
-		surface = IMG_Load(file_path);
-	}
-		
-	
 	if (!surface)
 	{
-		slog("failed to load texture file %s", filename);
+		slog("no surface provided for texture conversion");
 		return NULL;
 	}
+
 	tex = gf3d_texture_new();
 	if (!tex)
 	{
 		slog("Tex is null");
-		SDL_FreeSurface(surface);
 		return NULL;
 	}
-	gfc_line_cpy(tex->filename, filename);
+
 	tex->width = surface->w;
 	tex->height = surface->h;
 	imageSize = surface->w * surface->h * 4;
@@ -256,8 +237,6 @@ Texture *gf3d_texture_load(char *filename, SDL_Surface *surf)
 
 	SDL_LockSurface(surface);
 	vkMapMemory(gf3d_texture.device, stagingBufferMemory, 0, imageSize, 0, &data);
-	if (!surface->pixels)
-		slog("Pixels are null");
 	memcpy(data, surface->pixels, imageSize);
 	vkUnmapMemory(gf3d_texture.device, stagingBufferMemory);
 	SDL_UnlockSurface(surface);
@@ -275,8 +254,7 @@ Texture *gf3d_texture_load(char *filename, SDL_Surface *surf)
 	imageInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
 	imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 	imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
-	imageInfo.flags = VK_IMAGE_CREATE_MUTABLE_FORMAT_BIT; // Optional 
-	/*Note: Added flag for text render issue VK_IMAGE_FORMAT_R8G8B8A8_USCALED*/
+	imageInfo.flags = 0;// VK_IMAGE_CREATE_MUTABLE_FORMAT_BIT; // Optional 
 
 	if (vkCreateImage(gf3d_texture.device, &imageInfo, NULL, &tex->textureImage) != VK_SUCCESS)
 	{
@@ -304,27 +282,60 @@ Texture *gf3d_texture_load(char *filename, SDL_Surface *surf)
 	gf3d_swapchain_transition_image_layout(tex->textureImage, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
 	gf3d_texture_copy_buffer_to_image(stagingBuffer, tex->textureImage, surface->w, surface->h);
-	
-	if (surf)
-	{
-		gf3d_swapchain_transition_image_layout(tex->textureImage, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
-		tex->textureImageView = gf3d_vgraphics_create_image_view(tex->textureImage, VK_FORMAT_R8G8B8A8_USCALED);
+	gf3d_swapchain_transition_image_layout(tex->textureImage, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
-	}
-	else{
-		gf3d_swapchain_transition_image_layout(tex->textureImage, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-
-		tex->textureImageView = gf3d_vgraphics_create_image_view(tex->textureImage, VK_FORMAT_R8G8B8A8_UNORM);
-	}
+	tex->textureImageView = gf3d_vgraphics_create_image_view(tex->textureImage, VK_FORMAT_R8G8B8A8_USCALED);
 
 	gf3d_texture_create_sampler(tex);
 
 	vkDestroyBuffer(gf3d_texture.device, stagingBuffer, NULL);
 	vkFreeMemory(gf3d_texture.device, stagingBufferMemory, NULL);
-	SDL_FreeSurface(surface);
-	slog("created texture for image: %s", filename);
 	return tex;
+}
+
+Texture *gf3d_texture_load(char *filename, SDL_Surface *surf)
+{
+	SDL_Surface *surface;
+	Texture *tex;
+
+	snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, filename);
+	tex = gf3d_texture_get_by_filename(file_path);
+
+	if (tex)
+	{
+		slog("File found: %s", tex->filename);
+		tex->_refcount++;
+		return tex;
+	}
+
+	if (surf)
+	{
+		surface = surf;
+	}
+	else
+	{
+		surface = IMG_Load(file_path);
+	}
+	if (!surface)
+	{
+		slog("failed to load texture file %s", file_path);
+		return NULL;
+	}
+	tex = gf3d_texture_convert_surface(surface);
+
+	if (!tex)
+	{
+		SDL_FreeSurface(surface);
+		return NULL;
+	}
+	gfc_line_cpy(tex->filename, file_path);
+	tex->surface = surface;
+	slog("created texture for image: %s", tex->filename);
+	return tex;
+
+	SDL_FreeSurface(surface);
+	
 }
 
 /*eol@eof*/

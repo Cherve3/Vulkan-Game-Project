@@ -310,25 +310,25 @@ void rpg_update_loading_texture(const float angle, const SDL_RendererFlip flip)
 	SDL_RenderPresent(UI.main_menu.renderer);
 }
 
-void rpg_ui_draw_all(Uint32 bufferFrame, VkCommandBuffer commandbuffer)
+void rpg_ui_draw_all()
 {
 	int i = 0;
 	int x_pos = 110;
 	int y_pos = 90;
 
-	gf3d_sprite_draw(UI.hud.base, vector2d_create(10, 10), vector2d_create(1, 1), 0, bufferFrame, commandbuffer);
-	gf3d_sprite_draw(UI.hud.health, vector2d_create(12, 13), vector2d_create(life_ratio , 1), 0, bufferFrame, commandbuffer);
-	gf3d_sprite_draw(UI.hud.mana, vector2d_create(12, 31), vector2d_create(mana_ratio, 1), 0, bufferFrame, commandbuffer);
-	gf3d_sprite_draw(UI.hud.stamina, vector2d_create(12, 51), vector2d_create(stamina_ratio, 1), 0, bufferFrame, commandbuffer);
+	gf3d_sprite_draw(UI.hud.base, vector2d_create(10, 10), vector2d_create(1, 1), 0);
+	gf3d_sprite_draw(UI.hud.health, vector2d_create(12, 13), vector2d_create(life_ratio , 1), 0);
+	gf3d_sprite_draw(UI.hud.mana, vector2d_create(12, 31), vector2d_create(mana_ratio, 1), 0);
+	gf3d_sprite_draw(UI.hud.stamina, vector2d_create(12, 51), vector2d_create(stamina_ratio, 1), 0);
 
 	if (get_player_stats().toggleStats)
 	{
-		gf3d_sprite_draw(UI.menu.stats, vector2d_create(250, 175), vector2d_create(1.5, 1.5), 0, bufferFrame, commandbuffer);
+		gf3d_sprite_draw(UI.menu.stats, vector2d_create(250, 175), vector2d_create(1.5, 1.5), 0);
 		for (i = 0; i < UI.menu.text_count; i++)
 		{
 			
 			if (UI.menu.text[i])
-				gf3d_sprite_draw(UI.menu.text[i], vector2d_create(x_pos, y_pos), vector2d_create(1, 1), 0, bufferFrame, commandbuffer);
+				gf3d_sprite_draw(UI.menu.text[i], vector2d_create(x_pos, y_pos), vector2d_create(1, 1), 0);
 			
 			y_pos += 20;
 		}
@@ -336,8 +336,8 @@ void rpg_ui_draw_all(Uint32 bufferFrame, VkCommandBuffer commandbuffer)
 
 	if (get_player_stats().toggleMap)
 	{
-		gf3d_sprite_draw(UI.menu.map, vector2d_create(100, 0), vector2d_create(1, 1), 0, bufferFrame, commandbuffer);
-		gf3d_sprite_draw(UI.menu.map_point, UI.menu.point_position, vector2d_create(.3, .3), 0, bufferFrame, commandbuffer);
+		gf3d_sprite_draw(UI.menu.map, vector2d_create(100, 0), vector2d_create(1, 1), 0);
+		gf3d_sprite_draw(UI.menu.map_point, UI.menu.point_position, vector2d_create(.3, .3), 0);
 	}
 
 	if (get_player_stats().toggleShop)
@@ -346,67 +346,67 @@ void rpg_ui_draw_all(Uint32 bufferFrame, VkCommandBuffer commandbuffer)
 		if (rpg_get_itemshop_toggle())
 		{
 			//slog("Item shop");
-			gf3d_sprite_draw(UI.shop.menu, vector2d_create(400, 175), vector2d_create(1, 1), 0, bufferFrame, commandbuffer);
-			gf3d_sprite_draw(UI.shop.text[16], vector2d_create(420, 200), vector2d_create(1, 1), 0, bufferFrame, commandbuffer);
-			gf3d_sprite_draw(UI.shop.text[0], vector2d_create(420, 220), vector2d_create(1, 1), 0, bufferFrame, commandbuffer);
+			gf3d_sprite_draw(UI.shop.menu, vector2d_create(400, 175), vector2d_create(1, 1), 0);
+			gf3d_sprite_draw(UI.shop.text[16], vector2d_create(420, 200), vector2d_create(1, 1), 0);
+			gf3d_sprite_draw(UI.shop.text[0], vector2d_create(420, 220), vector2d_create(1, 1), 0);
 		}
 		else if (rpg_get_weaponshop_toggle())
 		{
 			//slog("Weapon shop");
-			gf3d_sprite_draw(UI.shop.menu, vector2d_create(400, 175), vector2d_create(1, 1), 0, bufferFrame, commandbuffer);
-			gf3d_sprite_draw(UI.shop.text[17], vector2d_create(420, 200), vector2d_create(1, 1), 0, bufferFrame, commandbuffer);
-			gf3d_sprite_draw(UI.shop.text[1], vector2d_create(420, 220), vector2d_create(1, 1), 0, bufferFrame, commandbuffer);
+			gf3d_sprite_draw(UI.shop.menu, vector2d_create(400, 175), vector2d_create(1, 1), 0);
+			gf3d_sprite_draw(UI.shop.text[17], vector2d_create(420, 200), vector2d_create(1, 1), 0);
+			gf3d_sprite_draw(UI.shop.text[1], vector2d_create(420, 220), vector2d_create(1, 1), 0);
 		}
 		else if (rpg_get_armorshop_toggle())
 		{
 			//slog("Armor shop");
-			gf3d_sprite_draw(UI.shop.menu, vector2d_create(400, 175), vector2d_create(1, 1), 0, bufferFrame, commandbuffer);
-			gf3d_sprite_draw(UI.shop.text[18], vector2d_create(420, 200), vector2d_create(1, 1), 0, bufferFrame, commandbuffer);
-			gf3d_sprite_draw(UI.shop.text[2], vector2d_create(420, 220), vector2d_create(1, 1), 0, bufferFrame, commandbuffer);
+			gf3d_sprite_draw(UI.shop.menu, vector2d_create(400, 175), vector2d_create(1, 1), 0);
+			gf3d_sprite_draw(UI.shop.text[18], vector2d_create(420, 200), vector2d_create(1, 1), 0);
+			gf3d_sprite_draw(UI.shop.text[2], vector2d_create(420, 220), vector2d_create(1, 1), 0);
 		}
 		else if (rpg_get_spellshop_toggle())
 		{
 			//slog("Spellshop shop");
-			gf3d_sprite_draw(UI.shop.menu, vector2d_create(400, 175), vector2d_create(1, 1), 0, bufferFrame, commandbuffer);
-			gf3d_sprite_draw(UI.shop.text[19], vector2d_create(420, 200), vector2d_create(1, 1), 0, bufferFrame, commandbuffer);
-			gf3d_sprite_draw(UI.shop.text[3], vector2d_create(420, 220), vector2d_create(1, 1), 0, bufferFrame, commandbuffer);
+			gf3d_sprite_draw(UI.shop.menu, vector2d_create(400, 175), vector2d_create(1, 1), 0);
+			gf3d_sprite_draw(UI.shop.text[19], vector2d_create(420, 200), vector2d_create(1, 1), 0);
+			gf3d_sprite_draw(UI.shop.text[3], vector2d_create(420, 220), vector2d_create(1, 1), 0);
 		}
 		else if (rpg_get_generic_toggle())
 		{
 			//slog("Talking with NPC");
-			gf3d_sprite_draw(UI.shop.textbox, vector2d_create(430, 420), vector2d_create(1.6, 1.5), 0, bufferFrame, commandbuffer);
-			gf3d_sprite_draw(UI.shop.text[20], vector2d_create(240, 320), vector2d_create(1, 1), 0, bufferFrame, commandbuffer);
+			gf3d_sprite_draw(UI.shop.textbox, vector2d_create(430, 420), vector2d_create(1.6, 1.5), 0);
+			gf3d_sprite_draw(UI.shop.text[20], vector2d_create(240, 320), vector2d_create(1, 1), 0);
 			if (rpg_get_current_quest() == 1)
-				gf3d_sprite_draw(UI.shop.text[4], vector2d_create(260, 340), vector2d_create(1, 1), 0, bufferFrame, commandbuffer);
+				gf3d_sprite_draw(UI.shop.text[4], vector2d_create(260, 340), vector2d_create(1, 1), 0);
 			if (rpg_get_current_quest() == 2)
-				gf3d_sprite_draw(UI.shop.text[5], vector2d_create(260, 340), vector2d_create(1, 1), 0, bufferFrame, commandbuffer);
+				gf3d_sprite_draw(UI.shop.text[5], vector2d_create(260, 340), vector2d_create(1, 1), 0);
 			if (rpg_get_current_quest() == 3)
-				gf3d_sprite_draw(UI.shop.text[6], vector2d_create(260, 340), vector2d_create(1, 1), 0, bufferFrame, commandbuffer);
+				gf3d_sprite_draw(UI.shop.text[6], vector2d_create(260, 340), vector2d_create(1, 1), 0);
 			if (rpg_get_current_quest() == 4)
-				gf3d_sprite_draw(UI.shop.text[7], vector2d_create(260, 340), vector2d_create(1, 1), 0, bufferFrame, commandbuffer);
+				gf3d_sprite_draw(UI.shop.text[7], vector2d_create(260, 340), vector2d_create(1, 1), 0);
 			if (rpg_get_current_quest() == 5)
-				gf3d_sprite_draw(UI.shop.text[8], vector2d_create(260, 340), vector2d_create(1, 1), 0, bufferFrame, commandbuffer);
+				gf3d_sprite_draw(UI.shop.text[8], vector2d_create(260, 340), vector2d_create(1, 1), 0);
 			if (rpg_get_current_quest() == 6)
-				gf3d_sprite_draw(UI.shop.text[9], vector2d_create(260, 340), vector2d_create(1, 1), 0, bufferFrame, commandbuffer);
+				gf3d_sprite_draw(UI.shop.text[9], vector2d_create(260, 340), vector2d_create(1, 1), 0);
 		}
 
 		else if (rpg_get_quest_toggle())
 		{
 			//slog("Talking to Questgiver");
-			gf3d_sprite_draw(UI.shop.textbox, vector2d_create(430, 420), vector2d_create(1.6, 1.5), 0, bufferFrame, commandbuffer);
-			gf3d_sprite_draw(UI.shop.text[21], vector2d_create(240, 320), vector2d_create(1, 1), 0, bufferFrame, commandbuffer);
+			gf3d_sprite_draw(UI.shop.textbox, vector2d_create(430, 420), vector2d_create(1.6, 1.5), 0);
+			gf3d_sprite_draw(UI.shop.text[21], vector2d_create(240, 320), vector2d_create(1, 1), 0);
 			if (rpg_get_current_quest() == 1)
-				gf3d_sprite_draw(UI.shop.text[10], vector2d_create(260, 340), vector2d_create(1, 1), 0, bufferFrame, commandbuffer);
+				gf3d_sprite_draw(UI.shop.text[10], vector2d_create(260, 340), vector2d_create(1, 1), 0);
 			if (rpg_get_current_quest() == 2)
-				gf3d_sprite_draw(UI.shop.text[11], vector2d_create(260, 340), vector2d_create(1, 1), 0, bufferFrame, commandbuffer);
+				gf3d_sprite_draw(UI.shop.text[11], vector2d_create(260, 340), vector2d_create(1, 1), 0);
 			if (rpg_get_current_quest() == 3)
-				gf3d_sprite_draw(UI.shop.text[12], vector2d_create(260, 340), vector2d_create(1, 1), 0, bufferFrame, commandbuffer);
+				gf3d_sprite_draw(UI.shop.text[12], vector2d_create(260, 340), vector2d_create(1, 1), 0);
 			if (rpg_get_current_quest() == 4)
-				gf3d_sprite_draw(UI.shop.text[13], vector2d_create(260, 340), vector2d_create(1, 1), 0, bufferFrame, commandbuffer);
+				gf3d_sprite_draw(UI.shop.text[13], vector2d_create(260, 340), vector2d_create(1, 1), 0);
 			if (rpg_get_current_quest() == 5)
-				gf3d_sprite_draw(UI.shop.text[14], vector2d_create(260, 340), vector2d_create(1, 1), 0, bufferFrame, commandbuffer);
+				gf3d_sprite_draw(UI.shop.text[14], vector2d_create(260, 340), vector2d_create(1, 1), 0);
 			if (rpg_get_current_quest() == 6)
-				gf3d_sprite_draw(UI.shop.text[15], vector2d_create(260, 340), vector2d_create(1, 1), 0, bufferFrame, commandbuffer);
+				gf3d_sprite_draw(UI.shop.text[15], vector2d_create(260, 340), vector2d_create(1, 1), 0);
 		}
 	}
 }
@@ -446,8 +446,6 @@ Sprite *rpg_ui_text(char* name, char* text, Bool wrap)
 	if (!sprite)
 		slog("Sprite null");
 
-//	SDL_FreeSurface(surface);
-	//TTF_CloseFont(UI.font);
 	return sprite;
 }
 

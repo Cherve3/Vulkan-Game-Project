@@ -4,7 +4,6 @@
 
 #include <SDL.h>
 #include <SDL_vulkan.h>
-#include <vulkan/vulkan.h>
 #include <limits.h>
 #include <string.h>
 #include <stdio.h>
@@ -17,8 +16,6 @@
 #include "gf3d_swapchain.h"
 #include "gf3d_vgraphics.h"
 #include "gf3d_model.h"
-#include "gf3d_pipeline.h"
-#include "gf3d_commands.h"
 #include "gf3d_texture.h"
 #include "gf3d_camera.h"
 #include "gf3d_sprite.h"
@@ -49,6 +46,7 @@ typedef struct vGraphics
     VkSurfaceKHR                surface;
 
     // color space
+    Color                       bg_color;
     VkFormat                    color_format;
     VkColorSpaceKHR             color_space;
 
@@ -62,13 +60,13 @@ typedef struct vGraphics
 	Pipeline				   *spritePipe;
     
     Command                    *graphicsCommandPool;
-
     MVPMatrix                   mvp;
+
+    //render frame and command buffer for the current render pass
+    Uint32                      bufferFrame;
 }vGraphics;
 
 static vGraphics gf3d_vgraphics = {0};
-
-extern Mesh *testMesh;
 
 char file_vert_path[70];
 char file_frag_path[70];
@@ -118,7 +116,6 @@ void gf3d_vgraphics_init(
         gf3d_vgraphics.mvp.proj
     );
 
-
     gf3d_vgraphics_setup(
         windowName,
         renderWidth,
@@ -132,11 +129,8 @@ void gf3d_vgraphics_init(
     gf3d_vqueues_setup_device_queues(gf3d_vgraphics.device);
     // swap chain!!!
     gf3d_swapchain_init(gf3d_vgraphics.gpu,gf3d_vgraphics.device, gf3d_vgraphics.surface, renderWidth, renderHeight);
-    
-	gf3d_mesh_init(1024);//TODO: pull this from a parameter
-    gf3d_texture_init(1024);
-    
-	gf3d_pipeline_init(4);// how many different rendering pipelines we need
+    gf3d_pipeline_init(4);// how many different rendering pipelines we need
+	
 
     snprintf(file_vert_path, sizeof(file_vert_path), "%s%s", FILE_PATH, "shaders/vert.spv");
     snprintf(file_frag_path, sizeof(file_frag_path), "%s%s", FILE_PATH, "shaders/frag.spv");
@@ -146,11 +140,14 @@ void gf3d_vgraphics_init(
     snprintf(file_frag_path, sizeof(file_frag_path), "%s%s", FILE_PATH, "shaders/sprite_frag.spv");
     gf3d_vgraphics.spritePipe = gf3d_pipeline_basic_sprite_create(gf3d_vgraphics.device, file_vert_path, file_frag_path, gf3d_vgraphics_get_view_extent(), 1024);
 	
-	gf3d_command_system_init(8 * gf3d_swapchain_get_swap_image_count(), gf3d_vgraphics.device);
+    gf3d_mesh_init(1024);//TODO: pull this from a parameter
+    gf3d_texture_init(1024);
+	
+    gf3d_command_system_init(8 * gf3d_swapchain_get_swap_image_count(), gf3d_vgraphics.device);
 	gf3d_vgraphics.graphicsCommandPool = gf3d_command_graphics_pool_setup(gf3d_swapchain_get_swap_image_count());
     
-    gf3d_model_manager_init(1024, gf3d_swapchain_get_swap_image_count(), gf3d_vgraphics.device);
-    gf3d_sprite_manager_init(1024, gf3d_swapchain_get_swap_image_count(), gf3d_vgraphics.device);
+    gf3d_model_manager_init(1024);
+    gf3d_sprite_manager_init(1024);
 	
     gf3d_swapchain_create_depth_image();
     gf3d_swapchain_setup_frame_buffers(gf3d_vgraphics.modelPipe);
@@ -173,7 +170,7 @@ void get_instance_extensions()
             &(gf3d_vgraphics.sdl_extension_count), 
             gf3d_vgraphics.sdl_extension_names);
 
-        for (Uint32 i = 0; i < gf3d_vgraphics.sdl_extension_count; i++)
+        for (int i = 0; i < gf3d_vgraphics.sdl_extension_count; i++)
         {
             slog("SDL Vulkan extensions support: %s", gf3d_vgraphics.sdl_extension_names[i]);
             gf3d_extensions_enable(
@@ -190,7 +187,7 @@ void get_instance_extensions()
     }
 }
 
-void create_instance(char* windowName)
+void set_application_and_instance_create_info(char* windowName)
 {
     gf3d_vgraphics.vk_app_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
     gf3d_vgraphics.vk_app_info.pNext = NULL;
@@ -279,9 +276,8 @@ void gf3d_vgraphics_setup(
     
 	slog_sync();
     
-    create_instance(windowName);
+    set_application_and_instance_create_info(windowName);
     enable_validation(enableValidation);
-
 
 	slog_sync();
 
@@ -458,7 +454,15 @@ Uint32 gf3d_vgraphics_render_begin()
     return imageIndex;
 }
 
-void gf3d_vgraphics_render_end(Uint32 imageIndex)
+void gf3d_vgraphics_render_start()
+{
+    gf3d_vgraphics.bufferFrame = gf3d_vgraphics_render_begin();
+
+    gf3d_mesh_reset_pipes();
+    gf3d_sprite_reset_pipes();
+}
+
+void gf3d_vgraphics_render_end()
 {
     VkPresentInfoKHR presentInfo = {0};
     VkSubmitInfo submitInfo = {0};
@@ -466,6 +470,10 @@ void gf3d_vgraphics_render_end(Uint32 imageIndex)
     VkSemaphore waitSemaphores[] = {gf3d_vgraphics.imageAvailableSemaphore};
     VkSemaphore signalSemaphores[] = {gf3d_vgraphics.renderFinishedSemaphore};
     VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+   
+    gf3d_mesh_submit_pipe_commands();
+    gf3d_sprite_submit_pipe_commands();
+    
     swapChains[0] = gf3d_swapchain_get();
 
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -494,7 +502,7 @@ void gf3d_vgraphics_render_end(Uint32 imageIndex)
     
     presentInfo.swapchainCount = 1;
     presentInfo.pSwapchains = swapChains;
-    presentInfo.pImageIndices = &imageIndex;
+    presentInfo.pImageIndices = &gf3d_vgraphics.bufferFrame;
     presentInfo.pResults = NULL; // Optional
     
     vkQueuePresentKHR(gf3d_vqueues_get_present_queue(), &presentInfo);
@@ -610,7 +618,6 @@ void gf3d_vgraphics_semaphores_close()
 {
     vkDestroySemaphore(gf3d_vgraphics.device, gf3d_vgraphics.renderFinishedSemaphore, NULL);
     vkDestroySemaphore(gf3d_vgraphics.device, gf3d_vgraphics.imageAvailableSemaphore, NULL);
-    
 }
 
 void gf3d_vgraphics_semaphores_create()
@@ -639,7 +646,6 @@ void gf3d_vgraphics_copy_buffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDevice
         vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
 
     gf3d_command_end_single_time(gf3d_vgraphics.graphicsCommandPool, commandBuffer);
-    
 }
 
 int gf3d_vgraphics_create_buffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer * buffer, VkDeviceMemory * bufferMemory)
@@ -786,6 +792,11 @@ VkImageView gf3d_vgraphics_create_image_view(VkImage image, VkFormat format)
 VkSurfaceKHR *gf3d_vgraphics_get_surface()
 {
 	return gf3d_vgraphics.surface;
+}
+
+Uint32  gf3d_vgraphics_get_current_buffer_frame()
+{
+    return gf3d_vgraphics.bufferFrame;
 }
 
 /*eol@eof*/
