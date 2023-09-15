@@ -82,7 +82,7 @@ void rpg_player_init(){
 	{
 		if (strcmp(model, "Player") == 0)
 		{
-			player->ent->model = gf3d_model_load_animated(model, 1, 20);//gf3d_model_load("player"); //
+			player->ent->model = gf3d_model_load("player"); //gf3d_model_load_animated(model, 1, 20)
 			player->ent->animated = true;
 		}
 		else
@@ -96,10 +96,10 @@ void rpg_player_init(){
 	player->ent->update = rpg_player_update;
 	player->ent->type = PLAYER;
 	player->ent->name = "Player";
-	player->ent->position = vector3d_create(0, 8, -10);
-	player->ent->velocity = vector3d_create(0, 0, 0);
-	player->ent->rotation = vector3d_create(0, 0, 0);
-	player->ent->direction = vector3d_create(0, 0, 1);
+	player->ent->position = vector3d(0, 8, -10);
+	player->ent->velocity = vector3d(0, 0, 0);
+	player->ent->rotation = vector3d(0, 0, 0);
+	player->ent->direction = vector3d(0, 0, 1);
 
 	player->ent->boxCollider.width = 3.0;
 	player->ent->boxCollider.height = 8.5;
@@ -112,7 +112,7 @@ void rpg_player_init(){
 	player->interactBound.x = player->ent->position.x;
 	player->interactBound.y = player->ent->position.z;
 
-	gf3d_camera_set_target_entity(player->ent);
+	//gf3d_camera_set_target_entity(player->ent);
 	player->stats.name =sj_get_string_value(sj_object_get_value(player_info, "name"));
 
 	sj_get_integer_value(sj_object_get_value(player_info, "level"), &player->stats.level);
@@ -197,7 +197,7 @@ void rpg_player_bag_free(Item *bag)
 void rpg_player_update(Entity *self)
 {
 	
-	if (vector3d_length(&self->velocity) > 0.001)
+	if (vector3d_magnitude(self->velocity) > 0.001)
 	{
 		self->velocity.y += GRAVITY;
 		vector3d_scale(self->velocity, self->velocity, 0.4);
@@ -321,8 +321,8 @@ void rpg_player_move(Entity *self){
 	SDL_GetRelativeMouseState(&x_rel, &y_rel);
 
 	//Move model to position
-	matrix4d_translate(self->position, self->modelMatrix);
-	matrix4d_rotate_arbitrary(-self->rotate, vector3d_create(0, 0, 1), self->modelMatrix);
+	gfc_matrix_translate(self->modelMatrix, self->position);
+	gfc_matrix_rotate(self->modelMatrix, self->modelMatrix,-self->rotate, vector3d(0, 0, 1));
 	//matrix4d_rotate(self->modelMatrix, self->modelMatrix, -self->rotate, vector3d(0, 0, 1));
 
 	self->rotate += x_rel * GFC_DEGTORAD;
@@ -424,7 +424,7 @@ void rpg_player_move(Entity *self){
 	else
 		player->state.crouched = false;
 
-	//gf3d_camera_update(self->position, vector3d_create(0, x_rel, self->rotate), x_rel, y_rel);
+	//gf3d_camera_update(self->position, vector3d(0, x_rel, self->rotate), x_rel, y_rel);
 }
 
 rpg_player_input(Entity *self)

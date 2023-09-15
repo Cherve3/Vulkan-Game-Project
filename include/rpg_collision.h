@@ -24,8 +24,8 @@ typedef struct {
 
 typedef struct
 {
-	Vector3 min;
-	Vector3 max;
+	Vector3D min;
+	Vector3D max;
 	
 }AABB;
 

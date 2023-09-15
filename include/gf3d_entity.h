@@ -2,7 +2,7 @@
 #define __GF3D_ENTITY_H__
 
 #include "gfc_types.h"
-#include "matrix.h"
+#include "gfc_matrix.h"
 
 #include "gf3d_model.h"
 
@@ -27,19 +27,21 @@ typedef enum{
 typedef struct Entity_S
 {
 	Uint8		_inuse;		/**<flag to make sure entities are not re-assigned while active*/
+	Uint8		hidden;
 	char *		name;
 	struct Entity_S   *parent;
 	EntityType	type;
 
-	Vector3	position;
-	Vector3	rotation;
-	Vector3	direction;
-	Vector3	velocity;
+	Vector3D	position;
+	Vector3D	rotation;
+	Vector3D	direction;
+	Vector3D	velocity;
 	float	rotate;
-	Vector2	forward;
+	Vector2D	forward;
 
 	Model		*model;
-	Matrix4D	modelMatrix;
+	Matrix4	modelMatrix;
+	Color		color;
 	BoxCollider boxCollider;
 
 	Bool		animated;

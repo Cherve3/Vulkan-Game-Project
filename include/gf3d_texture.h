@@ -9,14 +9,13 @@ typedef struct
 {
     Uint8               _inuse;
     Uint32              _refcount;
+    Uint32              width,height;
     TextLine            filename;
     VkImage             textureImage;
     VkDeviceMemory      textureImageMemory;
     VkImageView         textureImageView;
     VkSampler           textureSampler;
-	Uint32				height;
-	Uint32				width;
-    SDL_Surface* surface;
+    SDL_Surface        *surface;    /**<the image data in CPU space*/
 }Texture;
 
 /**
@@ -31,7 +30,7 @@ void gf3d_texture_init(Uint32 max_textures);
  * @param filename the path to the file to load
  * @return NULL on error or the texture loaded
  */
-Texture *gf3d_texture_load(const char *filename, SDL_Surface *surf);
+Texture *gf3d_texture_load(const char *filename);
 
 /**
  * @brief create a texture based on the provided surface.
@@ -39,11 +38,10 @@ Texture *gf3d_texture_load(const char *filename, SDL_Surface *surf);
  * @param surface the SDL_Surface image data to convert
  * @return NULL on error or a new Texture otherwise
  */
-Texture* gf3d_texture_convert_surface(SDL_Surface* surface);
+Texture *gf3d_texture_convert_surface(SDL_Surface * surface);
 
 /**
 * @brief free a previously loaded texture
-* @param the texture that will be freed
  */
 void gf3d_texture_free(Texture *tex);
 

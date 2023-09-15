@@ -322,7 +322,7 @@ Item rpg_item_create(Item item, ItemType type, char *name)
 	}
 }
 
-Item *rpg_item_new(ItemType type, char* name, Vector3 position)
+Item *rpg_item_new(ItemType type, char* name, Vector3D position)
 {
 	int i;
 	for (i = 0; i < items.item_count; i++)
@@ -335,8 +335,8 @@ Item *rpg_item_new(ItemType type, char* name, Vector3 position)
 			items.item_list[i].ent = gf3d_entity_new();
 			items.item_list[i].ent->model = gf3d_model_load(name);
 			items.item_list[i].ent->position = position;
-			matrix4d_scale(2, items.item_list[i].ent->modelMatrix);
-			matrix4d_translate(position, items.item_list[i].ent->modelMatrix);
+			gfc_matrix_scale(items.item_list[i].ent->modelMatrix, vector3d(2,2,2));
+			gfc_matrix_translate(items.item_list[i].ent->modelMatrix, position);
 			items.item_list[i].ent->type = ITEM;
 			items.item_list[i].ent->name = name;
 			items.item_list[i].ent->boxCollider.width = 2;

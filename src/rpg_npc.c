@@ -69,7 +69,7 @@ void rpg_npc_init(){
 	slog("NPC's Initialized");
 }
 
-void rpg_npc_spawn(NPCType type, Vector3 position)
+void rpg_npc_spawn(NPCType type, Vector3D position)
 {
 
 	npc[count].ent = rpg_npc_new();
@@ -85,8 +85,8 @@ void rpg_npc_spawn(NPCType type, Vector3 position)
 	npc[count].ent->type = NONPLAYER;
 
 	npc[count].ent->position = position;
-	npc[count].ent->velocity = vector3d_create(0, 0, 0);
-	npc[count].ent->rotation = vector3d_create(0,0,0);
+	npc[count].ent->velocity = vector3d(0, 0, 0);
+	npc[count].ent->rotation = vector3d(0,0,0);
 
 	npc[count].ent->interact = rpg_npc_interact;
 
@@ -97,7 +97,7 @@ void rpg_npc_spawn(NPCType type, Vector3 position)
 	npc[count].ent->boxCollider.y = npc[count].ent->position.y;
 	npc[count].ent->boxCollider.z = npc[count].ent->position.z;
 
-	matrix4d_translate(npc[count].ent->position, npc[count].ent->modelMatrix);
+	gfc_matrix_translate(npc[count].ent->modelMatrix, npc[count].ent->position);
 
 	switch (type)
 	{

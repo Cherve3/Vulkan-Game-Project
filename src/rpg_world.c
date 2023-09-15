@@ -13,7 +13,7 @@ static SJson *water_info = NULL;
 static SJson *structure_info = NULL;
 static SJson *tree_info = NULL;
 
-char file_path[60];
+char file_path[70];
 
 
 void rpg_world_init()
@@ -56,8 +56,8 @@ void rpg_world_init()
 	world.terrain = gf3d_entity_new();
 	if (world.terrain)
 	{
-		world.terrain->model = gf3d_model_load( sj_get_string_value(sj_object_get_value(ground_info, "model")));
-		world.terrain->name = "World";//sj_get_string_value(sj_object_get_value(ground_info, "name"));
+		world.terrain->model = gf3d_model_load(sj_get_string_value(sj_object_get_value(ground_info, "model")));
+		world.terrain->name = sj_get_string_value(sj_object_get_value(ground_info, "name"));
 
 		sj_get_float_value(sj_array_get_nth(sj_object_get_value(ground_info, "position"), 0), &world.terrain->position.x);
 		sj_get_float_value(sj_array_get_nth(sj_object_get_value(ground_info, "position"), 1), &world.terrain->position.y);
@@ -65,9 +65,9 @@ void rpg_world_init()
 		
 		sj_get_integer_value(sj_object_get_value(ground_info, "type"), &world.terrain->type);
 
-		matrix4d_translate(world.terrain->position, world.terrain->modelMatrix);
+		gfc_matrix_translate(world.terrain->modelMatrix, world.terrain->position);
 		world.terrain->boxCollider.depth = 1000.0;
-		world.terrain->boxCollider.height = 0;
+		world.terrain->boxCollider.height = -100;
 		world.terrain->boxCollider.width = 1000.0;
 		world.terrain->boxCollider.x = world.terrain->position.x;
 		world.terrain->boxCollider.y = world.terrain->position.y;
@@ -104,7 +104,8 @@ int water_init()
 	world.water = gf3d_entity_new();
 	if (world.water)
 	{
-		world.water->model = gf3d_model_load(sj_get_string_value(sj_object_get_value(water_info, "model")));
+		snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, sj_get_string_value(sj_object_get_value(water_info, "model")));
+		world.water->model = gf3d_model_load(file_path);
 		world.water->name = sj_get_string_value(sj_object_get_value(water_info, "name"));
 
 		sj_get_float_value(sj_array_get_nth(sj_object_get_value(water_info, "position"), 0), &world.water->position.x);
@@ -112,7 +113,7 @@ int water_init()
 		sj_get_float_value(sj_array_get_nth(sj_object_get_value(water_info, "position"), 2), &world.water->position.z);
 
 		sj_get_integer_value(sj_object_get_value(water_info, "type"), &world.water->type);
-		matrix4d_translate(world.water->position, world.water->modelMatrix);
+		gfc_matrix_translate(world.water->modelMatrix, world.water->position);
 		return 1;
 	}
 
@@ -132,7 +133,8 @@ int structures_init(Uint32 building_count)
 			SJson* structure = sj_object_get_value(structure_info, structure_name);
 			if (structure)
 			{
-				world.structures[i]->model = gf3d_model_load(sj_get_string_value(sj_object_get_value(structure, "model")));
+				snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, sj_get_string_value(sj_object_get_value(structure, "model")));
+				world.structures[i]->model = gf3d_model_load(file_path);
 				world.structures[i]->name = sj_get_string_value(sj_object_get_value(structure, "name"));;
 				sj_get_integer_value(sj_object_get_value(structure, "type"), &world.structures[i]->type);
 				sj_get_float_value(sj_array_get_nth(sj_object_get_value(structure, "position"), 0), &world.structures[i]->position.x);
@@ -144,7 +146,7 @@ int structures_init(Uint32 building_count)
 				world.structures[i]->boxCollider.width = 26;
 				world.structures[i]->boxCollider.height = 26;
 				world.structures[i]->boxCollider.depth = 26;
-				matrix4d_translate(world.structures[i]->position, world.structures[i]->modelMatrix);
+				gfc_matrix_translate(world.structures[i]->modelMatrix, world.structures[i]->position);
 			}
 			else
 			{
@@ -275,7 +277,8 @@ int trees_init(Uint32 tree_count)
 	if (world.trees[0])
 	{
 		SJson *tree = sj_object_get_value(tree_info, "tree1");
-		world.trees[0]->model = gf3d_model_load(sj_get_string_value(sj_object_get_value(tree, "model")));
+		snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, sj_get_string_value(sj_object_get_value(tree, "model")));
+		world.trees[0]->model = gf3d_model_load(file_path);
 		world.trees[0]->name = sj_get_string_value(sj_object_get_value(tree, "name"));;
 		sj_get_integer_value(sj_object_get_value(tree, "type"), &world.trees[0]->type);
 		sj_get_float_value(sj_array_get_nth(sj_object_get_value(tree, "position"), 0), &world.trees[0]->position.x);
@@ -286,8 +289,8 @@ int trees_init(Uint32 tree_count)
 		world.trees[0]->boxCollider.z = world.trees[0]->position.z;
 		world.trees[0]->boxCollider.width = 3;
 		world.trees[0]->boxCollider.height = 3;
-		world.trees[5]->boxCollider.depth = 3;
-		matrix4d_translate(world.trees[0]->position, world.trees[0]->modelMatrix);
+		world.trees[0]->boxCollider.depth = 3;
+		gfc_matrix_translate(world.trees[0]->modelMatrix, world.trees[0]->position);
 		return 1;
 	}
 	return 0;

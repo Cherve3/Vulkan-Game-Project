@@ -5,11 +5,11 @@
 
 typedef struct
 {    
-    Vector3 *vertices;
+    Vector3D *vertices;
     Uint32 vertex_count;
-    Vector3 *normals;
+    Vector3D *normals;
     Uint32 normal_count;
-    Vector2 *texels;
+    Vector2D *texels;
     Uint32 texel_count;
     
     Face *faceVerts;
@@ -29,7 +29,7 @@ typedef struct
  * @param filename the name of the file to parse
  * @return NULL on error or ObjData otherwise.  Note: this must be freed with gf3d_obj_free
  */
-ObjData *gf3d_obj_load_from_file(char *filename);
+ObjData *gf3d_obj_load_from_file(const char *filename);
 
 void gf3d_obj_free(ObjData *obj);
 

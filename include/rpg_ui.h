@@ -1,6 +1,8 @@
 #ifndef __RPG_UI_H__
 #define __RPG_UI_H__
 
+#include <stdbool.h>
+
 #include "gf3d_vgraphics.h"
 #include "gf3d_sprite.h"
 
@@ -25,7 +27,7 @@ typedef struct
 	Sprite **text;
 	Sprite *map;
 	Sprite *map_point;
-	Vector2 point_position;
+	Vector2D point_position;
 
 	Uint8 text_count;
 }Menu;

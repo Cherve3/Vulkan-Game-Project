@@ -17,7 +17,7 @@ typedef struct
     VkDevice         device;            /**<which device this is configured for*/
     Uint32           buffer_count;
     Uint32           buffer_frames;
-    UniformBuffer** buffers;
+    UniformBuffer  **buffers;
 }UniformBufferList;
 
 /**
@@ -29,13 +29,13 @@ typedef struct
  * @param bufferFrames how many buffer frames to support.  This should match the swap chain length
  * @return NULL on error, or a new list of uniform buffers
  */
-UniformBufferList* gf3d_uniform_buffer_list_new(VkDevice device, VkDeviceSize bufferSize, Uint32 bufferCount, Uint32 bufferFrames);
+UniformBufferList *gf3d_uniform_buffer_list_new(VkDevice device,VkDeviceSize bufferSize,Uint32 bufferCount,Uint32 bufferFrames);
 
 /**
  * @brief free a previously created uniform buffer list
  * @param list the list to free
  */
-void gf3d_uniform_buffer_list_free(UniformBufferList* list);
+void gf3d_uniform_buffer_list_free(UniformBufferList *list);
 
 /**
  * @brief get an unused uniform buffer from the list
@@ -43,11 +43,13 @@ void gf3d_uniform_buffer_list_free(UniformBufferList* list);
  * @param bufferFrame the frame to get it from
  * @return NULL if no more buffers left, or a valid InformBuffer pointer
  */
-UniformBuffer* gf3d_uniform_buffer_list_get_buffer(UniformBufferList* list, Uint32 bufferFrame);
+UniformBuffer *gf3d_uniform_buffer_list_get_buffer(UniformBufferList *list, Uint32 bufferFrame);
 
 /**
  * @brief clear all of the uniform buffers that have been used for the buffer frame
  */
-void gf3d_uniform_buffer_list_clear(UniformBufferList* list, Uint32 bufferFrame);
+void gf3d_uniform_buffer_list_clear(UniformBufferList *list, Uint32 bufferFrame);
+
+
 
 #endif

@@ -3,7 +3,7 @@
 #include "rpg_raycast.h"
 #include "simple_logger.h"
 
-Raycast *raycast(Vector3 origin, Vector3 direction, float maxDistance)
+Raycast *raycast(Vector3D origin, Vector3D direction, float maxDistance)
 {
 	Raycast *ray;
 	ray->origin = origin;

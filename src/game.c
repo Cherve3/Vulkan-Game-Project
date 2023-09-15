@@ -7,6 +7,8 @@
 
 #include "game.h"
 
+#include "gfc_input.h"
+
 #include "gf3d_vgraphics.h"
 #include "gf3d_pipeline.h"
 #include "gf3d_swapchain.h"
@@ -15,6 +17,7 @@
 #include "gf3d_texture.h"
 #include "gf3d_entity.h"
 #include "gf3d_sprite.h"
+#include "gf3d_particle.h"
 
 #include "rpg_world.h"
 #include "rpg_projectile.h"
@@ -28,6 +31,7 @@
 #include "rpg_ui.h"
 
 char *FILE_PATH;
+extern int __DEBUG;
 
 int quit() 
 {
@@ -46,6 +50,7 @@ int quit()
 
 int main(int argc,char *argv[])
 {
+	char filename[128];
     int done = 0;
 	int main_menu = 0;
     
@@ -57,8 +62,8 @@ int main(int argc,char *argv[])
     Uint8 validate = 1;
 	const Uint8* keys;
 
-	Matrix4D modelMat;
-	Matrix4D modelMat2;
+	Matrix4 modelMat;
+	Matrix4 modelMat2;
 
 	SDL_Event event;
 
@@ -92,6 +97,19 @@ int main(int argc,char *argv[])
 		}
 	}
 
+	// check arguments for nable/disable validation layers and debug
+    for (int i = 1; i < argc;i++)
+    {
+        if (strcmp(argv[i],"-disable_validate") == 0)
+        {
+            validate = 0;
+        }
+		if (strcmp(argv[i], "-debug") == 0)
+		{
+			__DEBUG = 1;
+		}
+    }
+
 	Bool toggleStats = false;
 
 	Chest *chest = NULL;
@@ -102,26 +120,24 @@ int main(int argc,char *argv[])
 
 	Model *model = NULL;
 	Model *dino = NULL;
+	Matrix4 skyMat;
+	Model* sky;
 
-	int i;
-    for (i = 1; i < argc;i++)
-    {
-        if (strcmp(argv[i],"-disable_validate") == 0)
-        {
-            validate = 0;
-        }
-    }
 
-    init_logger("gf3d.log", true);
+    init_logger("gf3d.log", false);
+	snprintf(filename, sizeof(filename), "%s%s", FILE_PATH, "config/input.cfg");
+	gfc_input_init(filename);
     slog("gf3d begin");
-    gf3d_vgraphics_init(
-        "gf3d",                 //program name
-        720,                   //screen width
-        480,                    //screen height
-		vector4d_create(0.3,0.75,.5,1),//background color
-        0,                      //fullscreen
-        validate                //validation
-    );
+  //  gf3d_vgraphics_init(
+  //      "gf3d",                 //program name
+  //      720,                   //screen width
+  //      480,                    //screen height
+		//vector4d(0.3,0.75,.5,1),//background color
+  //      0,                      //fullscreen
+  //      validate                //validation
+  //  );
+	snprintf(filename, sizeof(filename), "%s%s", FILE_PATH, "config/setup.cfg");
+	gf3d_vgraphics_init(filename);
 	slog_sync();
 	
 	rpg_main_menu_init();
@@ -149,41 +165,41 @@ int main(int argc,char *argv[])
 	rpg_update_loading_texture(108, SDL_FLIP_NONE);
 	
 	rpg_player_init();
-	gf3d_camera_init();
+	//gf3d_camera_init();
 
 	rpg_update_loading_texture(144, SDL_FLIP_NONE);
 
 	rpg_npc_init();
-	//rpg_npc_spawn(ItemShop, vector3d_create(0, -200, 0));
-	//rpg_npc_spawn(WeaponShop, vector3d_create(90, 5, -40));
-	//rpg_npc_spawn(ArmorShop, vector3d_create(90, 5.5, -60));
-	//rpg_npc_spawn(SpellShop, vector3d_create(60, 9.3, -20));
-	//rpg_npc_spawn(Generic, vector3d_create(100, 8.3, -80));
-	//rpg_npc_spawn(Questgiver, vector3d_create(90, 8.3, -20));
+	rpg_npc_spawn(ItemShop, vector3d(0, -200, 0));
+	//rpg_npc_spawn(WeaponShop, vector3d(90, 5, -40));
+	//rpg_npc_spawn(ArmorShop, vector3d(90, 5.5, -60));
+	//rpg_npc_spawn(SpellShop, vector3d(60, 9.3, -20));
+	//rpg_npc_spawn(Generic, vector3d(100, 8.3, -80));
+	//rpg_npc_spawn(Questgiver, vector3d(90, 8.3, -20));
 
 	//print_npc_stats(rpg_get_npc()[0]);
 
 	rpg_update_loading_texture(216, SDL_FLIP_NONE);
 
 	rpg_goblin_init();
-	//rpg_goblin_spawn(GoblinGrunt, vector3d_create(-420, 5, -505));
-	//rpg_goblin_spawn(GoblinHeavy, vector3d_create(-420, 5, -510));
-	//rpg_goblin_spawn(GoblinArcher, vector3d_create(-420, 5, -515));
-	//rpg_goblin_spawn(GoblinKing, vector3d_create(-410, 25, -550));
+	//rpg_goblin_spawn(GoblinGrunt, vector3d(-420, 5, -505));
+	//rpg_goblin_spawn(GoblinHeavy, vector3d(-420, 5, -510));
+	//rpg_goblin_spawn(GoblinArcher, vector3d(-420, 5, -515));
+	//rpg_goblin_spawn(GoblinKing, vector3d(-410, 25, -550));
 
 	//// For quest 2
-	//rpg_goblin_spawn(GoblinGrunt, vector3d_create(-200, 5, -205));
-	//rpg_goblin_spawn(GoblinGrunt, vector3d_create(-200, 5, -210));
-	//rpg_goblin_spawn(GoblinGrunt, vector3d_create(-200, 5, -215));
-	//rpg_goblin_spawn(GoblinGrunt, vector3d_create(-210, 5, -225));
-	//rpg_goblin_spawn(GoblinGrunt, vector3d_create(-210, 5, -205));
+	//rpg_goblin_spawn(GoblinGrunt, vector3d(-200, 5, -205));
+	//rpg_goblin_spawn(GoblinGrunt, vector3d(-200, 5, -210));
+	//rpg_goblin_spawn(GoblinGrunt, vector3d(-200, 5, -215));
+	//rpg_goblin_spawn(GoblinGrunt, vector3d(-210, 5, -225));
+	//rpg_goblin_spawn(GoblinGrunt, vector3d(-210, 5, -205));
 	
 	rpg_update_loading_texture(252, SDL_FLIP_NONE);
 	
 	rpg_item_entity_init(10);
-	//potion		= rpg_item_new(consumable, "healthpotion", vector3d_create(-5, 2, 30));
-	//arrow		= rpg_item_new(consumable, "arrow", vector3d_create(-5, 2, 50));
-	//woodsword	= rpg_item_new(weapon, "woodensword", vector3d_create(-5, 2, 70));
+	//potion		= rpg_item_new(consumable, "healthpotion", vector3d(-5, 2, 30));
+	//arrow		= rpg_item_new(consumable, "arrow", vector3d(-5, 2, 50));
+	//woodsword	= rpg_item_new(weapon, "woodensword", vector3d(-5, 2, 70));
 	
 	rpg_quest_init();
 
@@ -202,25 +218,29 @@ int main(int argc,char *argv[])
 
 	slog_sync();
 	
-	matrix4d_identity(modelMat);
-	matrix4d_identity(modelMat2);
+	gfc_matrix_identity(modelMat);
+	gfc_matrix_identity(modelMat2);
 
 	//model = gf3d_model_load("dino");
 	dino = gf3d_model_load("dino");
-	matrix4d_translate(vector3d_create(0,0,0),modelMat);
-	//matrix4d_translate(vector3d_create(10, 0, 0), modelMat2);
+	gfc_matrix_translate(modelMat, vector3d(0,0,0));
+	//matrix4d_translate(vector3d(10, 0, 0), modelMat2);
 	
 //		get_player()->ent->model = gf3d_model_load_animated("player", 1,19);
 
 	rpg_update_loading_texture(360, SDL_FLIP_NONE);
 	
-	
+	sky = gf3d_model_load("D:/Git/Projects/Vulkan-Game-Project/models/sky.model");
+	gfc_matrix_identity(skyMat);
+	gfc_matrix_scale(skyMat, vector3d(100, 100, 100));
+
 	//SDL_ShowCursor(SDL_FALSE);
 	//Game Loop
 	slog("Game Loop Begin");
 	while (!done)
 	{	
-		
+		gfc_input_update();
+
 		currentTime = SDL_GetTicks();
 		if (currentTime > lastTime + 1000) {
 			//slog("\ncurrent time: %i\n", currentTime);
@@ -242,15 +262,19 @@ int main(int argc,char *argv[])
 		SDL_PumpEvents();   // update SDL's internal event structures
 		keys = SDL_GetKeyboardState(NULL); // get the keyboard state for this frame
 
-		//update game things here
-		gf3d_camera_update();
+		// Update
 		gf3d_entity_think_all();
 		gf3d_entity_update_all();
+		rpg_ui_update();
 
+		gf3d_camera_update();
+		gf3d_camera_get_view_mat4(gf3d_vgraphics_get_view_matrix());
+
+		// Draw
 		gf3d_vgraphics_render_start();
-
+			gf3d_model_draw_sky(sky, skyMat, gfc_color(1, 1, 1, 1));
 			gf3d_entity_draw_all();
-			rpg_ui_update();
+			
 			rpg_ui_draw_all();
 
         gf3d_vgraphics_render_end();

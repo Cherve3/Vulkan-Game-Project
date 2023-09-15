@@ -9,6 +9,7 @@
 
 #include "gfc_types.h"
 #include "gfc_text.h"
+#include "gfc_vector.h"
 
 #include "gf3d_vgraphics.h"
 #include "gf3d_texture.h"
@@ -70,7 +71,7 @@ char* rpg_ui_get_player_model_name()
 void rpg_main_menu_init()
 {
 	slog("initializing menu...");
-
+	
 	UI.main_menu.renderer = SDL_CreateRenderer(gf3d_vgraphics_get_window(), -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
 	if (!UI.main_menu.renderer)
 	{ 
@@ -78,7 +79,7 @@ void rpg_main_menu_init()
 		SDL_Quit(); exit(0); 
 	}
 
-	snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, "images/mainmenu.png");
+	snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, "textures/UI/mainmenu.png");
 
 	UI.main_menu.bg_texture = IMG_LoadTexture(UI.main_menu.renderer, file_path);
 	if (!UI.main_menu.bg_texture) { slog("Main menu texture not created."); SDL_Quit(); exit(0); }
@@ -121,7 +122,7 @@ void rpg_ui_init()
 	UI.menu.map_point = NULL;
 	UI.menu.text	  = NULL;
 
-	UI.menu.point_position = vector2d_create(75, 65);
+	UI.menu.point_position = vector2d(75, 65);
 
 	life_ratio	  = 0;
 	mana_ratio	  = 0;
@@ -171,7 +172,7 @@ int rpg_menu_start_screen(int x, int y)
 	{
 		slog("Pressed Start button");
 
-		snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, "images/charchoice.png");
+		snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, "textures/UI/charchoice.png");
 
 		UI.main_menu.bg_texture = IMG_LoadTexture(UI.main_menu.renderer, file_path);
 		if (!UI.main_menu.bg_texture)
@@ -219,11 +220,11 @@ int rpg_menu_character_select_screen(int x, int y)
 void rpg_menu_loading_screen()
 {
 	SDL_RenderClear(UI.main_menu.renderer);
-	snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, "images/loading.png");
+	snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, "textures/UI/loading.png");
 	UI.main_menu.bg_texture = IMG_LoadTexture(UI.main_menu.renderer, file_path);
 	if (!UI.main_menu.bg_texture) { slog("Loading texture not created."); SDL_Quit(); exit(0); }
 
-	snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, "images/load_icon.png");
+	snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, "textures/UI/load_icon.png");
 	UI.main_menu.tex_loading = IMG_LoadTexture(UI.main_menu.renderer, file_path);
 	
 	VkExtent2D extent = gf3d_vgraphics_get_view_extent();
@@ -316,19 +317,23 @@ void rpg_ui_draw_all()
 	int x_pos = 110;
 	int y_pos = 90;
 
-	gf3d_sprite_draw(UI.hud.base, vector2d_create(10, 10), vector2d_create(1, 1), 0);
-	gf3d_sprite_draw(UI.hud.health, vector2d_create(12, 13), vector2d_create(life_ratio , 1), 0);
-	gf3d_sprite_draw(UI.hud.mana, vector2d_create(12, 31), vector2d_create(mana_ratio, 1), 0);
-	gf3d_sprite_draw(UI.hud.stamina, vector2d_create(12, 51), vector2d_create(stamina_ratio, 1), 0);
+	Vector3D rotation = vector3d(0, 0, 0);
+	Color color;
+	color.r = 1; color.g = 1; color.b = 1; color.a = 1;
+
+	gf2d_sprite_draw(UI.hud.base, vector2d(10, 10), vector2d(1, 1), rotation, color, 0);
+	gf2d_sprite_draw(UI.hud.health, vector2d(12, 13), vector2d(life_ratio , 1), rotation, color, 0);
+	gf2d_sprite_draw(UI.hud.mana, vector2d(12, 31), vector2d(mana_ratio, 1), rotation, color, 0);
+	gf2d_sprite_draw(UI.hud.stamina, vector2d(12, 51), vector2d(stamina_ratio, 1), rotation, color, 0);
 
 	if (get_player_stats().toggleStats)
 	{
-		gf3d_sprite_draw(UI.menu.stats, vector2d_create(250, 175), vector2d_create(1.5, 1.5), 0);
+		gf2d_sprite_draw(UI.menu.stats, vector2d(250, 175), vector2d(1.5, 1.5), rotation, color, 0);
 		for (i = 0; i < UI.menu.text_count; i++)
 		{
 			
 			if (UI.menu.text[i])
-				gf3d_sprite_draw(UI.menu.text[i], vector2d_create(x_pos, y_pos), vector2d_create(1, 1), 0);
+				gf2d_sprite_draw(UI.menu.text[i], vector2d(x_pos, y_pos), vector2d(1, 1), rotation, color, 0);
 			
 			y_pos += 20;
 		}
@@ -336,8 +341,8 @@ void rpg_ui_draw_all()
 
 	if (get_player_stats().toggleMap)
 	{
-		gf3d_sprite_draw(UI.menu.map, vector2d_create(100, 0), vector2d_create(1, 1), 0);
-		gf3d_sprite_draw(UI.menu.map_point, UI.menu.point_position, vector2d_create(.3, .3), 0);
+		gf2d_sprite_draw(UI.menu.map, vector2d(100, 0), vector2d(1, 1), rotation, color, 0);
+		gf2d_sprite_draw(UI.menu.map_point, UI.menu.point_position, vector2d(.3, .3), rotation, color, 0);
 	}
 
 	if (get_player_stats().toggleShop)
@@ -346,67 +351,67 @@ void rpg_ui_draw_all()
 		if (rpg_get_itemshop_toggle())
 		{
 			//slog("Item shop");
-			gf3d_sprite_draw(UI.shop.menu, vector2d_create(400, 175), vector2d_create(1, 1), 0);
-			gf3d_sprite_draw(UI.shop.text[16], vector2d_create(420, 200), vector2d_create(1, 1), 0);
-			gf3d_sprite_draw(UI.shop.text[0], vector2d_create(420, 220), vector2d_create(1, 1), 0);
+			gf2d_sprite_draw(UI.shop.menu, vector2d(400, 175), vector2d(1, 1), rotation, color, 0);
+			gf2d_sprite_draw(UI.shop.text[16], vector2d(420, 200), vector2d(1, 1), rotation, color, 0);
+			gf2d_sprite_draw(UI.shop.text[0], vector2d(420, 220), vector2d(1, 1), rotation, color, 0);
 		}
 		else if (rpg_get_weaponshop_toggle())
 		{
 			//slog("Weapon shop");
-			gf3d_sprite_draw(UI.shop.menu, vector2d_create(400, 175), vector2d_create(1, 1), 0);
-			gf3d_sprite_draw(UI.shop.text[17], vector2d_create(420, 200), vector2d_create(1, 1), 0);
-			gf3d_sprite_draw(UI.shop.text[1], vector2d_create(420, 220), vector2d_create(1, 1), 0);
+			gf2d_sprite_draw(UI.shop.menu, vector2d(400, 175), vector2d(1, 1), rotation, color, 0);
+			gf2d_sprite_draw(UI.shop.text[17], vector2d(420, 200), vector2d(1, 1), rotation, color, 0);
+			gf2d_sprite_draw(UI.shop.text[1], vector2d(420, 220), vector2d(1, 1), rotation, color, 0);
 		}
 		else if (rpg_get_armorshop_toggle())
 		{
 			//slog("Armor shop");
-			gf3d_sprite_draw(UI.shop.menu, vector2d_create(400, 175), vector2d_create(1, 1), 0);
-			gf3d_sprite_draw(UI.shop.text[18], vector2d_create(420, 200), vector2d_create(1, 1), 0);
-			gf3d_sprite_draw(UI.shop.text[2], vector2d_create(420, 220), vector2d_create(1, 1), 0);
+			gf2d_sprite_draw(UI.shop.menu, vector2d(400, 175), vector2d(1, 1), rotation, color, 0);
+			gf2d_sprite_draw(UI.shop.text[18], vector2d(420, 200), vector2d(1, 1), rotation, color, 0);
+			gf2d_sprite_draw(UI.shop.text[2], vector2d(420, 220), vector2d(1, 1), rotation, color, 0);
 		}
 		else if (rpg_get_spellshop_toggle())
 		{
 			//slog("Spellshop shop");
-			gf3d_sprite_draw(UI.shop.menu, vector2d_create(400, 175), vector2d_create(1, 1), 0);
-			gf3d_sprite_draw(UI.shop.text[19], vector2d_create(420, 200), vector2d_create(1, 1), 0);
-			gf3d_sprite_draw(UI.shop.text[3], vector2d_create(420, 220), vector2d_create(1, 1), 0);
+			gf2d_sprite_draw(UI.shop.menu, vector2d(400, 175), vector2d(1, 1), rotation, color, 0);
+			gf2d_sprite_draw(UI.shop.text[19], vector2d(420, 200), vector2d(1, 1), rotation, color, 0);
+			gf2d_sprite_draw(UI.shop.text[3], vector2d(420, 220), vector2d(1, 1), rotation, color, 0);
 		}
 		else if (rpg_get_generic_toggle())
 		{
 			//slog("Talking with NPC");
-			gf3d_sprite_draw(UI.shop.textbox, vector2d_create(430, 420), vector2d_create(1.6, 1.5), 0);
-			gf3d_sprite_draw(UI.shop.text[20], vector2d_create(240, 320), vector2d_create(1, 1), 0);
+			gf2d_sprite_draw(UI.shop.textbox, vector2d(430, 420), vector2d(1.6, 1.5), rotation, color, 0);
+			gf2d_sprite_draw(UI.shop.text[20], vector2d(240, 320), vector2d(1, 1), rotation, color, 0);
 			if (rpg_get_current_quest() == 1)
-				gf3d_sprite_draw(UI.shop.text[4], vector2d_create(260, 340), vector2d_create(1, 1), 0);
+				gf2d_sprite_draw(UI.shop.text[4], vector2d(260, 340), vector2d(1, 1), rotation, color, 0);
 			if (rpg_get_current_quest() == 2)
-				gf3d_sprite_draw(UI.shop.text[5], vector2d_create(260, 340), vector2d_create(1, 1), 0);
+				gf2d_sprite_draw(UI.shop.text[5], vector2d(260, 340), vector2d(1, 1), rotation, color, 0);
 			if (rpg_get_current_quest() == 3)
-				gf3d_sprite_draw(UI.shop.text[6], vector2d_create(260, 340), vector2d_create(1, 1), 0);
+				gf2d_sprite_draw(UI.shop.text[6], vector2d(260, 340), vector2d(1, 1), rotation, color, 0);
 			if (rpg_get_current_quest() == 4)
-				gf3d_sprite_draw(UI.shop.text[7], vector2d_create(260, 340), vector2d_create(1, 1), 0);
+				gf2d_sprite_draw(UI.shop.text[7], vector2d(260, 340), vector2d(1, 1), rotation, color, 0);
 			if (rpg_get_current_quest() == 5)
-				gf3d_sprite_draw(UI.shop.text[8], vector2d_create(260, 340), vector2d_create(1, 1), 0);
+				gf2d_sprite_draw(UI.shop.text[8], vector2d(260, 340), vector2d(1, 1), rotation, color, 0);
 			if (rpg_get_current_quest() == 6)
-				gf3d_sprite_draw(UI.shop.text[9], vector2d_create(260, 340), vector2d_create(1, 1), 0);
+				gf2d_sprite_draw(UI.shop.text[9], vector2d(260, 340), vector2d(1, 1), rotation, color, 0);
 		}
 
 		else if (rpg_get_quest_toggle())
 		{
 			//slog("Talking to Questgiver");
-			gf3d_sprite_draw(UI.shop.textbox, vector2d_create(430, 420), vector2d_create(1.6, 1.5), 0);
-			gf3d_sprite_draw(UI.shop.text[21], vector2d_create(240, 320), vector2d_create(1, 1), 0);
+			gf2d_sprite_draw(UI.shop.textbox, vector2d(430, 420), vector2d(1.6, 1.5), rotation, color, 0);
+			gf2d_sprite_draw(UI.shop.text[21], vector2d(240, 320), vector2d(1, 1), rotation, color, 0);
 			if (rpg_get_current_quest() == 1)
-				gf3d_sprite_draw(UI.shop.text[10], vector2d_create(260, 340), vector2d_create(1, 1), 0);
+				gf2d_sprite_draw(UI.shop.text[10], vector2d(260, 340), vector2d(1, 1), rotation, color, 0);
 			if (rpg_get_current_quest() == 2)
-				gf3d_sprite_draw(UI.shop.text[11], vector2d_create(260, 340), vector2d_create(1, 1), 0);
+				gf2d_sprite_draw(UI.shop.text[11], vector2d(260, 340), vector2d(1, 1), rotation, color, 0);
 			if (rpg_get_current_quest() == 3)
-				gf3d_sprite_draw(UI.shop.text[12], vector2d_create(260, 340), vector2d_create(1, 1), 0);
+				gf2d_sprite_draw(UI.shop.text[12], vector2d(260, 340), vector2d(1, 1), rotation, color, 0);
 			if (rpg_get_current_quest() == 4)
-				gf3d_sprite_draw(UI.shop.text[13], vector2d_create(260, 340), vector2d_create(1, 1), 0);
+				gf2d_sprite_draw(UI.shop.text[13], vector2d(260, 340), vector2d(1, 1), rotation, color, 0);
 			if (rpg_get_current_quest() == 5)
-				gf3d_sprite_draw(UI.shop.text[14], vector2d_create(260, 340), vector2d_create(1, 1), 0);
+				gf2d_sprite_draw(UI.shop.text[14], vector2d(260, 340), vector2d(1, 1), rotation, color, 0);
 			if (rpg_get_current_quest() == 6)
-				gf3d_sprite_draw(UI.shop.text[15], vector2d_create(260, 340), vector2d_create(1, 1), 0);
+				gf2d_sprite_draw(UI.shop.text[15], vector2d(260, 340), vector2d(1, 1), rotation, color, 0);
 		}
 	}
 }
@@ -421,7 +426,7 @@ void rpg_ui_update()
 	{
 		old_x = get_player()->ent->position.x+500;
 		old_y = get_player()->ent->position.z+150;
-		UI.menu.point_position = vector2d_create(old_x/5, old_y/5);
+		UI.menu.point_position = vector2d(old_x/5, old_y/5);
 	}
 }
 
@@ -442,7 +447,7 @@ Sprite *rpg_ui_text(char* name, char* text, Bool wrap)
 	{
 		slog("Surface null");
 	}
-	Sprite *sprite = gf3d_sprite_load(name, surface, -1, -1, 0);
+	Sprite *sprite = gf2d_sprite_load(name, surface, -1, -1);
 	if (!sprite)
 		slog("Sprite null");
 
@@ -488,25 +493,25 @@ void load_npc_dialog()
 
 void setup_hud()
 {
-	UI.hud.base = gf3d_sprite_load("images/base_bars.png", NULL, -1, -1, 0);
+	UI.hud.base = gf2d_sprite_load("textures/UI/base_bars.png", NULL, -1, -1, 0);
 	if (!UI.hud.base) slog("base sprite not loaded");
 
-	UI.hud.health = gf3d_sprite_load("images/health_bar.png", NULL, -1, -1, 0);
+	UI.hud.health = gf2d_sprite_load("textures/UI/health_bar.png", NULL, -1, -1, 0);
 	if (!UI.hud.health) slog("health sprite not loaded");
 
-	UI.hud.mana = gf3d_sprite_load("images/mana_bar.png", NULL, -1, -1, 0);
+	UI.hud.mana = gf2d_sprite_load("textures/UI/mana_bar.png", NULL, -1, -1, 0);
 	if (!UI.hud.mana) slog("mana sprite not loaded");
 
-	UI.hud.stamina = gf3d_sprite_load("images/stamina_bar.png", NULL, -1, -1, 0);
+	UI.hud.stamina = gf2d_sprite_load("textures/UI/stamina_bar.png", NULL, -1, -1, 0);
 	if (!UI.hud.stamina) slog("stamina sprite not loaded");
 
-	UI.menu.stats = gf3d_sprite_load("images/statmenu.png", NULL, -1, -1, 0);
+	UI.menu.stats = gf2d_sprite_load("textures/UI/statmenu.png", NULL, -1, -1, 0);
 	if (!UI.menu.stats) slog("stat menu sprite not loaded");
 
-	UI.menu.map = gf3d_sprite_load("images/map.png", NULL, -1, -1, 0);
+	UI.menu.map = gf2d_sprite_load("textures/UI/map.png", NULL, -1, -1, 0);
 	if (!UI.menu.stats) slog("map menu sprite not loaded");
 
-	UI.menu.map_point = gf3d_sprite_load("images/mappointer.png", NULL, -1, -1, 0);
+	UI.menu.map_point = gf2d_sprite_load("textures/UI/mappointer.png", NULL, -1, -1, 0);
 	if (!UI.menu.stats) slog("map menu sprite not loaded");
 
 	char buffer[26];
@@ -614,10 +619,10 @@ void setup_npc_ui()
 	quest_info = sj_load(file_path);
 	if (!dialog_info){ slog("Quest info json not found."); return; }
 
-	UI.shop.menu = gf3d_sprite_load("images/shopmenu.png", NULL, -1, -1, 0);
+	UI.shop.menu = gf2d_sprite_load("textures/UI/shopmenu.png", NULL, -1, -1, 0);
 	if (!UI.shop.menu) slog("shop menu sprite not loaded");
 
-	UI.shop.textbox = gf3d_sprite_load("images/textbox.png", NULL, -1, -1, 0);
+	UI.shop.textbox = gf2d_sprite_load("textures/UI/textbox.png", NULL, -1, -1, 0);
 	if (!UI.shop.textbox) slog("text box sprite not loaded");
 
 	load_npc_dialog();

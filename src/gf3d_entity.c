@@ -61,7 +61,7 @@ Entity *gf3d_entity_new()
 		if (!gf3d_entity.entity_list[i]._inuse)
 		{
 			gf3d_entity.entity_list[i]._inuse = 1;
-			matrix4d_identity(gf3d_entity.entity_list[i].modelMatrix);
+			gfc_matrix_identity(gf3d_entity.entity_list[i].modelMatrix);
 			return &gf3d_entity.entity_list[i];
 		}
 	}
@@ -135,7 +135,7 @@ void gf3d_entity_draw(Entity *self)
 {
 	if (!self) return;
 	if (self->animated)return;
-	gf3d_model_draw(self->model, self->modelMatrix);
+	gf3d_model_draw(self->model, self->modelMatrix, gfc_color_to_vector4f(self->color), vector4d(1, 1, 1, 1));
 
 }
 
@@ -145,7 +145,7 @@ void gf3d_entity_draw_all()
 	for (i = 0; i < gf3d_entity.entity_count; i++)
 	{
 		if (!gf3d_entity.entity_list[i]._inuse) continue;
-		gf3d_entity_draw(&gf3d_entity.entity_list[i]);
+		gf3d_entity_draw(&gf3d_entity.entity_list[i], gfc_color_to_vector4f(gf3d_entity.entity_list[i].color), vector4d(1, 1, 1, 1));
 	}
 }
 

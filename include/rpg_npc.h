@@ -77,7 +77,7 @@ void rpg_npc_init();
  *	@param type an enum of the goblin type
  *	@param position the initial spawn position of the goblin
  */
-void rpg_npc_spawn(NPCType type, Vector3 position);
+void rpg_npc_spawn(NPCType type, Vector3D position);
 
 /**
 *	@brief runs gf3d_entity_new function to add an NPC to entity system

@@ -1,26 +1,26 @@
 #ifndef __GF3D_CAMERA_H__
 #define __GF3D_CAMERA_H__
 
-#include "matrix.h"
-#include "vector.h"
+#include "gfc_matrix.h"
+#include "gfc_vector.h"
 
 #include "gf3d_entity.h"
 
 typedef struct
 {
-	Matrix4D *proj;
-	Matrix4D *model;
-	Matrix4D *view;
+	Matrix4 proj;
+	Matrix4 model;
+	Matrix4 view;
 
-	Vector3 position;
-	Vector3 velocity;
-	Vector3 projVel;
-	Vector3 forward;
-	Vector3 up;
-	Vector3 right;
+	Vector3D position;
+	Vector3D velocity;
+	Vector3D projVel;
+	Vector3D forward;
+	Vector3D up;
+	Vector3D right;
 
-	Vector3 offset;
-	Vector3 rotation;
+	Vector3D offset;
+	Vector3D rotation;
 
 	Entity *target;
 
@@ -34,23 +34,23 @@ typedef struct
 void gf3d_camera_init();
 
 void gf3d_camera_update();
-//void camera_update(Vector3 rotation, Vector3 playerPosition, Matrix4 playerMat);
+//void camera_update(Vector3D rotation, Vector3D playerPosition, Matrix4 playerMat);
 
-Matrix4D *gf3d_get_camera();
+Matrix4 *gf3d_get_camera();
 
 /**
 * @brief get the current camera view
 * @param view output, the matrix provided will be populated with the current camera information
 */
-void gf3d_camera_get_view(Matrix4D view);
+void gf3d_camera_get_view(Matrix4 view);
 
 /**
 * @brief set the current camera based on the matrix provided
 */
-void gf3d_camera_set_view(Matrix4D view);
+void gf3d_camera_set_view(Matrix4 view);
 
 
-Vector3 gf3d_camera_get_position();
+Vector3D gf3d_camera_get_position();
 /**
 * @brief set the camera properties based on position and direction that the camera should be looking
 * @param position the location for the camera
@@ -58,16 +58,16 @@ Vector3 gf3d_camera_get_position();
 * @param up the direction considered to be "up"
 */
 void gf3d_camera_look_at(
-	Vector3 position,
-	Vector3 target,
-	Vector3 up
+	Vector3D position,
+	Vector3D target,
+	Vector3D up
 	);
 
 /**
 * @brief explicitely set the camera positon, holding all other parameters the same
 * @param position the new position for the camera
 */
-void gf3d_camera_set_position(Vector3 position);
+void gf3d_camera_set_position(Vector3D position);
 
 /**
 * @brief move the camera relatively based on the vector provided
@@ -77,4 +77,6 @@ void gf3d_camera_move();
 
 void gf3d_camera_set_target_entity(Entity *target);
 
+
+void gf3d_camera_get_view_mat4(Matrix4* view);
 #endif

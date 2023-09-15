@@ -3,6 +3,8 @@
 #include "simple_json.h"
 #include "simple_logger.h"
 
+#include "gfc_vector.h"
+
 #include "rpg_quest.h"
 #include "rpg_items.h"
 #include "rpg_goblin.h"
@@ -126,11 +128,11 @@ Quest rpg_start_quest(int quest_number)
 		slog("Quest 1 started");
 		quests.current_quest = 1;
 		quests.item_spawn_list = gfc_allocate_array(sizeof(Item), 5);
-		quests.item_spawn_list[0] = rpg_item_new(material, "Wood Log", vector3d_create(-5, 2, 20));
-		quests.item_spawn_list[1] = rpg_item_new(material, "Wood Log", vector3d_create(-5, 2, 22.5));
-		quests.item_spawn_list[2] = rpg_item_new(material, "Wood Log", vector3d_create(-5, 2, 24.5));
-		quests.item_spawn_list[3] = rpg_item_new(material, "Wood Log", vector3d_create(-5, 4, 21.5));
-		quests.item_spawn_list[4] = rpg_item_new(material, "Wood Log", vector3d_create(-5, 4, 23.5));
+		quests.item_spawn_list[0] = rpg_item_new(material, "Wood Log", vector3d(-5, 2, 20));
+		quests.item_spawn_list[1] = rpg_item_new(material, "Wood Log", vector3d(-5, 2, 22.5));
+		quests.item_spawn_list[2] = rpg_item_new(material, "Wood Log", vector3d(-5, 2, 24.5));
+		quests.item_spawn_list[3] = rpg_item_new(material, "Wood Log", vector3d(-5, 4, 21.5));
+		quests.item_spawn_list[4] = rpg_item_new(material, "Wood Log", vector3d(-5, 4, 23.5));
 
 		return quests.quest_list[0];
 	}
@@ -139,11 +141,11 @@ Quest rpg_start_quest(int quest_number)
 	{
 		slog("Quest 2 started");
 		quests.current_quest = 2;
-		rpg_goblin_spawn(GoblinGrunt, vector3d_create(-200, 5, -205));
-		rpg_goblin_spawn(GoblinGrunt, vector3d_create(-200, 5, -210));
-		rpg_goblin_spawn(GoblinGrunt, vector3d_create(-200, 5, -215));
-		rpg_goblin_spawn(GoblinGrunt, vector3d_create(-210, 5, -225));
-		rpg_goblin_spawn(GoblinGrunt, vector3d_create(-210, 5, -205));
+		rpg_goblin_spawn(GoblinGrunt, vector3d(-200, 5, -205));
+		rpg_goblin_spawn(GoblinGrunt, vector3d(-200, 5, -210));
+		rpg_goblin_spawn(GoblinGrunt, vector3d(-200, 5, -215));
+		rpg_goblin_spawn(GoblinGrunt, vector3d(-210, 5, -225));
+		rpg_goblin_spawn(GoblinGrunt, vector3d(-210, 5, -205));
 
 		return quests.quest_list[1];
 	}
