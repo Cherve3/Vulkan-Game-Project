@@ -2,14 +2,14 @@
     "ground":
     {
         "name":"world",
-        "model":"world",
+        "model":"D:/Git/Projects/Vulkan-Game-Project/models/world.model",
         "type":6,
         "position":[0.0,0.0,0.0]
     },
     "water":
     {
         "name":"Water",
-        "model":"water",
+        "model":"D:/Git/Projects/Vulkan-Game-Project/models/water.model",
         "type":6,
         "position":[0.0,-4.0,0.0]
     },
@@ -18,7 +18,7 @@
         "structure0":
         {
             "name":"House 0",
-            "model":"house1",
+            "model":"D:/Git/Projects/Vulkan-Game-Project/models/structure1.model",
             "type":7,
             "position":[100.0, 26.0, 100.0]
 
@@ -26,7 +26,7 @@
         "structure1":
         {
             "name":"House 1",
-            "model":"house2",
+            "model":"D:/Git/Projects/Vulkan-Game-Project/models/structure2.model",
             "type":7,
             "position":[-100.0, 22.0, 100.0]
 
@@ -34,7 +34,7 @@
         "structure2":
         {
             "name":"House 2",
-            "model":"house3",
+            "model":"D:/Git/Projects/Vulkan-Game-Project/models/structure3.model",
             "type":7,
             "position":[-50.0, 22.0, 150.0]
 
@@ -42,7 +42,7 @@
         "structure3":
         {
             "name":"House 3",
-            "model":"house4",
+            "model":"D:/Git/Projects/Vulkan-Game-Project/models/structure4.model",
             "type":7,
             "position":[20.0, 29.0, 170.0]
 
@@ -50,7 +50,7 @@
         "structure4":
         {
             "name":"Well",
-            "model":"well",
+            "model":"D:/Git/Projects/Vulkan-Game-Project/models/well.model",
             "type":7,
             "position":[20.0, 20.0, 150.0]
     
@@ -58,7 +58,7 @@
         "structure5":
         {
             "name":"Goblin Base",
-            "model":"goblinbase",
+            "model":"D:/Git/Projects/Vulkan-Game-Project/models/goblinbase.model",
             "type":7,
             "position":[-400.0, 0.0, -500.0]
         }
@@ -68,7 +68,7 @@
         "tree1":
         {
             "name":"Tree",
-            "model":"tree1",
+            "model":"D:/Git/Projects/Vulkan-Game-Project/models/tree1.model",
             "type":7,
             "position":[-400.0, 0.0, -400.0]
         }

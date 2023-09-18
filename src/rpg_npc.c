@@ -40,7 +40,6 @@ void npc_close()
 	sj_free(spellshop_info);
 	sj_free(generic_info);
 	sj_free(questgiver_info);
-	sj_free(npc_info);
 	memset(npc, 0, sizeof(NPC)* 10);
 	slog("NPC files closing");
 }

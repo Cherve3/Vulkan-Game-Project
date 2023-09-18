@@ -1,8 +1,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "simple_logger.h"
-#include "simple_json.h"
+#include "game.h"
 
 #include "gf3d_config.h"
 #include "gf3d_swapchain.h"
@@ -11,6 +10,8 @@
 #include "gf3d_pipeline.h"
 
 extern int __DEBUG;
+
+static char file_path[70];
 
 typedef struct
 {
@@ -271,7 +272,8 @@ Pipeline *gf3d_pipeline_create_from_config(
     vertFile = sj_object_get_value_as_string(config,"vertex_shader");
     if (vertFile)
     {
-        pipe->vertShader = (char *)gf3d_shaders_load_data(vertFile,&pipe->vertSize);
+        snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, vertFile);
+        pipe->vertShader = (char *)gf3d_shaders_load_data(file_path,&pipe->vertSize);
         pipe->vertModule = gf3d_shaders_create_module(pipe->vertShader,pipe->vertSize,device);
         vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
         vertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
@@ -289,7 +291,8 @@ Pipeline *gf3d_pipeline_create_from_config(
     fragFile = sj_object_get_value_as_string(config,"fragment_shader");
     if (fragFile)
     {
-        pipe->fragShader = (char *)gf3d_shaders_load_data(fragFile,&pipe->fragSize);
+        snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, fragFile);
+        pipe->fragShader = (char *)gf3d_shaders_load_data(file_path,&pipe->fragSize);
         pipe->fragModule = gf3d_shaders_create_module(pipe->fragShader,pipe->fragSize,device);
         fragShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
         fragShaderStageInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;

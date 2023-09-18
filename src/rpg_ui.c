@@ -493,25 +493,32 @@ void load_npc_dialog()
 
 void setup_hud()
 {
-	UI.hud.base = gf2d_sprite_load("textures/UI/base_bars.png", NULL, -1, -1, 0);
+	snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, "textures/UI/base_bars.png");
+	UI.hud.base = gf2d_sprite_load(file_path, NULL, -1, -1, 0);
 	if (!UI.hud.base) slog("base sprite not loaded");
 
-	UI.hud.health = gf2d_sprite_load("textures/UI/health_bar.png", NULL, -1, -1, 0);
+	snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, "textures/UI/health_bar.png");
+	UI.hud.health = gf2d_sprite_load(file_path, NULL, -1, -1, 0);
 	if (!UI.hud.health) slog("health sprite not loaded");
 
-	UI.hud.mana = gf2d_sprite_load("textures/UI/mana_bar.png", NULL, -1, -1, 0);
+	snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, "textures/UI/mana_bar.png");
+	UI.hud.mana = gf2d_sprite_load(file_path, NULL, -1, -1, 0);
 	if (!UI.hud.mana) slog("mana sprite not loaded");
 
-	UI.hud.stamina = gf2d_sprite_load("textures/UI/stamina_bar.png", NULL, -1, -1, 0);
+	snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, "textures/UI/stamina_bar.png");
+	UI.hud.stamina = gf2d_sprite_load(file_path, NULL, -1, -1, 0);
 	if (!UI.hud.stamina) slog("stamina sprite not loaded");
 
-	UI.menu.stats = gf2d_sprite_load("textures/UI/statmenu.png", NULL, -1, -1, 0);
+	snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, "textures/UI/statmenu.png");
+	UI.menu.stats = gf2d_sprite_load(file_path, NULL, -1, -1, 0);
 	if (!UI.menu.stats) slog("stat menu sprite not loaded");
 
-	UI.menu.map = gf2d_sprite_load("textures/UI/map.png", NULL, -1, -1, 0);
+	snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, "textures/UI/map.png");
+	UI.menu.map = gf2d_sprite_load(file_path, NULL, -1, -1, 0);
 	if (!UI.menu.stats) slog("map menu sprite not loaded");
 
-	UI.menu.map_point = gf2d_sprite_load("textures/UI/mappointer.png", NULL, -1, -1, 0);
+	snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, "textures/UI/mappointer.png");
+	UI.menu.map_point = gf2d_sprite_load(file_path, NULL, -1, -1, 0);
 	if (!UI.menu.stats) slog("map menu sprite not loaded");
 
 	char buffer[26];
@@ -619,10 +626,12 @@ void setup_npc_ui()
 	quest_info = sj_load(file_path);
 	if (!dialog_info){ slog("Quest info json not found."); return; }
 
-	UI.shop.menu = gf2d_sprite_load("textures/UI/shopmenu.png", NULL, -1, -1, 0);
+	snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, "textures/UI/shopmenu.png");
+	UI.shop.menu = gf2d_sprite_load(file_path, NULL, -1, -1, 0);
 	if (!UI.shop.menu) slog("shop menu sprite not loaded");
 
-	UI.shop.textbox = gf2d_sprite_load("textures/UI/textbox.png", NULL, -1, -1, 0);
+	snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, "textures/UI/textbox.png");
+	UI.shop.textbox = gf2d_sprite_load(file_path, NULL, -1, -1, 0);
 	if (!UI.shop.textbox) slog("text box sprite not loaded");
 
 	load_npc_dialog();

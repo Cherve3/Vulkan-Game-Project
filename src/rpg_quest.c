@@ -28,6 +28,8 @@ char file_path[60];
 void rpg_quest_close()
 {
 	int i;
+
+	sj_free(quest_info);
 	if (quests.quest_list != NULL)
 	{
 		//for (i = 0; i < quests.quest_count; i++)

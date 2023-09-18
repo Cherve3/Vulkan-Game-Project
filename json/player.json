@@ -1,7 +1,7 @@
 {
     "player":
     {
-        "name":                 "Player 1",
+        "name":                 "Player",
         "level":                1,
         "exp":                  0,
         "bits":                 1000,

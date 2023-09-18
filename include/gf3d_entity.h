@@ -36,11 +36,12 @@ typedef struct Entity_S
 	Vector3D	rotation;
 	Vector3D	direction;
 	Vector3D	velocity;
-	float	rotate;
+	float		rotate;
 	Vector2D	forward;
+	Vector2D	right;
 
 	Model		*model;
-	Matrix4	modelMatrix;
+	Matrix4		modelMatrix;
 	Color		color;
 	BoxCollider boxCollider;
 

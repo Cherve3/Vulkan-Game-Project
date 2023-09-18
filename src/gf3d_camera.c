@@ -16,17 +16,12 @@ static float camera_distance = 10;
 
 void gf3d_camera_init()
 {
-	gfc_matrix_copy(camera.proj, gf3d_vgraphics_get_uniform_buffer_object().proj);
-	gfc_matrix_copy(camera.model, gf3d_vgraphics_get_uniform_buffer_object().model);
-	gfc_matrix_copy(camera.view, gf3d_vgraphics_get_uniform_buffer_object().view);
 	camera.position = vector3d(0, 0, 0);
 	camera.velocity = vector3d(0, 0, 0);
-	camera.projVel = vector3d(0, 0, 0);
 	camera.forward = vector3d(0, 0, -1);
 	camera.up = vector3d(0, 1, 0);
 	camera.right = vector3d(1, 0, 0);
 	camera.rotation = vector3d(0, 0, 0);
-	camera.offset = vector3d(0, 0, 0);
 	camera.speed = 0.5;
 	camera.zoom = 20;
 
@@ -42,32 +37,32 @@ void gf3d_camera_update_velocity()
 
 	if (keys[SDL_SCANCODE_W])
 	{
-		camera.velocity.z += camera.forward.z;
+		camera.velocity.z += 1;
 		slog("W: z: %.4f", camera.velocity.z);
 	}
 	if (keys[SDL_SCANCODE_A])
 	{
-		camera.velocity.x -= camera.right.x;
+		camera.velocity.x -= 1;
 		slog("A: x:%.4f", camera.velocity.x);
 	}
 	if (keys[SDL_SCANCODE_S])
 	{
-		camera.velocity.z -= camera.forward.z;
+		camera.velocity.z -= 1;
 		slog("S: z: %.4f", camera.velocity.z);
 	}
 	if (keys[SDL_SCANCODE_D])
 	{
-		camera.velocity.x += camera.right.x;
+		camera.velocity.x += 1;
 		slog("D: x:%.4f", camera.velocity.x);
 	}
 	if (keys[SDL_SCANCODE_Q])
 	{
-		camera.velocity.y -= camera.up.y;
+		camera.velocity.y -= 1;
 		slog("Q: y:%.4f", camera.velocity.y);
 	}
 	if (keys[SDL_SCANCODE_E])
 	{
-		camera.velocity.y += camera.up.y;
+		camera.velocity.y += 1;
 		slog("E: y:%.4f", camera.velocity.y);
 	}
 }
@@ -100,108 +95,60 @@ void gf3d_camera_zoom()
 void gf3d_camera_get_view_mat4(Matrix4* view)
 {
 	if (!view)return;
-	memcpy(view, camera.view, sizeof(Matrix4));
+	memcpy(view, camera.camMatrix, sizeof(Matrix4));
+}
+
+void gf3d_camera_set_view_mat4(Matrix4* view)
+{
+	if (!view)return;
+	memcpy(camera.camMatrix, view, sizeof(Matrix4));
 }
 
 void gf3d_camera_update()
 {
-	//const int x_rel, y_rel;
-	//SDL_GetRelativeMouseState(&x_rel, &y_rel);
-
-	//Matrix4 rotationX;
-	//Matrix4 rotationY;
-	//Matrix4 rotation;
-	//gfc_matrix_identity(&rotationX);
-	//gfc_matrix_identity(&rotationY);
-
-	//camera.pitch += y_rel*GFC_DEGTORAD;
-	//camera.yaw += x_rel *GFC_DEGTORAD;
-
-	//if (camera.pitch >= GFC_PI_HALFPI)
-	//{
-	//	camera.pitch = GFC_PI_HALFPI;
-	//}
-	//else if (camera.pitch <= 0)
-	//{
-	//	camera.pitch = 0;
-	//}
-	//if (camera.yaw >= GFC_2PI)
-	//{
-	//	camera.yaw = 0;
-	//}
-	//
-	//if (camera.target)
-	//{	
-	//	Vector2D cpos;
-	//	float s = SDL_sinf(camera.yaw - 2.35619);
-	//	float c = SDL_cosf(camera.yaw - 2.35619);
-
-	//	gf3d_camera_zoom();
-	//	cpos.x = ((-camera.zoom) * c) - ((-camera.zoom) * s);
-	//	cpos.y = ((-camera.zoom) * s) + ((-camera.zoom) * c);
-
-	//	gf3d_camera_look_at(
-	//		vector3d(cpos.x + camera.target->position.x,  camera.target->position.y, cpos.y + camera.target->position.z),
-	//		camera.target->position,
-	//		camera.up);
-	//}
-	//else
-	//{
-	//	gf3d_camera_update_velocity();
-	//	gf3d_camera_move();
-	//	//gfc_vector3d_print(camera.velocity);
-	//}
-
-	////matrix4d_rotate_arbitrary(camera.yaw, camera.up, &rotationX);
-	////matrix4d_rotate_arbitrary(camera.pitch, camera.up, &rotationY);
-
-	////matrix4d_multiply(rotationX, rotationY, &rotation);
-	////matrix4d_multiply(rotation, camera.view, &camera.view);
-	//
-	//vector3d_clear(camera.velocity);
-	////matrix4d_print(camera.view);
-
 	Vector3D xaxis, yaxis, zaxis, position;
+
 	float cosPitch = cos(camera.rotation.x);
 	float sinPitch = sin(camera.rotation.x);
 	float cosYaw = cos(camera.rotation.z);
 	float sinYaw = sin(camera.rotation.z);
 
+	gf3d_camera_move();
 	position.x = camera.position.x;
 	position.y = -camera.position.z;        //inverting for Z-up
 	position.z = camera.position.y;
-	gfc_matrix_identity(camera.view);
+	gfc_matrix_identity(camera.camMatrix);
 
 	vector3d_set(xaxis, cosYaw, 0, -sinYaw);
 	vector3d_set(yaxis, sinYaw * sinPitch, cosPitch, cosYaw * sinPitch);
 	vector3d_set(zaxis, sinYaw * cosPitch, -sinPitch, cosPitch * cosYaw);
 
-	camera.view[0][0] = xaxis.x;
-	camera.view[0][1] = yaxis.x;
-	camera.view[0][2] = zaxis.x;
+	camera.camMatrix[0][0] = xaxis.x;
+	camera.camMatrix[0][1] = yaxis.x;
+	camera.camMatrix[0][2] = zaxis.x;
 
-	camera.view[1][0] = xaxis.z;
-	camera.view[1][1] = yaxis.z;
-	camera.view[1][2] = zaxis.z;
+	camera.camMatrix[1][0] = xaxis.z;
+	camera.camMatrix[1][1] = yaxis.z;
+	camera.camMatrix[1][2] = zaxis.z;
 
-	camera.view[2][0] = -xaxis.y;
-	camera.view[2][1] = -yaxis.y;
-	camera.view[2][2] = -zaxis.y;
+	camera.camMatrix[2][0] = -xaxis.y;
+	camera.camMatrix[2][1] = -yaxis.y;
+	camera.camMatrix[2][2] = -zaxis.y;
 
-	camera.view[3][0] = vector3d_dot_product(xaxis, position);
-	camera.view[3][1] = vector3d_dot_product(yaxis, position);
-	camera.view[3][2] = vector3d_dot_product(zaxis, position);
+	camera.camMatrix[3][0] = vector3d_dot_product(xaxis, position);
+	camera.camMatrix[3][1] = vector3d_dot_product(yaxis, position);
+	camera.camMatrix[3][2] = vector3d_dot_product(zaxis, position);
 }
 
 Matrix4 *gf3d_get_camera()
 {
-	return camera.view;
+	return camera.camMatrix;
 }
 
 void gf3d_camera_look_at(Vector3D position, Vector3D target, Vector3D up)
 {
 	gfc_matrix_view(
-		camera.view,
+		camera.camMatrix,
 		position,
 		target,
 		up);
@@ -238,15 +185,15 @@ void gf3d_camera_set_rotation(Vector3D rotation)
 
 void gf3d_camera_set_velocity(Vector3D velocity)
 {
-	camera.velocity.x = velocity.x;
-	camera.velocity.y = velocity.y;
-	camera.velocity.z = velocity.z;
+	camera.velocity.x = -velocity.x;
+	camera.velocity.y = -velocity.y;
+	camera.velocity.z = -velocity.z;
 }
 
 void gf3d_camera_move()
 {
-	vector3d_add(camera.position, camera.velocity, camera.position);
- 	gfc_matrix_translate(camera.view, camera.velocity);
+	vector3d_add(camera.position, camera.position, camera.velocity);
+ 	gfc_matrix_translate(camera.camMatrix, camera.velocity);
 }
 
 void gf3d_camera_set_target_entity(Entity* target)
@@ -257,8 +204,24 @@ void gf3d_camera_set_target_entity(Entity* target)
 		return;
 	}
 	camera.target = target;
+}
 
+void gf3d_camera_set_scale(Vector3D scale)
+{
+	if (!scale.x)camera.scale.x = 0;
+	else camera.scale.x = 1 / scale.x;
+	if (!scale.y)camera.scale.y = 0;
+	else camera.scale.y = 1 / scale.y;
+	if (!scale.z)camera.scale.z = 0;
+	else camera.scale.z = 1 / scale.z;
+}
 
+gf3d_camera_print(Matrix4 mat)
+{
+	printf("\n\n[%.4f][%.4f][%.4f][%.4f]\n[%.4f][%.4f][%.4f][%.4f]\n", 
+		mat[0][0],mat[0][1], mat[0][2], mat[0][3], mat[1][0], mat[1][1], mat[1][2], mat[1][3]);
+	printf("[%.4f][%.4f][%.4f][%.4f]\n[%.4f][%.4f][%.4f][%.4f]",
+		mat[2][0], mat[2][1], mat[2][2], mat[2][3], mat[3][0], mat[3][1], mat[3][2], mat[3][3]);
 }
 
 /*eol@eof*/

@@ -5,6 +5,7 @@
 
 #include "game.h"
 
+#include "gf3d_camera.h"
 #include "rpg_cooldowns.h"
 #include "rpg_player.h"
 #include "rpg_spellbook.h"
@@ -78,19 +79,15 @@ void rpg_player_init(){
 	/**
 	 * Player Stats
 	 */
-	if (model)
+
+	snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, "models/player.model");
+	player->ent->model = gf3d_model_load(file_path);
+	if (!player->ent->model)
 	{
-		if (strcmp(model, "Player") == 0)
-		{
-			player->ent->model = gf3d_model_load("player"); //gf3d_model_load_animated(model, 1, 20)
-			player->ent->animated = true;
-		}
-		else
-		{
-			player->ent->model = gf3d_model_load(model);
-			player->ent->animated = false;
-		}
+		slog("Player model is NULL");
 	}
+	player->ent->animated = false;
+
 	
 	player->ent->think = rpg_player_think;
 	player->ent->update = rpg_player_update;
@@ -98,7 +95,7 @@ void rpg_player_init(){
 	player->ent->name = "Player";
 	player->ent->position = vector3d(0, 8, -10);
 	player->ent->velocity = vector3d(0, 0, 0);
-	player->ent->rotation = vector3d(0, 0, 0);
+	player->ent->rotation = vector3d(-GFC_PI, 0, -GFC_HALF_PI);
 	player->ent->direction = vector3d(0, 0, 1);
 
 	player->ent->boxCollider.width = 3.0;
@@ -196,17 +193,16 @@ void rpg_player_bag_free(Item *bag)
 
 void rpg_player_update(Entity *self)
 {
-	
+	gf3d_camera_set_velocity(self->velocity);
+	gf3d_camera_set_rotation(self->rotation);
 	if (vector3d_magnitude(self->velocity) > 0.001)
 	{
 		self->velocity.y += GRAVITY;
 		vector3d_scale(self->velocity, self->velocity, 0.4);
 		self->position.x += self->velocity.x;
 
-		//if (player->state.onGround = true);
-		//self->position.y += self->velocity.y;
-
-		self->position.z += self->velocity.z;
+		if (player->state.onGround = true)
+			self->position.y += self->velocity.y;
 
 		total_movement += (float)(fabs(self->velocity.x) + fabs(self->velocity.z));
 		if (total_movement * 0.1 >= 10)
@@ -224,10 +220,9 @@ void rpg_player_update(Entity *self)
 	self->boxCollider.y = self->position.y;
 	self->boxCollider.z = self->position.z;
 
-	//slog("\nPosition: x:%f, y:%f, z:%f", self->position.x, self->position.y, self->position.z);
-	//slog("\nVelocity: x:%f, y:%f, z:%f", self->velocity.x, self->velocity.y, self->velocity.z);
-	//slog("\nRotation: x:%f, y:%f, z:%f", self->rotation.x, self->rotation.y, self->rotation.z);
-
+	slog("\nPosition: x:%f, y:%f, z:%f", self->position.x, self->position.y, self->position.z);
+	slog("\nVelocity: x:%f, y:%f, z:%f", self->velocity.x, self->velocity.y, self->velocity.z);
+	slog("\nRotation: x:%f, y:%f, z:%f", self->rotation.x, self->rotation.y, self->rotation.z);
 }
 
 void rpg_player_think(Entity *self){
@@ -274,7 +269,6 @@ void rpg_player_think(Entity *self){
 			}
 		}
 	}
-
 	gf3d_entity_collision_test(self);
 
 	rpg_player_move(self);
@@ -316,73 +310,73 @@ void rpg_player_move(Entity *self){
 	const Uint8 *keys;
 	const Uint32 x, y;
 	const int x_rel, y_rel;
+	Vector2D w;
 
 	keys = SDL_GetKeyboardState(NULL);
 	SDL_GetRelativeMouseState(&x_rel, &y_rel);
 
 	//Move model to position
-	gfc_matrix_translate(self->modelMatrix, self->position);
-	gfc_matrix_rotate(self->modelMatrix, self->modelMatrix,-self->rotate, vector3d(0, 0, 1));
-	//matrix4d_rotate(self->modelMatrix, self->modelMatrix, -self->rotate, vector3d(0, 0, 1));
+	//gfc_matrix_translate(self->modelMatrix, self->position);
+	//gfc_matrix_rotate(self->modelMatrix, self->modelMatrix,-self->rotate, vector3d(0, 0, 1));
 
-	self->rotate += x_rel * GFC_DEGTORAD;
-
-	player->ent->forward.x = -(1 * SDL_sinf(self->rotate));
-	player->ent->forward.y = (1 * SDL_cosf(self->rotate));
-
-	double forward = atan2(player->ent->forward.y, player->ent->forward.y);
+	w = vector2d_from_angle(self->rotation.z);
+	self->forward.x = w.x;
+	self->forward.y = w.y;
+	w = vector2d_from_angle(self->rotation.z - GFC_HALF_PI);
+	self->right.x = w.x;
+	self->right.y = w.y;
 
 	//Player input
 	if (keys[SDL_SCANCODE_W])
 	{
 		if (player->state.crouched)
 		{
-			self->velocity.z -= player->ent->forward.y * 0.5;
-			self->velocity.x -= player->ent->forward.x * 0.5;
+			self->velocity.z -= self->forward.y * 0.5;
+			self->velocity.x -= self->forward.x * 0.5;
 		}
 		else
 		{
-			self->velocity.z -= player->ent->forward.y;
-			self->velocity.x -= player->ent->forward.x;
+			self->velocity.z -= self->forward.y;
+			self->velocity.x -= self->forward.x;
 		}
 	}
 	if (keys[SDL_SCANCODE_A])
 	{
 		if (player->state.crouched)
 		{
-			self->velocity.x -= player->ent->forward.y * 0.5;
-			self->velocity.z -= -player->ent->forward.x * 0.5;
+			self->velocity.x -= self->right.y * 0.5;
+			self->velocity.z -= -self->right.x * 0.5;
 		}
 		else
 		{
-			self->velocity.x -=  player->ent->forward.y;
-			self->velocity.z -= -player->ent->forward.x;
+			self->velocity.x -= self->right.y;
+			self->velocity.z -= -self->right.x;
 		}
 	}
 	if (keys[SDL_SCANCODE_S])
 	{
 		if (player->state.crouched)
 		{
-			self->velocity.z -= -player->ent->forward.y * 0.5;
-			self->velocity.x -= -player->ent->forward.x * 0.5;
+			self->velocity.z -= -self->forward.y * 0.5;
+			self->velocity.x -= -self->forward.x * 0.5;
 		}
 		else
 		{
-			self->velocity.z -= -player->ent->forward.y;
-			self->velocity.x -= -player->ent->forward.x;
+			self->velocity.z -= -self->forward.y;
+			self->velocity.x -= -self->forward.x;
 		}
 	}
 	if (keys[SDL_SCANCODE_D])
 	{
 		if (player->state.crouched)
 		{
-			self->velocity.x += player->ent->forward.y * 0.5;
-			self->velocity.z += -player->ent->forward.x * 0.5;
+			self->velocity.x += self->right.y * 0.5;
+			self->velocity.z += -self->right.x * 0.5;
 		}
 		else
 		{
-			self->velocity.x +=  player->ent->forward.y;
-			self->velocity.z += -player->ent->forward.x;
+			self->velocity.x += self->right.y;
+			self->velocity.z += -self->right.x;
 		}
 	}
 	if (keys[SDL_SCANCODE_SPACE])
@@ -406,7 +400,14 @@ void rpg_player_move(Entity *self){
 			stat_counter("jumpamount");
 		}
 	}
+	if (keys[SDL_SCANCODE_UP])self->rotation.x -= 0.0050;
+	if (keys[SDL_SCANCODE_DOWN])self->rotation.x += 0.0050;
+	if (keys[SDL_SCANCODE_RIGHT])self->rotation.z -= 0.0050;
+	if (keys[SDL_SCANCODE_LEFT])self->rotation.z += 0.0050;
 	
+	if (x_rel != 0)self->rotation.z -= (x_rel * 0.001);
+    if (y_rel != 0)self->rotation.x += (y_rel * 0.001);
+
 	if (player->state.inAir)
 	{
 		player->state.onGround = false;
@@ -424,7 +425,6 @@ void rpg_player_move(Entity *self){
 	else
 		player->state.crouched = false;
 
-	//gf3d_camera_update(self->position, vector3d(0, x_rel, self->rotate), x_rel, y_rel);
 }
 
 rpg_player_input(Entity *self)
@@ -620,3 +620,5 @@ void print_player_name()
 	slog("Name: %s", player->stats.name);
 	slog("Name: %s", get_player()->stats.name);
 }
+
+/*eol@eof*/

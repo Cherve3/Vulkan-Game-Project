@@ -67,7 +67,7 @@ void rpg_world_init()
 
 		gfc_matrix_translate(world.terrain->modelMatrix, world.terrain->position);
 		world.terrain->boxCollider.depth = 1000.0;
-		world.terrain->boxCollider.height = -100;
+		world.terrain->boxCollider.height = 0;
 		world.terrain->boxCollider.width = 1000.0;
 		world.terrain->boxCollider.x = world.terrain->position.x;
 		world.terrain->boxCollider.y = world.terrain->position.y;
@@ -104,8 +104,7 @@ int water_init()
 	world.water = gf3d_entity_new();
 	if (world.water)
 	{
-		snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, sj_get_string_value(sj_object_get_value(water_info, "model")));
-		world.water->model = gf3d_model_load(file_path);
+		world.water->model = gf3d_model_load(sj_get_string_value(sj_object_get_value(water_info, "model")));
 		world.water->name = sj_get_string_value(sj_object_get_value(water_info, "name"));
 
 		sj_get_float_value(sj_array_get_nth(sj_object_get_value(water_info, "position"), 0), &world.water->position.x);
@@ -133,8 +132,7 @@ int structures_init(Uint32 building_count)
 			SJson* structure = sj_object_get_value(structure_info, structure_name);
 			if (structure)
 			{
-				snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, sj_get_string_value(sj_object_get_value(structure, "model")));
-				world.structures[i]->model = gf3d_model_load(file_path);
+				world.structures[i]->model = gf3d_model_load(sj_get_string_value(sj_object_get_value(structure, "model")));
 				world.structures[i]->name = sj_get_string_value(sj_object_get_value(structure, "name"));;
 				sj_get_integer_value(sj_object_get_value(structure, "type"), &world.structures[i]->type);
 				sj_get_float_value(sj_array_get_nth(sj_object_get_value(structure, "position"), 0), &world.structures[i]->position.x);

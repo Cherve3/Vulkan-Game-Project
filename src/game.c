@@ -38,7 +38,6 @@ int quit()
 	vkDeviceWaitIdle(gf3d_vgraphics_get_default_logical_device());
 	//cleanup
 	
-	SDL_Quit();
 	slog_sync();
 	if (FILE_PATH)
 	{
@@ -118,8 +117,8 @@ int main(int argc,char *argv[])
 	Item *potion = NULL;
 	Item *woodsword = NULL;
 
-	Model *model = NULL;
-	Model *dino = NULL;
+	Matrix4 dinoMat;
+	Model *dino;
 	Matrix4 skyMat;
 	Model* sky;
 
@@ -165,7 +164,7 @@ int main(int argc,char *argv[])
 	rpg_update_loading_texture(108, SDL_FLIP_NONE);
 	
 	rpg_player_init();
-	//gf3d_camera_init();
+	gf3d_camera_init();
 
 	rpg_update_loading_texture(144, SDL_FLIP_NONE);
 
@@ -181,7 +180,7 @@ int main(int argc,char *argv[])
 
 	rpg_update_loading_texture(216, SDL_FLIP_NONE);
 
-	rpg_goblin_init();
+	//rpg_goblin_init();
 	//rpg_goblin_spawn(GoblinGrunt, vector3d(-420, 5, -505));
 	//rpg_goblin_spawn(GoblinHeavy, vector3d(-420, 5, -510));
 	//rpg_goblin_spawn(GoblinArcher, vector3d(-420, 5, -515));
@@ -196,35 +195,35 @@ int main(int argc,char *argv[])
 	
 	rpg_update_loading_texture(252, SDL_FLIP_NONE);
 	
-	rpg_item_entity_init(10);
+	//rpg_item_entity_init(10);
 	//potion		= rpg_item_new(consumable, "healthpotion", vector3d(-5, 2, 30));
 	//arrow		= rpg_item_new(consumable, "arrow", vector3d(-5, 2, 50));
 	//woodsword	= rpg_item_new(weapon, "woodensword", vector3d(-5, 2, 70));
 	
-	rpg_quest_init();
+	//rpg_quest_init();
 
-	rpg_main_quests_init();
+	//rpg_main_quests_init();
 
 	rpg_update_loading_texture(288, SDL_FLIP_NONE);
 	
-	rpg_chests_init(10);
+	//rpg_chests_init(10);
 	/*chest = rpg_chest_new();*/
 
 	rpg_update_loading_texture(324, SDL_FLIP_NONE);
 	
-	rpg_projectile_init(10);
+	//rpg_projectile_init(10);
 
-	rpg_ui_init();
+	//rpg_ui_init();
 
 	slog_sync();
-	
-	gfc_matrix_identity(modelMat);
-	gfc_matrix_identity(modelMat2);
+
+	gf3d_camera_set_scale(vector3d(1, 1, 1));
+	//player_new(vector3d(-50, 0, 0));
 
 	//model = gf3d_model_load("dino");
-	dino = gf3d_model_load("dino");
-	gfc_matrix_translate(modelMat, vector3d(0,0,0));
-	//matrix4d_translate(vector3d(10, 0, 0), modelMat2);
+	dino = gf3d_model_load("D:/Git/Projects/Vulkan-Game-Project/models/dino.model");
+	gfc_matrix_identity(dinoMat);
+	gfc_matrix_translate(dinoMat, vector3d(100, 0, 0));
 	
 //		get_player()->ent->model = gf3d_model_load_animated("player", 1,19);
 

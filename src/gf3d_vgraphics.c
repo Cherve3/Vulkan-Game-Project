@@ -292,7 +292,7 @@ void gf3d_vgraphics_setup(
     gf3d_vgraphics.vk_app_info.applicationVersion = 0;
     gf3d_vgraphics.vk_app_info.pEngineName = windowName;
     gf3d_vgraphics.vk_app_info.engineVersion = 0;
-    gf3d_vgraphics.vk_app_info.apiVersion = VK_API_VERSION_1_2;
+    gf3d_vgraphics.vk_app_info.apiVersion = VK_API_VERSION_1_3;
     
     gf3d_vgraphics.vk_instance_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     gf3d_vgraphics.vk_instance_info.pNext = NULL;
