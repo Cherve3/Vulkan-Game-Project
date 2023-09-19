@@ -34,12 +34,7 @@ void rpg_npc_interact(Entity *self);
 
 void npc_close()
 {
-	sj_free(itemshop_info);
-	sj_free(weaponshop_info);
-	sj_free(armorshop_info);
-	sj_free(spellshop_info);
-	sj_free(generic_info);
-	sj_free(questgiver_info);
+	sj_free(npc_info);
 	memset(npc, 0, sizeof(NPC)* 10);
 	slog("NPC files closing");
 }

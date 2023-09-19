@@ -34,11 +34,12 @@ typedef struct Entity_S
 
 	Vector3D	position;
 	Vector3D	rotation;
-	Vector3D	direction;
+	Vector3D	scale;
 	Vector3D	velocity;
-	float		rotate;
-	Vector2D	forward;
-	Vector2D	right;
+
+	Vector3D	up;
+	Vector3D	forward;
+	Vector3D	right;
 
 	Model		*model;
 	Matrix4		modelMatrix;
@@ -51,8 +52,8 @@ typedef struct Entity_S
 	void		(*think)	(struct Entity_S *self);
 	void		(*interact) (struct Entity_S *self);
 	void		(*touch)	(struct Entity_S *self, struct Entity_S *other);
-	void		(*damage)	(struct Entity_S *self);
-	void		(*die)		(struct Entity_S *self);
+	void		(*damage)	(struct Entity_S *self, float damage, struct Entity_S *inflictor);
+	void		(*on_death)	(struct Entity_S *self);
 
 	void *data;		// Expecting typedef Struct of entity (ex. Item, Goblin, etc.)
 
@@ -76,7 +77,7 @@ Entity *gf3d_entity_new();
  *	@param bufferFrame the renderFrame to draw with
  *	@param commandBuffer the command to populate with this draw command
  */
-void gf3d_entity_draw(Entity *self, Uint32 bufferFrame, VkCommandBuffer commandBuffer);
+void gf3d_entity_draw(Entity *self);
 
 /**
  *	@brief draw all active entities for a draw call
@@ -89,24 +90,33 @@ void gf3d_entity_draw_all();
 void gf3d_entity_update_all();
 
 /**
+*	@brief call think function for all active entities
+*/
+void gf3d_entity_think_all();
+
+/**
  *	@brief call interact function for active entity
+ *	@param self the entity in question
  */
-void gf3d_entity_interact(Entity *self);
+void gf3d_entity_interact(Entity *self, void* data);
 
 /**
 *	@brief call touch function for active entity
+* 	@param self the entity in question
 */
-void gf3d_entity_touch(Entity *self);
+void gf3d_entity_touch(Entity *self, Entity *other);
 
 /**
 *	@brief call damage function for active entity
+* 	@param self the entity in question
 */
-void gf3d_entity_damage(Entity *self);
+void gf3d_entity_damage(Entity *self, float damage, Entity* inflictor);
 
 /**
 *	@brief call die function for active entity
+* 	@param self the entity in question
 */
-void gf3d_entity_die(Entity *self);
+void gf3d_entity_on_death(Entity *self);
 
 /**
  *	@brief free an entity so it can be reused by the system
@@ -125,8 +135,12 @@ void gf3d_entity_collision_test(Entity *self);
 *	@brief get the list of all entities 
 *	@return a pointer to entity list
 */
-Entity* gf3d_get_entity_list();
+Entity *gf3d_get_entity_list();
 
+/**
+*	@brief Get the max amount of entities for the list
+* @return an integer of the max entities
+*/
 int gf3d_get_entity_list_count();
 
 #endif

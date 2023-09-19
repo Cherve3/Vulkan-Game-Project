@@ -122,19 +122,12 @@ int main(int argc,char *argv[])
 	Matrix4 skyMat;
 	Model* sky;
 
+	slog("gf3d begin");
 
     init_logger("gf3d.log", false);
 	snprintf(filename, sizeof(filename), "%s%s", FILE_PATH, "config/input.cfg");
 	gfc_input_init(filename);
-    slog("gf3d begin");
-  //  gf3d_vgraphics_init(
-  //      "gf3d",                 //program name
-  //      720,                   //screen width
-  //      480,                    //screen height
-		//vector4d(0.3,0.75,.5,1),//background color
-  //      0,                      //fullscreen
-  //      validate                //validation
-  //  );
+
 	snprintf(filename, sizeof(filename), "%s%s", FILE_PATH, "config/setup.cfg");
 	gf3d_vgraphics_init(filename);
 	slog_sync();
@@ -148,11 +141,17 @@ int main(int argc,char *argv[])
 	
 	main_menu = rpg_main_menu_load_screen(CharacterSelectScreen);
 
-	SDL_SetRelativeMouseMode(SDL_TRUE); // DO NOT move this it crashes moved below and is useless above.
+	/** 
+	*	Mouse seems to lose focus on game sometimes and crashes the game. It is happening
+	*	because the mouse is able to leave the game focus before this is called if it is not within
+	*	the screen when this is called it will crash. I am leaning towards having a cursor drawn in
+	*	the position of the mouse and calling this at start up to avoid the issue.
+	*/
+	SDL_SetRelativeMouseMode(SDL_TRUE);
 
     slog("gf3d loading game begin");
 	
-	// Called multiple times to reload the rotated loading texture.
+	// Called multiple times to reload and rotate loading texture.
 	rpg_update_loading_texture(36, SDL_FLIP_NONE);
 
 	gf3d_entity_init(1024);
@@ -170,94 +169,67 @@ int main(int argc,char *argv[])
 
 	rpg_npc_init();
 	rpg_npc_spawn(ItemShop, vector3d(0, -200, 0));
-	//rpg_npc_spawn(WeaponShop, vector3d(90, 5, -40));
-	//rpg_npc_spawn(ArmorShop, vector3d(90, 5.5, -60));
-	//rpg_npc_spawn(SpellShop, vector3d(60, 9.3, -20));
-	//rpg_npc_spawn(Generic, vector3d(100, 8.3, -80));
-	//rpg_npc_spawn(Questgiver, vector3d(90, 8.3, -20));
+	rpg_npc_spawn(WeaponShop, vector3d(90, 5, -40));
+	rpg_npc_spawn(ArmorShop, vector3d(90, 5.5, -60));
+	rpg_npc_spawn(SpellShop, vector3d(60, 9.3, -20));
+	rpg_npc_spawn(Generic, vector3d(100, 8.3, -80));
+	rpg_npc_spawn(Questgiver, vector3d(90, 8.3, -20));
 
-	//print_npc_stats(rpg_get_npc()[0]);
+	print_npc_stats(rpg_get_npc()[0]);
 
 	rpg_update_loading_texture(216, SDL_FLIP_NONE);
 
-	//rpg_goblin_init();
-	//rpg_goblin_spawn(GoblinGrunt, vector3d(-420, 5, -505));
-	//rpg_goblin_spawn(GoblinHeavy, vector3d(-420, 5, -510));
-	//rpg_goblin_spawn(GoblinArcher, vector3d(-420, 5, -515));
-	//rpg_goblin_spawn(GoblinKing, vector3d(-410, 25, -550));
+	rpg_goblin_init();
+	rpg_goblin_spawn(GoblinGrunt, vector3d(-420, 5, -505));
+	rpg_goblin_spawn(GoblinHeavy, vector3d(-420, 5, -510));
+	rpg_goblin_spawn(GoblinArcher, vector3d(-420, 5, -515));
+	rpg_goblin_spawn(GoblinKing, vector3d(-410, 25, -550));
 
 	//// For quest 2
-	//rpg_goblin_spawn(GoblinGrunt, vector3d(-200, 5, -205));
-	//rpg_goblin_spawn(GoblinGrunt, vector3d(-200, 5, -210));
-	//rpg_goblin_spawn(GoblinGrunt, vector3d(-200, 5, -215));
-	//rpg_goblin_spawn(GoblinGrunt, vector3d(-210, 5, -225));
-	//rpg_goblin_spawn(GoblinGrunt, vector3d(-210, 5, -205));
+	rpg_goblin_spawn(GoblinGrunt, vector3d(-200, 5, -205));
+	rpg_goblin_spawn(GoblinGrunt, vector3d(-200, 5, -210));
+	rpg_goblin_spawn(GoblinGrunt, vector3d(-200, 5, -215));
+	rpg_goblin_spawn(GoblinGrunt, vector3d(-210, 5, -225));
+	rpg_goblin_spawn(GoblinGrunt, vector3d(-210, 5, -205));
 	
 	rpg_update_loading_texture(252, SDL_FLIP_NONE);
 	
-	//rpg_item_entity_init(10);
-	//potion		= rpg_item_new(consumable, "healthpotion", vector3d(-5, 2, 30));
-	//arrow		= rpg_item_new(consumable, "arrow", vector3d(-5, 2, 50));
-	//woodsword	= rpg_item_new(weapon, "woodensword", vector3d(-5, 2, 70));
+	rpg_item_entity_init(10);
+	potion		= rpg_item_new(consumable, "healthpotion", vector3d(-5, 2, 30));
+	arrow		= rpg_item_new(consumable, "arrow", vector3d(-5, 2, 50));
+	woodsword	= rpg_item_new(weapon, "woodensword", vector3d(-5, 2, 70));
 	
-	//rpg_quest_init();
+	rpg_quest_init();
 
-	//rpg_main_quests_init();
+	rpg_main_quests_init();
 
 	rpg_update_loading_texture(288, SDL_FLIP_NONE);
 	
-	//rpg_chests_init(10);
-	/*chest = rpg_chest_new();*/
+	rpg_chests_init(10);
+	chest = rpg_chest_new();
 
 	rpg_update_loading_texture(324, SDL_FLIP_NONE);
 	
-	//rpg_projectile_init(10);
+	rpg_projectile_init(10);
 
-	//rpg_ui_init();
+	rpg_ui_init();
 
 	slog_sync();
 
 	gf3d_camera_set_scale(vector3d(1, 1, 1));
-	//player_new(vector3d(-50, 0, 0));
-
-	//model = gf3d_model_load("dino");
-	dino = gf3d_model_load("D:/Git/Projects/Vulkan-Game-Project/models/dino.model");
-	gfc_matrix_identity(dinoMat);
-	gfc_matrix_translate(dinoMat, vector3d(100, 0, 0));
-	
-//		get_player()->ent->model = gf3d_model_load_animated("player", 1,19);
 
 	rpg_update_loading_texture(360, SDL_FLIP_NONE);
 	
 	sky = gf3d_model_load("D:/Git/Projects/Vulkan-Game-Project/models/sky.model");
 	gfc_matrix_identity(skyMat);
-	gfc_matrix_scale(skyMat, vector3d(100, 100, 100));
+	gfc_matrix_scale(skyMat, vector3d(1000, 1000, 1000));
 
-	//SDL_ShowCursor(SDL_FALSE);
 	//Game Loop
 	slog("Game Loop Begin");
 	while (!done)
 	{	
 		gfc_input_update();
 
-		currentTime = SDL_GetTicks();
-		if (currentTime > lastTime + 1000) {
-			//slog("\ncurrent time: %i\n", currentTime);
-			//slog("\nlast time: %i\n", lastTime);
-			lastTime = currentTime;
-		}
-		// Time
-		old_time = time;
-		time = SDL_GetTicks();
-		deltaTime = ((float)(time - old_time) / 1000);
-
-		frame = frame + 0.1;
-		if (frame >= 19)frame = 5;
-
-		frame2 = frame2 + 0.2;
-		if (frame2 >= 19)frame2 = 1;
-
-		
 		SDL_PumpEvents();   // update SDL's internal event structures
 		keys = SDL_GetKeyboardState(NULL); // get the keyboard state for this frame
 

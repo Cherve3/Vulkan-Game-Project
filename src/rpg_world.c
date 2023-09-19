@@ -15,6 +15,11 @@ static SJson *tree_info = NULL;
 
 char file_path[70];
 
+rpg_world_close()
+{
+	sj_free(world_info);
+	// Cleaned up world
+}
 
 void rpg_world_init()
 {
@@ -96,6 +101,7 @@ void rpg_world_init()
 		slog("tree is null");
 		return;
 	}*/
+	atexit(rpg_world_close);
 }
 
 int water_init()

@@ -18,8 +18,8 @@ char file_path[60];
 
 static Player *player = { 0 };
 
-Uint32 timer;
-Uint32 old_time;
+static Uint32 timer;
+static Uint32 old_time;
 
 SJson *player_info = NULL;
 
@@ -42,19 +42,52 @@ float old_z_pos;
 
 void rpg_player_move(Entity *self);
 void rpg_player_update();
+void rpg_player_take_damage(Entity* self, float damage, Entity* inflictor);
+void rpg_player_interact(Entity* self, void* data);
+void rpg_player_death(Entity* self);
 void print_inventory();
 void print_stats();
 
-void rpg_player_init(){
-	char* model = rpg_ui_get_player_model_name();
-
+void rpg_player_init()
+{
 	player = (Player *)gfc_allocate_array(sizeof(Player), 1);
 
-	player->ent = rpg_player_new();
+	player->ent = gf3d_entity_new();
 	if (!player->ent)
 	{
 		slog("Player ent null");
 	}
+	snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, "models/player.model");
+	player->ent->model = gf3d_model_load(file_path);
+	if (!player->ent->model)
+	{
+		slog("Player model is NULL");
+	}
+	player->ent->animated = false;
+
+	player->ent->think = rpg_player_think;
+	player->ent->update = rpg_player_update;
+	player->ent->damage = rpg_player_take_damage;
+	player->ent->on_death = rpg_player_death;
+	player->ent->interact = rpg_player_interact;
+	player->ent->type = PLAYER;
+	player->ent->name = "Player";
+	player->ent->position = vector3d(0, 0, 0);
+	player->ent->velocity = vector3d(0, 0, 0);
+	
+	player->ent->rotation = vector3d(-GFC_PI, 0, -GFC_HALF_PI);
+
+	player->ent->boxCollider.width = 3.0;
+	player->ent->boxCollider.height = 8.5;
+	player->ent->boxCollider.depth = 3.0;
+	player->ent->boxCollider.x = player->ent->position.x;
+	player->ent->boxCollider.y = player->ent->position.y;
+	player->ent->boxCollider.z = player->ent->position.z;
+
+	player->interactBound.radius = 10;
+	player->interactBound.x = player->ent->position.x;
+	player->interactBound.y = player->ent->position.z;
+	
 	cd_interact.old_time = 0;
 	cd_jump.old_time = 0;
 	cd_primary_attack.old_time = 0;
@@ -67,7 +100,15 @@ void rpg_player_init(){
 	cd_stamina_regen.old_time = 0;
 
 	total_movement = 0;
-	// Load player json file
+	
+	/***********************
+	 * Player Stats
+	 ***********************/
+
+	player->max_speed = 1;
+	player->speed = 0.2;
+	vector3d_clear(player->acceleration);
+
 	snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, "json/player.json");
 	player_info = sj_load(file_path);
 
@@ -75,41 +116,6 @@ void rpg_player_init(){
 		slog("Failed to load player json data %s", sj_get_error());
 
 	player_info = sj_object_get_value(player_info, "Player");
-
-	/**
-	 * Player Stats
-	 */
-
-	snprintf(file_path, sizeof(file_path), "%s%s", FILE_PATH, "models/player.model");
-	player->ent->model = gf3d_model_load(file_path);
-	if (!player->ent->model)
-	{
-		slog("Player model is NULL");
-	}
-	player->ent->animated = false;
-
-	
-	player->ent->think = rpg_player_think;
-	player->ent->update = rpg_player_update;
-	player->ent->type = PLAYER;
-	player->ent->name = "Player";
-	player->ent->position = vector3d(0, 8, -10);
-	player->ent->velocity = vector3d(0, 0, 0);
-	player->ent->rotation = vector3d(-GFC_PI, 0, -GFC_HALF_PI);
-	player->ent->direction = vector3d(0, 0, 1);
-
-	player->ent->boxCollider.width = 3.0;
-	player->ent->boxCollider.height = 8.5;
-	player->ent->boxCollider.depth = 3.0;
-	player->ent->boxCollider.x = player->ent->position.x;
-	player->ent->boxCollider.y = player->ent->position.y;
-	player->ent->boxCollider.z = player->ent->position.z;
-
-	player->interactBound.radius = 10;
-	player->interactBound.x = player->ent->position.x;
-	player->interactBound.y = player->ent->position.z;
-
-	//gf3d_camera_set_target_entity(player->ent);
 	player->stats.name =sj_get_string_value(sj_object_get_value(player_info, "name"));
 
 	sj_get_integer_value(sj_object_get_value(player_info, "level"), &player->stats.level);
@@ -150,6 +156,10 @@ void rpg_player_init(){
 	player->stats.toggleShop  = false;
 	player->stats.toggleMap   = false;
 	
+	/***********************
+	*	Player Inventory
+	************************/
+
 	player->inventory.bagSize = 30;
 	player->inventory.spellbookSize = 5;
 	player->inventory.bag = (Item *)gfc_allocate_array(sizeof(Item), player->inventory.bagSize);
@@ -158,14 +168,10 @@ void rpg_player_init(){
 	srand((unsigned)time(&t));
 }
 
-Entity *rpg_player_new(){
-
-	return gf3d_entity_new();
-}
-
 void rpg_player_free(Player *player)
 {
 	if (!player) return;
+	sj_free(player_info);
 	rpg_spellbook_free(player->inventory.spellbook);
 	rpg_player_bag_free(player->inventory.bag);
 	rpg_player_inventory_free(&player->inventory);
@@ -174,10 +180,10 @@ void rpg_player_free(Player *player)
 	memset(player, 0, sizeof(Player));
 }
 
-void rpg_player_inventory_free(pInventory *inventory)
+void rpg_player_inventory_free(PlayerInventory *inventory)
 {
 	if (!inventory) return;
-	memset(inventory, 0, sizeof(pInventory));
+	memset(inventory, 0, sizeof(PlayerInventory));
 }
 
 void rpg_player_bag_free(Item *bag)
@@ -193,13 +199,15 @@ void rpg_player_bag_free(Item *bag)
 
 void rpg_player_update(Entity *self)
 {
-	gf3d_camera_set_velocity(self->velocity);
+	//gf3d_camera_set_target_entity(player->ent);
 	gf3d_camera_set_rotation(self->rotation);
+	gf3d_camera_set_velocity(self->velocity);
+	
 	if (vector3d_magnitude(self->velocity) > 0.001)
 	{
-		self->velocity.y += GRAVITY;
-		vector3d_scale(self->velocity, self->velocity, 0.4);
-		self->position.x += self->velocity.x;
+		//self->velocity.y += GRAVITY;
+		//vector3d_scale(self->velocity, self->velocity, 0.4);
+		//self->position.x += self->velocity.x;
 
 		if (player->state.onGround = true)
 			self->position.y += self->velocity.y;
@@ -216,21 +224,25 @@ void rpg_player_update(Entity *self)
 		vector3d_clear(self->velocity);
 	}
 	
+	self->position.x += self->velocity.x;
+	self->position.y += self->velocity.y;
+	self->position.z += self->velocity.z;
+
+	gfc_matrix_zero(&self->velocity);
+
 	self->boxCollider.x = self->position.x;
 	self->boxCollider.y = self->position.y;
 	self->boxCollider.z = self->position.z;
 
-	slog("\nPosition: x:%f, y:%f, z:%f", self->position.x, self->position.y, self->position.z);
-	slog("\nVelocity: x:%f, y:%f, z:%f", self->velocity.x, self->velocity.y, self->velocity.z);
-	slog("\nRotation: x:%f, y:%f, z:%f", self->rotation.x, self->rotation.y, self->rotation.z);
+	 
+	slog("\nPosition: x:%f, y:%f, z:%f\n", self->position.x, self->position.y, self->position.z);
+	slog("\nVelocity: x:%f, y:%f, z:%f\n", self->velocity.x, self->velocity.y, self->velocity.z);
+	slog("\nAccelera: x:%f, y:%f, z:%f\n", player->acceleration.x, player->acceleration.y, player->acceleration.z);
+	slog("\nRotation: x:%f, y:%f, z:%f\n", self->rotation.x, self->rotation.y, self->rotation.z);
 }
 
-void rpg_player_think(Entity *self){
-	
-	int random_luck = rand() % 1000;
-	if (random_luck == 1)
-		stat_counter("random");
-
+void rpg_update_player_vitals()
+{
 	if (player->stats.health != player->stats.health_max)
 	{
 		if (timer > cd_health_regen.old_time + 5000)
@@ -269,11 +281,36 @@ void rpg_player_think(Entity *self){
 			}
 		}
 	}
+}
+
+void rpg_player_think(Entity *self){
+	
+	int random_luck = rand() % 1000;
+	if (random_luck == 1)
+		stat_counter("random");
+	old_time = timer;
+	timer = SDL_GetTicks();
+	rpg_update_player_vitals();
 	gf3d_entity_collision_test(self);
 
 	rpg_player_move(self);
-	timer = SDL_GetTicks();
+	
 	rpg_player_input(self);
+}
+
+void rpg_player_take_damage(Entity *self, float damage, Entity *inflictor)
+{
+	slog("Player damaged");
+}
+
+void rpg_player_interact(Entity *self, void *data)
+{
+	slog("Player interacting with...");
+}
+
+void rpg_player_death(Entity *self)
+{
+	slog("Player died");
 }
 
 Entity *get_player_entity()
@@ -286,12 +323,12 @@ Player *get_player()
 	return player;
 }
 
-pStats get_player_stats()
+PlayerStats get_player_stats()
 {
 	return player->stats;
 }
 
-pInventory get_player_inventory()
+PlayerInventory get_player_inventory()
 {
 	return player->inventory;
 }
@@ -306,6 +343,18 @@ int get_player_spellbook_size()
 	return player->inventory.spellbookSize;
 }
 
+float rpg_player_accelerate(float axis)
+{
+	float delta_time = (timer - old_time) / 1000.0f;
+	if (axis != player->max_speed)
+	{
+		axis += player->speed * delta_time;
+	}
+	//slog("\n      Time: %i\nLast Time: %i", timer, old_time);
+	return axis;
+}
+
+
 void rpg_player_move(Entity *self){
 	const Uint8 *keys;
 	const Uint32 x, y;
@@ -315,10 +364,6 @@ void rpg_player_move(Entity *self){
 	keys = SDL_GetKeyboardState(NULL);
 	SDL_GetRelativeMouseState(&x_rel, &y_rel);
 
-	//Move model to position
-	//gfc_matrix_translate(self->modelMatrix, self->position);
-	//gfc_matrix_rotate(self->modelMatrix, self->modelMatrix,-self->rotate, vector3d(0, 0, 1));
-
 	w = vector2d_from_angle(self->rotation.z);
 	self->forward.x = w.x;
 	self->forward.y = w.y;
@@ -326,58 +371,42 @@ void rpg_player_move(Entity *self){
 	self->right.x = w.x;
 	self->right.y = w.y;
 
+	if (player->state.inAir)
+	{
+		player->state.onGround = false;
+		player->state.inAir = true;
+	}
+	else
+	{
+		player->state.onGround = true;
+		player->state.inAir = false;
+	}
+
+	if (keys[SDL_SCANCODE_LSHIFT])
+		player->state.crouched = true;
+	else
+		player->state.crouched = false;
+
 	//Player input
 	if (keys[SDL_SCANCODE_W])
 	{
-		if (player->state.crouched)
-		{
-			self->velocity.z -= self->forward.y * 0.5;
-			self->velocity.x -= self->forward.x * 0.5;
-		}
-		else
-		{
-			self->velocity.z -= self->forward.y;
-			self->velocity.x -= self->forward.x;
-		}
+		player->acceleration.x = rpg_player_accelerate(player->acceleration.x);
+		self->velocity.x += player->acceleration.x;
 	}
 	if (keys[SDL_SCANCODE_A])
 	{
-		if (player->state.crouched)
-		{
-			self->velocity.x -= self->right.y * 0.5;
-			self->velocity.z -= -self->right.x * 0.5;
-		}
-		else
-		{
-			self->velocity.x -= self->right.y;
-			self->velocity.z -= -self->right.x;
-		}
+		player->acceleration.z = rpg_player_accelerate(player->acceleration.z);
+		self->velocity.z += -player->acceleration.z;
 	}
 	if (keys[SDL_SCANCODE_S])
 	{
-		if (player->state.crouched)
-		{
-			self->velocity.z -= -self->forward.y * 0.5;
-			self->velocity.x -= -self->forward.x * 0.5;
-		}
-		else
-		{
-			self->velocity.z -= -self->forward.y;
-			self->velocity.x -= -self->forward.x;
-		}
+		player->acceleration.x = rpg_player_accelerate(player->acceleration.x);
+		self->velocity.x += -player->acceleration.x;
 	}
 	if (keys[SDL_SCANCODE_D])
 	{
-		if (player->state.crouched)
-		{
-			self->velocity.x += self->right.y * 0.5;
-			self->velocity.z += -self->right.x * 0.5;
-		}
-		else
-		{
-			self->velocity.x += self->right.y;
-			self->velocity.z += -self->right.x;
-		}
+		player->acceleration.z = rpg_player_accelerate(player->acceleration.z);
+		self->velocity.z += player->acceleration.z;
 	}
 	if (keys[SDL_SCANCODE_SPACE])
 	{
@@ -400,6 +429,13 @@ void rpg_player_move(Entity *self){
 			stat_counter("jumpamount");
 		}
 	}
+	if (player->state.crouched)
+	{
+		self->velocity.x * 0.5;
+		self->velocity.y * 0.5;
+		self->velocity.z * 0.5;
+	}
+
 	if (keys[SDL_SCANCODE_UP])self->rotation.x -= 0.0050;
 	if (keys[SDL_SCANCODE_DOWN])self->rotation.x += 0.0050;
 	if (keys[SDL_SCANCODE_RIGHT])self->rotation.z -= 0.0050;
@@ -407,24 +443,6 @@ void rpg_player_move(Entity *self){
 	
 	if (x_rel != 0)self->rotation.z -= (x_rel * 0.001);
     if (y_rel != 0)self->rotation.x += (y_rel * 0.001);
-
-	if (player->state.inAir)
-	{
-		player->state.onGround = false;
-		player->state.inAir = true;
-	}
-	else
-	{
-		player->state.onGround = true;
-		player->state.inAir = false;
-	}
-
-	//Toggle Crouch state
-	if (keys[SDL_SCANCODE_LSHIFT])
-		player->state.crouched = true;
-	else
-		player->state.crouched = false;
-
 }
 
 rpg_player_input(Entity *self)
@@ -497,7 +515,6 @@ rpg_player_input(Entity *self)
 	if (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_RIGHT))
 	{
 		slog("Button: %i", SDL_GetMouseState(NULL, NULL));
-		slog("\n      Time: %i\nLast Time: %i", timer, old_time);
 		if (timer > cd_secondary_attack.old_time + 3000)
 		{
 			if (player->stats.mana >= 10)

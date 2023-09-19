@@ -10,9 +10,10 @@
 /**
 *	@purpose this is the definition file for a player character.
 */
-typedef struct
+typedef struct PlayerState_S
 {
 	Uint8 walking;
+	Uint8 running;
 	Uint8 crouched;
 	Uint8 inAir;
 	Uint8 attacking;
@@ -21,7 +22,7 @@ typedef struct
 	
 }PlayerState;
 
-typedef struct PStats_S
+typedef struct PlayerStats_S
 {
 	char* name;
 	
@@ -39,8 +40,8 @@ typedef struct PStats_S
 	Uint8 stamina_max;
 	Uint8 stamina_regen;
 	
-	float carry_weight;		//Kilograms
-	float carry_weight_max;		//Kilograms
+	float carry_weight;		//Weight in kilograms
+	float carry_weight_max;	//max weight in Kilograms
 
 	Uint8 strength;
 	Uint8 strength_max;
@@ -63,34 +64,31 @@ typedef struct PStats_S
 	Bool toggleMap;
 	Bool toggleShop;
 
-}pStats;
+}PlayerStats;
 
-typedef struct PInventory_S{
-	Spell *spellbook;
-	Item *bag;
-	Uint8 bagSize;
-	Uint8 spellbookSize;
-}pInventory;
+typedef struct PlayerInventory_S{
+	Spell	*spellbook;
+	Item	*bag;
+	Uint8	 bagSize;
+	Uint8	 spellbookSize;
+}PlayerInventory;
 
 typedef struct Player_S
 {
-	Entity *ent;
-	pStats stats;
-	pInventory inventory;
-	PlayerState state;
-	CircleCollider interactBound;
+	Entity			*ent;
+	PlayerStats		 stats;
+	Vector3D		 acceleration;
+	float			 speed;
+	float			 max_speed;
+	PlayerInventory	 inventory;
+	PlayerState		 state;
+	CircleCollider	 interactBound;
 }Player;
 
 /**
  *	@brief initialize a player character
  */
 void rpg_player_init();
-
-/**
- *	@brief runs gf3d_entity_new function to add player to entity system
- *	@return NULL on error or a pointer to an entity otherwise
- */
-Entity *rpg_player_new();
 
 /**
 *	@brief called once per frame to update player state
@@ -102,7 +100,7 @@ void rpg_player_free(Player *player);
 
 void rpg_player_touch(Entity *self);
 
-void rpg_player_inventory_free(pInventory *inventory);
+void rpg_player_inventory_free(PlayerInventory *inventory);
 
 void rpg_player_bag_free(Item *bag);
 
@@ -112,9 +110,9 @@ void rpg_player_move(Entity *self);
 
 Player *get_player();
 
-pStats get_player_stats();
+PlayerStats get_player_stats();
 
-pInventory get_player_inventory();
+PlayerInventory get_player_inventory();
 
 void player_interaction();
 

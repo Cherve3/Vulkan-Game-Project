@@ -18,12 +18,12 @@ void gf3d_camera_init()
 {
 	camera.position = vector3d(0, 0, 0);
 	camera.velocity = vector3d(0, 0, 0);
-	camera.forward = vector3d(0, 0, -1);
-	camera.up = vector3d(0, 1, 0);
-	camera.right = vector3d(1, 0, 0);
+	camera.forward	= vector3d(0, 0, -1);
+	camera.up		= vector3d(0, 1, 0);
+	camera.right	= vector3d(1, 0, 0);
 	camera.rotation = vector3d(0, 0, 0);
-	camera.speed = 0.5;
-	camera.zoom = 20;
+	camera.speed	= 0.5;
+	camera.zoom		= 20;
 
 	vector3d_normalize(&camera.forward);
 	vector3d_normalize(&camera.up);
@@ -37,32 +37,32 @@ void gf3d_camera_update_velocity()
 
 	if (keys[SDL_SCANCODE_W])
 	{
-		camera.velocity.z += 1;
+		camera.velocity.z += -1;
 		slog("W: z: %.4f", camera.velocity.z);
 	}
 	if (keys[SDL_SCANCODE_A])
 	{
-		camera.velocity.x -= 1;
+		camera.velocity.x += 1;
 		slog("A: x:%.4f", camera.velocity.x);
 	}
 	if (keys[SDL_SCANCODE_S])
 	{
-		camera.velocity.z -= 1;
+		camera.velocity.z += 1;
 		slog("S: z: %.4f", camera.velocity.z);
 	}
 	if (keys[SDL_SCANCODE_D])
 	{
-		camera.velocity.x += 1;
+		camera.velocity.x += -1;
 		slog("D: x:%.4f", camera.velocity.x);
 	}
 	if (keys[SDL_SCANCODE_Q])
 	{
-		camera.velocity.y -= 1;
+		camera.velocity.y += 1;
 		slog("Q: y:%.4f", camera.velocity.y);
 	}
 	if (keys[SDL_SCANCODE_E])
 	{
-		camera.velocity.y += 1;
+		camera.velocity.y += -1;
 		slog("E: y:%.4f", camera.velocity.y);
 	}
 }
@@ -105,39 +105,53 @@ void gf3d_camera_set_view_mat4(Matrix4* view)
 }
 
 void gf3d_camera_update()
-{
-	Vector3D xaxis, yaxis, zaxis, position;
-
-	float cosPitch = cos(camera.rotation.x);
-	float sinPitch = sin(camera.rotation.x);
-	float cosYaw = cos(camera.rotation.z);
-	float sinYaw = sin(camera.rotation.z);
-
+{		
+	Vector3D position; 
 	gf3d_camera_move();
 	position.x = camera.position.x;
-	position.y = -camera.position.z;        //inverting for Z-up
-	position.z = camera.position.y;
+	position.y = -camera.position.y;
+	position.z = camera.position.z;
 	gfc_matrix_identity(camera.camMatrix);
 
-	vector3d_set(xaxis, cosYaw, 0, -sinYaw);
-	vector3d_set(yaxis, sinYaw * sinPitch, cosPitch, cosYaw * sinPitch);
-	vector3d_set(zaxis, sinYaw * cosPitch, -sinPitch, cosPitch * cosYaw);
+	if (camera.target)
+	{
+		gf3d_camera_look_at(camera.position, camera.target->position, vector3d(0,1,0));
+	}
+	else
+	{
+		Vector3D xaxis, yaxis, zaxis;
 
-	camera.camMatrix[0][0] = xaxis.x;
-	camera.camMatrix[0][1] = yaxis.x;
-	camera.camMatrix[0][2] = zaxis.x;
+		float cosPitch = cos(camera.rotation.x);
+		float sinPitch = sin(camera.rotation.x);
+		float cosYaw = cos(camera.rotation.z);
+		float sinYaw = sin(camera.rotation.z);
 
-	camera.camMatrix[1][0] = xaxis.z;
-	camera.camMatrix[1][1] = yaxis.z;
-	camera.camMatrix[1][2] = zaxis.z;
+		if (cosPitch >= 0)
+			cosPitch == 0;
 
-	camera.camMatrix[2][0] = -xaxis.y;
-	camera.camMatrix[2][1] = -yaxis.y;
-	camera.camMatrix[2][2] = -zaxis.y;
+		vector3d_set(xaxis, cosYaw, 0, -sinYaw);
+		vector3d_set(yaxis, sinYaw * sinPitch, cosPitch, cosYaw * sinPitch);
+		vector3d_set(zaxis, sinYaw * cosPitch, -sinPitch, cosPitch * cosYaw);
 
-	camera.camMatrix[3][0] = vector3d_dot_product(xaxis, position);
-	camera.camMatrix[3][1] = vector3d_dot_product(yaxis, position);
-	camera.camMatrix[3][2] = vector3d_dot_product(zaxis, position);
+		camera.camMatrix[0][0] = xaxis.x;
+		camera.camMatrix[0][1] = yaxis.x;
+		camera.camMatrix[0][2] = zaxis.x;
+
+		camera.camMatrix[1][0] = xaxis.y;
+		camera.camMatrix[1][1] = yaxis.y;
+		camera.camMatrix[1][2] = zaxis.y;
+
+		camera.camMatrix[2][0] = -xaxis.z;
+		camera.camMatrix[2][1] = -yaxis.z;
+		camera.camMatrix[2][2] = -zaxis.z;
+
+		camera.camMatrix[3][0] = vector3d_dot_product(xaxis, position);
+		camera.camMatrix[3][1] = vector3d_dot_product(yaxis, position);
+		camera.camMatrix[3][2] = vector3d_dot_product(zaxis, position);
+	}
+	gf3d_camera_print(camera.camMatrix);
+	slog("\nCamera Position: %.4f, %.4f, %.4f\n", camera.position.x, camera.position.y, camera.position.z);
+	vector3d_clear(camera.velocity);
 }
 
 Matrix4 *gf3d_get_camera()

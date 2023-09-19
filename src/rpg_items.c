@@ -34,11 +34,8 @@ void rpg_item_close()
 {
 	int i;
 
-	sj_free(item_info);
 	sj_free(consumable_info);
 	sj_free(material_info);
-	sj_free(weapons);
-	sj_free(armors);
 	sj_free(weapon_info);
 	sj_free(armor_info);
 	if (items.item_list != NULL)
@@ -47,7 +44,7 @@ void rpg_item_close()
 		{
 			gf3d_entity_free(&items.item_list[i].ent);
 		}
-		free(items.item_list);
+		//free(items.item_list);
 	}
 	memset(&items, 0, sizeof(ItemManager));
 	slog("Item System Closed");

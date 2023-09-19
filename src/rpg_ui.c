@@ -48,6 +48,8 @@ void rpg_menu_loading_screen();
 
 void rpg_ui_close()
 {
+	sj_free(dialog_info);
+	sj_free(quest_info);
 	memset(&UI, 0, sizeof(UIManager));
 	slog("UIManager System Closed");
 }
@@ -90,14 +92,14 @@ void rpg_main_menu_init()
 	SDL_ShowCursor(SDL_TRUE);
 
 	UI.main_menu.button_1_rect.h = 80;
-	UI.main_menu.button_1_rect.w = 150;
-	UI.main_menu.button_1_rect.x = 250;
-	UI.main_menu.button_1_rect.y = 230;
+	UI.main_menu.button_1_rect.w = 250;
+	UI.main_menu.button_1_rect.x = gf3d_vgraphics_get_view_extent().width * 0.5 - UI.main_menu.button_1_rect.w / 2;
+	UI.main_menu.button_1_rect.y = gf3d_vgraphics_get_view_extent().height - 280 - UI.main_menu.button_1_rect.h / 2;
 
 	UI.main_menu.button_2_rect.h = 80;
-	UI.main_menu.button_2_rect.w = 150;
-	UI.main_menu.button_2_rect.x = 250;
-	UI.main_menu.button_2_rect.y = 350;
+	UI.main_menu.button_2_rect.w = 250;
+	UI.main_menu.button_2_rect.x = gf3d_vgraphics_get_view_extent().width * 0.5 - UI.main_menu.button_2_rect.w / 2;
+	UI.main_menu.button_2_rect.y = gf3d_vgraphics_get_view_extent().height - 130 - UI.main_menu.button_2_rect.h / 2;
 
 	SDL_RenderPresent(UI.main_menu.renderer);
 	slog("Main Menu loaded");
